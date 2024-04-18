@@ -158,6 +158,9 @@
       --gradient-pink: linear-gradient(45deg, #E4B3C1, #ECBCCC);
       --gradient-green: linear-gradient(45deg, #30D34D, #66FFA1);
 
+      --border-rgba-light: rgba(0, 0, 0, 0.25);
+      --border-rgba-dark: rgba(255, 255, 255, 0.25);
+
     }
 
     :root {
@@ -172,6 +175,7 @@
       --background-modal: var(--neutral-solid-50);
 
       --border: var(--border-normal);
+      --border-rgba: var(var(var(--border-rgba-light)));
     }
 
     @media (prefers-color-scheme: dark) {
@@ -185,8 +189,9 @@
         --background-message: var(--neutral-solid-800);
         --background-shadow: rgba(53, 56, 73, 30%);
         --background-modal: var(--neutral-solid-700);
-
+        
         --border: var(--border-muted);
+        --border-rgba: var(var(var(--border-rgba-dark)));
       }
     }
 
