@@ -11,10 +11,12 @@ pub fn Header() -> Element {
                 text: "Hola Virto"
            }
            div { class: "header__memberships",
-                Button {
-                    text: "🚀 Membresías: 10",
-                    status: None,
-                    on_click: move |_| {}
+                button { class: "button button--primary",
+                    "🚀 "
+                    span {
+                        "Membresías: "
+                    }
+                    "10"
                 }
            }
        }

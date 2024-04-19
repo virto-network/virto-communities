@@ -29,7 +29,7 @@ pub fn Discover() -> Element {
             value: String::from("Educación"),
         },
         DropdownItem {
-            key: String::from("write"),
+            key: String::from("custom"),
             value: String::from("Prefiero escribirlo"),
         },
     ];
@@ -85,7 +85,7 @@ pub fn Discover() -> Element {
 
                     }
                 }
-                div {
+                div { class: "discover__form__attach",
                     Attach {
                         // value: "",
                         label: "Personaliza tu comunidad con el logo",
