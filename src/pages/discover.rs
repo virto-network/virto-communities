@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
@@ -9,28 +10,30 @@ use crate::{
 
 #[component]
 pub fn Discover() -> Element {
+    let i18 = use_i18();
     let nav = use_navigator();
+
     let mut dropdown_value = use_signal(|| None);
     let dropdown_items = vec![
         DropdownItem {
-            key: String::from("ecommerce"),
-            value: String::from("Comercio"),
+            key: String::from("commerce"),
+            value: translate!(i18, "discover.form.industry.options.commerce"),
         },
         DropdownItem {
-            key: String::from("Politician"),
-            value: String::from("Político"),
+            key: String::from("olitical"),
+            value: translate!(i18, "discover.form.industry.options.political"),
         },
         DropdownItem {
-            key: String::from("Gaming"),
-            value: String::from("Video juegos"),
+            key: String::from("gaming"),
+            value: translate!(i18, "discover.form.industry.options.gaming"),
         },
         DropdownItem {
             key: String::from("educational"),
-            value: String::from("Educación"),
+            value: translate!(i18, "discover.form.industry.options.education"),
         },
         DropdownItem {
-            key: String::from("write"),
-            value: String::from("Prefiero escribirlo"),
+            key: String::from("custom"),
+            value: translate!(i18, "discover.form.industry.options.custom"),
         },
     ];
 
@@ -38,7 +41,7 @@ pub fn Discover() -> Element {
         div {
             class: "discover",
             Title {
-                text: "Crea tu propia \ncomunidad 🙌"
+                text: translate!(i18, "discover.title")
             }
             div {
                 class: "discover__form row",
@@ -46,8 +49,8 @@ pub fn Discover() -> Element {
                     class: "discover__form__wrapper",
                     MessageInput {
                         message: "",
-                        label: "Escribe el nombre de tu comunidad",
-                        placeholder: "Ej: PartyCalls",
+                        label: translate!(i18, "discover.form.name.label"),
+                        placeholder: translate!(i18, "discover.form.name.placeholder"),
                         error: None,
                         on_input: move |_| {},
                         on_keypress: move |_| {},
@@ -56,18 +59,18 @@ pub fn Discover() -> Element {
                     Dropdown {
                         value: dropdown_value(),
                         items: dropdown_items,
-                        label: "Industria",
+                        label: translate!(i18, "discover.form.industry.label"),
                         default: None,
                         on_change: move |event: DropdownItem| {
                             dropdown_value.set(Some(event))
                         }
                     }
                     if let Some(v) = dropdown_value() {
-                        if v.key == "write" {
+                        if v.key == "custom" {
                             MessageInput {
                                 message: "",
-                                label: "Escribe la industria",
-                                placeholder: "Ej: marketing",
+                                label: translate!(i18, "discover.form.custom_industry.label"),
+                                placeholder: translate!(i18, "discover.form.custom_industry.placeholder"),
                                 error: None,
                                 on_input: move |_| {},
                                 on_keypress: move |_| {},
@@ -77,8 +80,8 @@ pub fn Discover() -> Element {
                     }
                     TextareaInput {
                         value: String::from(""),
-                        placeholder: "Cuéntanos por qué tu comunidad es única y todos deberíann unirse",
-                        label: "Descripción",
+                        placeholder: translate!(i18, "discover.form.description.placeholder"),
+                        label: translate!(i18, "discover.form.description.label"),
                         on_input: move |_| {},
                         on_keypress: move |_| {},
                         on_click: move |_| {},
@@ -88,14 +91,15 @@ pub fn Discover() -> Element {
                 div {
                     Attach {
                         // value: "",
-                        label: "Personaliza tu comunidad con el logo",
+                        label: translate!(i18, "discover.form.logo.label"),
+                        cta_text: translate!(i18, "discover.form.logo.placeholder")
                     }
                 }
             }
             div {
                 class: "button--floating",
                 Button {
-                    text: "Continuar",
+                    text: translate!(i18, "discover.form.cta_send"),
                     status: None,
                     on_click: move |_| {
                         nav.push(Route::Custom { });

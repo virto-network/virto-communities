@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{Button, MessageInput, Title},
@@ -7,18 +8,20 @@ use crate::{
 
 #[component]
 pub fn Member() -> Element {
+    let i18 = use_i18();
     let nav = use_navigator();
+
     rsx! {
         div {
             class: "dash",
             Title {
-                text: "Agregar miembro 💁"
+                text: translate!(i18, "member.title")
             }
             div { class: "dash__form",
                 MessageInput {
                     message: "",
-                    label: "Escribe la dirección de billetera del nuevo miembro",
-                    placeholder: "Ej: 5h1xa...",
+                    label: translate!(i18, "member.form.address.label"),
+                    placeholder: translate!(i18, "member.form.address.placeholder"),
                     error: None,
                     on_input: move |_| {},
                     on_keypress: move |_| {},
@@ -28,7 +31,7 @@ pub fn Member() -> Element {
             div {
                 class: "button--floating",
                 Button {
-                    text: "Continuar",
+                    text: translate!(i18, "member.form.cta_send"),
                     status: None,
                     on_click: move |_| {
                         nav.push(Route::Discover { });

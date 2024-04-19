@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{Button, Title},
@@ -7,23 +8,25 @@ use crate::{
 
 #[component]
 pub fn Dash() -> Element {
+    let i18 = use_i18();
     let nav = use_navigator();
+
     rsx! {
         div {
             class: "dash",
             Title {
-                text: "¿Qué quieres hacer ahora?"
+                text: translate!(i18, "dash.title")
             }
             div { class: "dash__form",
                 Button {
-                    text: "Agregar miembro 💁",
+                    text: translate!(i18, "dash.form.options.add_member"),
                     status: None,
                     on_click: move |_| {
                         nav.push(Route::Member { });
                     },
                 }
                 Button {
-                    text: "Ir al chat 👋",
+                    text: translate!(i18, "dash.form.options.chat"),
                     status: None,
                     on_click: move |_| {
                         nav.push(Route::Dash { });

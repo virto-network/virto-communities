@@ -1,6 +1,98 @@
 {
     "id": "es-ES",
     "texts": {
-        
+        "sidebar": {
+            "cta": "Agregar comunidad"
+        },
+        "header": {
+            "title": "¡Hola",
+            "options": {
+                "memberships": "Membresías: "
+            }
+        },
+        "home": {
+            "title": "¡Hola, 👋!",
+            "form": {
+                "username": {
+                    "label": "Escribe tu nombre de usuario",
+                    "placeholder": "Ej: pepe"
+                },
+                "cta_send": "Continuar"
+            }
+        },
+        "discover": {
+            "title": "Crea tu propia \ncomunidad 🙌",
+            "form": {
+                "name": {
+                    "label": "Escribe el nombre de tu comunidad",
+                    "placeholder": "Ej: PartyCalls"
+                },
+                "industry": {
+                    "label": "Industria",
+                    "placeholder": "Selecciona...",
+                    "options": {
+                        "commerce": "Comercio",
+                        "political": "Político",
+                        "gaming": "Video juegos",
+                        "education": "Educación",
+                        "custom": "Prefiero escribirlo"
+                    }
+                },
+                "custom_industry": {
+                    "label": "Escribe la industria",
+                    "placeholder": "Ej: Marketing"
+                },
+                "description": {
+                    "label": "Descripción",
+                    "placeholder": "Cuéntanos por qué tu comunidad es única y todos deberían unirse"
+                },
+                "logo": {
+                    "label": "Personaliza tu comunidad con el logo",
+                    "placeholder": "Lo tengo"
+                },
+                "cta_send": "Continuar"
+            }
+        },
+        "custom": {
+            "title": "Configura tu DAO, \nVirto 🚧️",
+            "subtitle": "Virto te ofrece gran posibilidad de soluciones",
+            "form": {
+                "solutions": {
+                    "label": "Selecciona las que son de tu mayor interés y potencia tu organización.",
+                    "options": {
+                        "token": "Token",
+                        "treasury": "Tesorería",
+                        "chat": "Chat"
+                    }
+                },
+                "cta_send": "Finalizar"
+            }
+        },
+        "success": {
+            "title": "¡Perfecto! \n¡Haz creado tu comunidad!🚀",
+            "subtitle": "Virto te da la bienvenida a un mundo lleno de posibilidades para tu organización.",
+            "form": {
+                "cta_send": "Continuar"
+            }
+        },
+        "dash": {
+            "title": "¿Qué quieres hacer ahora?",
+            "form": {
+                "options": {
+                    "add_member": "Agregar miembro 💁",
+                    "chat": "Ir al chat 👋"
+                }
+            }
+        },
+        "member": {
+            "title": "Agregar miembro 💁",
+            "form": {
+                "address": {
+                    "label": "Escribe la dirección de billetera del nuevo miembro",
+                    "placeholder": "Ej: 5h1xa..."
+                },
+                "cta_send": "Continuar"
+            }
+        }
     }
 }

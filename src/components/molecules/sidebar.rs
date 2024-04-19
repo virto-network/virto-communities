@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{avatar::Variant, AddPlus, Avatar, Icon, IconButton},
@@ -7,6 +8,7 @@ use crate::{
 
 #[component]
 pub fn Sidebar() -> Element {
+    let i18 = use_i18();
     let nav = use_navigator();
     rsx!(
        section {
@@ -37,6 +39,9 @@ pub fn Sidebar() -> Element {
                         ),
                         on_click: move |_| {
                             nav.push(Route::Discover {});
+                        }
+                        span {
+                            {translate!(i18, "sidebar.cta")}
                         }
                     }
                 }

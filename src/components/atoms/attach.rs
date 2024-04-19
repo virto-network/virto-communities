@@ -23,6 +23,7 @@ pub struct AttachEvent {
 pub struct AttachProps {
     // value: Vec<u8>,
     label: Option<String>,
+    cta_text: String 
 }
 
 pub fn Attach(props: AttachProps) -> Element {
@@ -103,7 +104,7 @@ pub fn Attach(props: AttachProps) -> Element {
                 div {
                     class: "attach__cta",
                     Button {
-                        text: "Lo tengo",
+                        text: "{props.cta_text}",
                         status: None,
                         variant: Variant::Secondary,
                         on_click: on_handle_attach

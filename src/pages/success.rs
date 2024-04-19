@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{Button, Subtitle, Title},
@@ -7,23 +8,25 @@ use crate::{
 
 #[component]
 pub fn Success() -> Element {
+    let i18 = use_i18();
     let nav = use_navigator();
+
     rsx! {
         div {
             class: "success",
             Title {
-                text: "¡Perfecto! \n¡Haz creado tu comunidad!🚀"
+                text: translate!(i18, "success.title")
             }
             div {
                 class: "success__subtitle",
                 Subtitle {
-                    text: "Virto te da la bienvenida a un mundo lleno de posibilidades para tu organización."
+                    text: translate!(i18, "success.subtitle")
                 }
             }
             div {
                 class: "button--floating",
                 Button {
-                    text: "Continuar",
+                    text: translate!(i18, "success.form.cta_send"),
                     status: None,
                     on_click: move |_| {
                         nav.push(Route::Dash { });
