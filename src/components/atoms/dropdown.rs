@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::components::atoms::{button::Variant as ButtonVariant, Arrow, Button, Icon};
 
-#[derive(PartialEq, Clone, Default)]
+#[derive(PartialEq, Debug, Clone, Default)]
 pub struct DropdownItem {
     pub key: String,
     pub value: String,

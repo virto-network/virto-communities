@@ -15,7 +15,11 @@ pub mod layouts {
 }
 
 pub mod hooks {
+    pub mod use_attach;
+    pub mod use_communities;
     pub mod use_language;
+    pub mod use_onboard;
+    pub mod use_startup;
 }
 
 pub mod components {

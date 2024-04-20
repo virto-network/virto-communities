@@ -2,12 +2,15 @@ use dioxus::prelude::*;
 
 use crate::{
     components::atoms::{Button, CheckboxCard, Subtitle, Title},
+    hooks::use_communities::use_communities,
     pages::route::Route,
 };
 
 #[component]
 pub fn Custom() -> Element {
     let nav = use_navigator();
+    let communities = use_communities();
+    
     rsx! {
         div {
             class: "custom",

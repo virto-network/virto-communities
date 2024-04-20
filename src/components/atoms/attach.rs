@@ -5,7 +5,10 @@ use futures_util::TryFutureExt;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
-use crate::components::atoms::{button::Variant, Button};
+use crate::{
+    components::atoms::{button::Variant, Button},
+    hooks::use_attach::{use_attach, AttachFile},
+};
 
 #[derive(Clone, Debug)]
 pub enum AttachError {
@@ -23,11 +26,13 @@ pub struct AttachEvent {
 pub struct AttachProps {
     // value: Vec<u8>,
     label: Option<String>,
+    cta_text: String,
 }
 
 pub fn Attach(props: AttachProps) -> Element {
     let mut textarea_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
     let mut preview_url = use_signal(|| None);
+    let mut attach = use_attach();
 
     let on_handle_attach = move |_| {
         if let Some(input_element) = textarea_ref() {
@@ -60,8 +65,17 @@ pub fn Attach(props: AttachProps) -> Element {
                     _ => gloo::file::Blob::new(content.deref()),
                 };
 
+                let size = blob.size().clone();
                 let object_url = gloo::file::ObjectUrl::from(blob);
-                preview_url.set(Some(object_url));
+                preview_url.set(Some(object_url.clone()));
+
+                attach.set(Some(AttachFile {
+                    name: existing_file.to_string(),
+                    preview_url: object_url,
+                    data: content.clone(),
+                    content_type,
+                    size,
+                }));
 
                 Ok::<(), AttachError>(())
             }
