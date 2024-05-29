@@ -1,20 +1,17 @@
 use dioxus::prelude::*;
 
 use crate::{
-    pages::custom::Custom, pages::dash::Dash, pages::discover::Discover, pages::home::Home,
-    pages::member::Member,
+    layouts::{authenticated::Authenticated, onboard::Onboard},
+    pages::{dashboard::Dashboard, not_found::PageNotFound},
 };
 
 #[derive(Clone, Routable, Debug, PartialEq)]
+#[rustfmt::skip]
 pub enum Route {
-    #[route("/")]
-    Home {},
-    #[route("/discover")]
-    Discover {},
-    #[route("/custom")]
-    Custom {},
-    #[route("/dash")]
-    Dash {},
-    #[route("/member")]
-    Member {},
+    #[layout(Authenticated)]
+        #[route("/")]
+        Dashboard {},
+    #[end_layout]
+    #[route("/:..route")]
+    PageNotFound { route: Vec<String> },
 }

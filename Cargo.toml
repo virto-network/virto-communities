@@ -12,7 +12,7 @@ dioxus-std = { version = "0.5.0", features = ["i18n"] }
 log = "0.4.19"
 dioxus-logger = "0.4.1"
 console_error_panic_hook = "0.1.7"
-wasm-bindgen = "0.2.92"
+wasm-bindgen = "=0.2.92"
 unic-langid = "0.9.1"
 web-sys = { version = "0.3.69", features = [
     "Document",
@@ -28,3 +28,35 @@ web-sys = { version = "0.3.69", features = [
     "Navigator",
     "DomRect",
 ] }
+gloo = "0.11.0"
+infer = "0.15.0"
+mime = "0.3.17"
+futures-util = "0.3.30"
+uuid = { version = "1.8.0", features = ["v4"] }
+
+sube = { path = "../virto-sdk/sube", default-features = false, features = [
+    "js",
+    'wss',
+] }
+pjs = { package = "pjs", git = "https://github.com/virto-network/virto-sdk.git", branch = "feat/pjs-vault", default-features=false }
+libwallet = { package = "libwallet", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
+    "substrate",
+    "mnemonic",
+    "rand",
+] }
+
+codec = { version = "3.1.2", package = "parity-scale-codec", default-features = false }
+rand_core = "0.6.4"
+serde = "1.0.197"
+serde_json = "1.0.114"
+hex = "0.4.3"
+wasm-bindgen-futures = "0.4.42"
+sp-core = "32.0.0"
+manganis = "0.2.2"
+grass = "0.13.2"
+
+[patch.crates-io]
+cookie = { git = "https://github.com/S0c5/cookie-rs.git" }
+
+[build-dependencies]
+grass = "0.13.2"

@@ -1,6 +1,67 @@
 {
     "id": "es-ES",
     "texts": {
-        
+        "sidebar": {
+            "cta": "Agregar comunidad"
+        },
+        "header": {
+            "cta": {
+                "connect": "Conectar",
+                "account": "Selecciona..."
+            },
+            "menu": {
+                "invitations": "Invitaciones",
+                "messages": "Mensajes",
+                "profile": "Perfil",
+                "settings": "Configuración"
+            }
+        },
+        "dashboard": {
+            "tabs": {
+                "all": "DAOS",
+                "owned": "Mis DAOS"
+            },
+            "tips": {
+                "loading": {
+                    "title": "Trayendo las comunidades",
+                    "description": "Esto puede tomar un momento"
+                }
+            },
+            "cta_header": {
+                "filter": {
+                    "title": "Filtrar",
+                    "options": {}
+                },
+                "search": "Buscar"
+            },
+            "cta_cards": {
+                "explore": {
+                    "title": "Explorar DAOs",
+                    "description": "Un ecosistema global de organizaciones autónomas"
+                },
+                "create": {
+                    "title": "Crear una DAO",
+                    "description": "Una gobernanza abierta y descentralizada para todas tus ideas",
+                    "cta": "Aprender más"
+                }
+            },
+            "footer": {
+                "paginator": "{from} of {to}",
+                "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
+            }
+        },
+        "errors": {
+            "session": {
+                "persist": "No se ha podido guardar la sesión"
+            },
+            "wallet": {
+                "accounts_not_found": "No se han encontrado cuentas",
+                "account_address": "No se ha encontrado la dirección pública",
+                "connection_failed": "La conexión ha fallado, si el problema persiste comunícate con nosotros"
+            },
+            "communities": {
+                "query_failed": "No se ha podido traer comunidades"
+            }
+        }
     }
 }

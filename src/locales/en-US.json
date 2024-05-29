@@ -1,6 +1,69 @@
 {
     "id": "en-US",
     "texts": {
+        "sidebar": {
+            "cta": "Add community"
+        },
+        "header": {
+            "cta": {
+                "connect": "Connect",
+                "account": "Select..."
+            },
+            "menu": {
+                "invitations": "Invitations",
+                "messages": "Messages",
+                "profile": "Profile",
+                "settings": "Settings"
+            }
+        },
+        "dashboard":  {
+            "tabs": {
+                "all": "All DAOs",
+                "owned": "Your DAOs"
+            },
+            "tips": {
+                "loading": {
+                    "title": "Fetching communities",
+                    "description": "This may take a moment"
+                }
+            },
+            "cta_header": {
+                "filter": {
+                    "title": "Filter",
+                    "options": {
         
+                    }
+                },
+                "search": "Search"
+            },
+            "cta_cards": {
+                "explore": {
+                    "title": "Explore DAOs",
+                    "description": "A Global Ecosystem of autonomous infrastructure."
+                },
+                "create": {
+                    "title": "Create a DAO",
+                    "description": "A Decentralized and open governed entity for all of your Ideas.",
+                    "cta": "Learn more"
+                }
+            },
+            "footer": {
+                "paginator": "{from} of {to}",
+                "rights": "Virto PROD V.0.0.1. 2024 All rights reserved"
+            }
+        },
+        "errors": {
+            "session": {
+                "persist": "Failed to save session"
+            },
+            "wallet": {
+                "accounts_not_found": "No accounts found",
+                "account_address": "Public address not found",
+                "connection_failed": "Connection failed, if the problem persists please contact us"
+            },
+            "communities": {
+                "query_failed": "Failed to fetch communities"
+            }
+        }
     }
 }
