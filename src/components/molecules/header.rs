@@ -17,13 +17,15 @@ use crate::{
         use_notification::use_notification,
         use_session::{use_session, UserSession},
     },
-    services::{kreivo::balances::account, pjs::Pjs},
+    services::kreivo::balances::account,
 };
+
+use pjs::PjsExtension;
 
 #[component]
 pub fn Header() -> Element {
     let i18 = use_i18();
-    let mut accounts: crate::hooks::use_accounts::UseAccountsState = use_accounts();
+    let mut accounts = use_accounts();
     let mut notification = use_notification();
     let mut session = use_session();
     let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
@@ -129,14 +131,10 @@ pub fn Header() -> Element {
     };
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        let vault = Pjs::connect("virto").await;
+        let vault = PjsExtension::connect("virto").await;
 
         if let Ok(mut vault) = vault {
-            let Ok(vault_accounts) = vault.list_accounts().await else {
-                notification.handle_error("Accounts not found");
-                return;
-            };
-
+            let vault_accounts = vault.accounts();
             accounts.set(vault_accounts);
 
             if let Some(user_session) = session.get() {
@@ -209,22 +207,22 @@ pub fn Header() -> Element {
             if session.is_logged() && session.get().is_some() {
                 div { class: "dashboard__header__right {active_class}",
                     div { class: "balance__container",
-                        div { class: "deposit",
-                            IconButton {
-                                variant: Variant::Round,
-                                size: ElementSize::Big,
-                                class: "button--avatar",
-                                body: rsx!(
-                                    Icon {
-                                        icon: ArrowUpDown,
-                                        height: 32,
-                                        width: 32,
-                                        fill: "var(--fill-00)"
-                                    }
-                                ),
-                                on_click: move |_| { }
-                            }
-                        }
+                        // div { class: "deposit",
+                        //     IconButton {
+                        //         variant: Variant::Round,
+                        //         size: ElementSize::Big,
+                        //         class: "button--avatar",
+                        //         body: rsx!(
+                        //             Icon {
+                        //                 icon: ArrowUpDown,
+                        //                 height: 32,
+                        //                 width: 32,
+                        //                 fill: "var(--fill-00)"
+                        //             }
+                        //         ),
+                        //         on_click: move |_| { }
+                        //     }
+                        // }
                         div { class: "balances",
                             span { class: "balance__title",
                                 span { class: "balance__sign",
@@ -256,186 +254,186 @@ pub fn Header() -> Element {
                             }
                         }
                     }
-                    div { class: "header__cta",
-                        IconButton {
-                            variant: Variant::Round,
-                            size: ElementSize::Big,
-                            class: "button--avatar bg--fill-50",
-                            body: rsx!(
-                                Icon {
-                                    icon: Votes,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-600)"
-                                }
-                            ),
-                            on_click: move |_| { }
-                        }
-                        IconButton {
-                            variant: Variant::Round,
-                            size: ElementSize::Big,
-                            class: "button--avatar bg--fill-50",
-                            body: rsx!(
-                                Icon {
-                                    icon: Messages,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-600)"
-                                }
-                            ),
-                            on_click: move |_| { }
-                        }
-                        IconButton {
-                            variant: Variant::Round,
-                            size: ElementSize::Big,
-                            class: "button--avatar bg--fill-50",
-                            body: rsx!(
-                                Icon {
-                                    icon: Profile,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-600)"
-                                }
-                            ),
-                            on_click: move |_| { }
-                        }
-                        IconButton {
-                            variant: Variant::Round,
-                            size: ElementSize::Big,
-                            class: "button--avatar bg--fill-50",
-                            body: rsx!(
-                                Icon {
-                                    icon: Settings,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-600)"
-                                }
-                            ),
-                            on_click: move |_| { }
-                        }
+                    // div { class: "header__cta",
+                    //     IconButton {
+                    //         variant: Variant::Round,
+                    //         size: ElementSize::Big,
+                    //         class: "button--avatar bg--fill-50",
+                    //         body: rsx!(
+                    //             Icon {
+                    //                 icon: Votes,
+                    //                 height: 32,
+                    //                 width: 32,
+                    //                 fill: "var(--fill-600)"
+                    //             }
+                    //         ),
+                    //         on_click: move |_| { }
+                    //     }
+                    //     IconButton {
+                    //         variant: Variant::Round,
+                    //         size: ElementSize::Big,
+                    //         class: "button--avatar bg--fill-50",
+                    //         body: rsx!(
+                    //             Icon {
+                    //                 icon: Messages,
+                    //                 height: 32,
+                    //                 width: 32,
+                    //                 fill: "var(--fill-600)"
+                    //             }
+                    //         ),
+                    //         on_click: move |_| { }
+                    //     }
+                    //     IconButton {
+                    //         variant: Variant::Round,
+                    //         size: ElementSize::Big,
+                    //         class: "button--avatar bg--fill-50",
+                    //         body: rsx!(
+                    //             Icon {
+                    //                 icon: Profile,
+                    //                 height: 32,
+                    //                 width: 32,
+                    //                 fill: "var(--fill-600)"
+                    //             }
+                    //         ),
+                    //         on_click: move |_| { }
+                    //     }
+                    //     IconButton {
+                    //         variant: Variant::Round,
+                    //         size: ElementSize::Big,
+                    //         class: "button--avatar bg--fill-50",
+                    //         body: rsx!(
+                    //             Icon {
+                    //                 icon: Settings,
+                    //                 height: 32,
+                    //                 width: 32,
+                    //                 fill: "var(--fill-600)"
+                    //             }
+                    //         ),
+                    //         on_click: move |_| { }
+                    //     }
 
-                        IconButton {
-                            variant: Variant::Round,
-                            size: ElementSize::Big,
-                            class: "button--avatar bg--fill-50 mobile",
-                            body: rsx!(
-                                Icon {
-                                    icon: Hamburguer,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-600)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                is_active.toggle();
-                            }
-                        }
-                    }
-                    div { class: "header__menu mobile",
-                        div { class: "header__scream",
-                            onclick: move |_| {
-                                is_active.toggle();
-                            }
-                        }
-                        div { class: "header__menu__list",
-                            div { class: "header__close",
-                                IconButton {
-                                    variant: Variant::Round,
-                                    size: ElementSize::Big,
-                                    class: "button--avatar bg--transparent",
-                                    body: rsx!(
-                                        Icon {
-                                            icon: Close,
-                                            height: 32,
-                                            width: 32,
-                                            fill: "var(--fill-600)"
-                                        }
-                                    ),
-                                    on_click: move |_| {
-                                        is_active.toggle();
-                                    }
-                                }
-                            }
-                            ul {
-                                li {
-                                    span {
-                                        {translate!(i18, "header.menu.invitations")}
-                                    }
-                                    IconButton {
-                                        variant: Variant::Round,
-                                        size: ElementSize::Big,
-                                        class: "button--avatar bg--fill-50",
-                                        body: rsx!(
-                                            Icon {
-                                                icon: Votes,
-                                                height: 32,
-                                                width: 32,
-                                                fill: "var(--fill-600)"
-                                            }
-                                        ),
-                                        on_click: move |_| { }
-                                    }
-                                }
-                                li {
-                                    span {
-                                        {translate!(i18, "header.menu.messages")}
-                                    }
-                                    IconButton {
-                                        variant: Variant::Round,
-                                        size: ElementSize::Big,
-                                        class: "button--avatar bg--fill-50",
-                                        body: rsx!(
-                                            Icon {
-                                                icon: Messages,
-                                                height: 32,
-                                                width: 32,
-                                                fill: "var(--fill-600)"
-                                            }
-                                        ),
-                                        on_click: move |_| { }
-                                    }
-                                }
-                                li {
-                                    span {
-                                        {translate!(i18, "header.menu.profile")}
-                                    }
-                                    IconButton {
-                                        variant: Variant::Round,
-                                        size: ElementSize::Big,
-                                        class: "button--avatar bg--fill-50",
-                                        body: rsx!(
-                                            Icon {
-                                                icon: Profile,
-                                                height: 32,
-                                                width: 32,
-                                                fill: "var(--fill-600)"
-                                            }
-                                        ),
-                                        on_click: move |_| { }
-                                    }
-                                }
-                                li {
-                                    span {
-                                        {translate!(i18, "header.menu.settings")}
-                                    }
-                                    IconButton {
-                                        variant: Variant::Round,
-                                        size: ElementSize::Big,
-                                        class: "button--avatar bg--fill-50",
-                                        body: rsx!(
-                                            Icon {
-                                                icon: Settings,
-                                                height: 32,
-                                                width: 32,
-                                                fill: "var(--fill-600)"
-                                            }
-                                        ),
-                                        on_click: move |_| { }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    //     IconButton {
+                    //         variant: Variant::Round,
+                    //         size: ElementSize::Big,
+                    //         class: "button--avatar bg--fill-50 mobile",
+                    //         body: rsx!(
+                    //             Icon {
+                    //                 icon: Hamburguer,
+                    //                 height: 32,
+                    //                 width: 32,
+                    //                 fill: "var(--fill-600)"
+                    //             }
+                    //         ),
+                    //         on_click: move |_| {
+                    //             is_active.toggle();
+                    //         }
+                    //     }
+                    // }
+                    // div { class: "header__menu mobile",
+                    //     div { class: "header__scream",
+                    //         onclick: move |_| {
+                    //             is_active.toggle();
+                    //         }
+                    //     }
+                    //     div { class: "header__menu__list",
+                    //         div { class: "header__close",
+                    //             IconButton {
+                    //                 variant: Variant::Round,
+                    //                 size: ElementSize::Big,
+                    //                 class: "button--avatar bg--transparent",
+                    //                 body: rsx!(
+                    //                     Icon {
+                    //                         icon: Close,
+                    //                         height: 32,
+                    //                         width: 32,
+                    //                         fill: "var(--fill-600)"
+                    //                     }
+                    //                 ),
+                    //                 on_click: move |_| {
+                    //                     is_active.toggle();
+                    //                 }
+                    //             }
+                    //         }
+                    //         ul {
+                    //             li {
+                    //                 span {
+                    //                     {translate!(i18, "header.menu.invitations")}
+                    //                 }
+                    //                 IconButton {
+                    //                     variant: Variant::Round,
+                    //                     size: ElementSize::Big,
+                    //                     class: "button--avatar bg--fill-50",
+                    //                     body: rsx!(
+                    //                         Icon {
+                    //                             icon: Votes,
+                    //                             height: 32,
+                    //                             width: 32,
+                    //                             fill: "var(--fill-600)"
+                    //                         }
+                    //                     ),
+                    //                     on_click: move |_| { }
+                    //                 }
+                    //             }
+                    //             li {
+                    //                 span {
+                    //                     {translate!(i18, "header.menu.messages")}
+                    //                 }
+                    //                 IconButton {
+                    //                     variant: Variant::Round,
+                    //                     size: ElementSize::Big,
+                    //                     class: "button--avatar bg--fill-50",
+                    //                     body: rsx!(
+                    //                         Icon {
+                    //                             icon: Messages,
+                    //                             height: 32,
+                    //                             width: 32,
+                    //                             fill: "var(--fill-600)"
+                    //                         }
+                    //                     ),
+                    //                     on_click: move |_| { }
+                    //                 }
+                    //             }
+                    //             li {
+                    //                 span {
+                    //                     {translate!(i18, "header.menu.profile")}
+                    //                 }
+                    //                 IconButton {
+                    //                     variant: Variant::Round,
+                    //                     size: ElementSize::Big,
+                    //                     class: "button--avatar bg--fill-50",
+                    //                     body: rsx!(
+                    //                         Icon {
+                    //                             icon: Profile,
+                    //                             height: 32,
+                    //                             width: 32,
+                    //                             fill: "var(--fill-600)"
+                    //                         }
+                    //                     ),
+                    //                     on_click: move |_| { }
+                    //                 }
+                    //             }
+                    //             li {
+                    //                 span {
+                    //                     {translate!(i18, "header.menu.settings")}
+                    //                 }
+                    //                 IconButton {
+                    //                     variant: Variant::Round,
+                    //                     size: ElementSize::Big,
+                    //                     class: "button--avatar bg--fill-50",
+                    //                     body: rsx!(
+                    //                         Icon {
+                    //                             icon: Settings,
+                    //                             height: 32,
+                    //                             width: 32,
+                    //                             fill: "var(--fill-600)"
+                    //                         }
+                    //                     ),
+                    //                     on_click: move |_| { }
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }

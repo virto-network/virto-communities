@@ -34,7 +34,7 @@ pub fn IconButton(props: IconButtonProps) -> Element {
 
     rsx!(
         button {
-            class: "button button--tertiary padding-reset {props.class} {variant} {size}",
+            class: "button button--tertiary padding-reset {props.class} {variant} {size} commin-soon",
             onclick: move |event| props.on_click.call(event),
             {props.body}
         }

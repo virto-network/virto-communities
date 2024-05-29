@@ -20,7 +20,6 @@ use crate::{
     },
     pages::route::Route,
     services::kreivo::{
-        communities,
         community_memberships::{collection, item},
         community_track::{tracks, tracksIds},
     },
@@ -37,13 +36,12 @@ pub struct Community {
     pub icon: Option<String>,
     pub name: String,
     pub description: String,
-    pub treasury: u64,
     pub memberships: u16,
     pub tags: Vec<CommunityTag>,
     pub members: u16,
 }
 
-static SKIP: u8 = 6;
+static SKIP: u8 = 8;
 
 #[component]
 pub fn Dashboard() -> Element {
@@ -60,16 +58,10 @@ pub fn Dashboard() -> Element {
 
     theme.set_background(String::from("var(--olive-100)"));
 
-    let tab_items = vec![
-        TabItem {
-            k: String::from("all"),
-            value: translate!(i18, "dashboard.tabs.all"),
-        },
-        TabItem {
-            k: String::from("owned"),
-            value: translate!(i18, "dashboard.tabs.owned"),
-        },
-    ];
+    let tab_items = vec![TabItem {
+        k: String::from("all"),
+        value: translate!(i18, "dashboard.tabs.all"),
+    }];
 
     let mut tab_value = use_signal::<String>(|| String::from("all"));
 
@@ -121,11 +113,8 @@ pub fn Dashboard() -> Element {
                     c.push(Community {
                         icon: None,
                         name: String::from_utf8_lossy(filtered_name).to_string(),
-                        description: String::from(
-                            "Lorem ipsum dolor sit amet consectetur. Mauris mattis pharetra massa massa vitae ",
-                        ),
-                        treasury: 104_110,
-                        tags: vec![CommunityTag::Neighborhood, CommunityTag::SocialImpact],
+                        description: String::from(""),
+                        tags: vec![],
                         memberships: collection_items,
                         members: item_details,
                     })
@@ -188,37 +177,6 @@ pub fn Dashboard() -> Element {
                     }
                 }
                 div { class: "head__actions",
-                    Button {
-                        class: "head__actions__filter",
-                        text: translate!(i18, "dashboard.cta_header.filter.title"),
-                        status: None,
-                        size: ElementSize::Medium,
-                        icon: rsx!(
-                            Icon {
-                                icon: Filter,
-                                height: 14,
-                                width: 14,
-                                stroke_width: 1,
-                                fill: "var(--text-primary)"
-                            }
-                        ),
-                        on_click: move |_| {
-                        },
-                    }
-                    IconButton {
-                        class: "button--avatar bg--fill-50 mobile",
-                        size: ElementSize::Medium,
-                        body: rsx!(
-                            Icon {
-                                icon: Filter,
-                                height: 26,
-                                width: 26,
-                                stroke_width: 1.5,
-                                fill: "var(--fill-600)"
-                            }
-                        ),
-                        on_click: move |_| { }
-                    }
                     MessageInput {
                         message: search_word(),
                         itype: InputType::Search,
@@ -236,20 +194,6 @@ pub fn Dashboard() -> Element {
                         },
                         on_keypress: move |_| {},
                         on_click: move |_| {},
-                    }
-                    IconButton {
-                        class: "button--avatar desktop",
-                        size: ElementSize::Medium,
-                        body: rsx!(
-                            Icon {
-                                icon: AddPlus,
-                                height: 26,
-                                width: 26,
-                                stroke_width: 1.5,
-                                fill: "var(--fill-00)"
-                            }
-                        ),
-                        on_click: move |_| { }
                     }
                 }
             }
@@ -277,18 +221,7 @@ pub fn Dashboard() -> Element {
                                 "{community.description}"
                             }
                             div { class: "card__metrics",
-                                span { class: "card__metric",
-                                    Icon {
-                                        icon: Monetization,
-                                        height: 16,
-                                        width: 16,
-                                        stroke_width: 1,
-                                        fill: "var(--text-primary)"
-                                    }
-                                    small {
-                                        {nice_money(community.treasury)}
-                                    }
-                                }
+
                                 span { class: "card__metric",
                                     Icon {
                                         icon: UserGroup,
@@ -333,96 +266,96 @@ pub fn Dashboard() -> Element {
                             }
                         }
 
-                        div { class: "card__cta",
-                            IconButton {
-                                class: "button--avatar",
-                                body: rsx!(
-                                    Icon {
-                                        icon: ArrowRight,
-                                        height: 32,
-                                        width: 32,
-                                        stroke_width: 2,
-                                        fill: "var(--fill-00)"
-                                    }
-                                ),
-                                on_click: move |_| { }
-                            }
-                        }
+                        // div { class: "card__cta",
+                        //     IconButton {
+                        //         class: "button--avatar",
+                        //         body: rsx!(
+                        //             Icon {
+                        //                 icon: ArrowRight,
+                        //                 height: 32,
+                        //                 width: 32,
+                        //                 stroke_width: 2,
+                        //                 fill: "var(--fill-00)"
+                        //             }
+                        //         ),
+                        //         on_click: move |_| { }
+                        //     }
+                        // }
                     }
                 }
-                section { class: "card card--reverse",
-                    div { class: "card__container",
-                        div { class: "card__head",
-                            h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.explore.title")}
-                            }
-                        }
-                        p { class: "card__description",
-                            {translate!(i18, "dashboard.cta_cards.explore.description")}
-                        }
-                    }
+                // section { class: "card card--reverse",
+                //     div { class: "card__container",
+                //         div { class: "card__head",
+                //             h3 { class: "card__title",
+                //                 {translate!(i18, "dashboard.cta_cards.explore.title")}
+                //             }
+                //         }
+                //         p { class: "card__description",
+                //             {translate!(i18, "dashboard.cta_cards.explore.description")}
+                //         }
+                //     }
 
-                    div { class: "card__cta",
-                        IconButton {
-                            class: "button--avatar",
-                            body: rsx!(
-                                Icon {
-                                    icon: Compass,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-00)"
-                                }
-                            ),
-                            on_click: move |_| { }
-                        }
-                    }
-                }
-                section { class: "card card--reverse",
-                    div { class: "card__container",
-                        div { class: "card__head",
-                            h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.create.title")}
-                            }
-                        }
-                        p { class: "card__description",
-                            {translate!(i18, "dashboard.cta_cards.create.description")}
-                        }
-                        div { class: "card__head",
-                            a { class: "card__learn",
-                                {translate!(i18, "dashboard.cta_cards.create.cta")}
-                            }
-                            Icon {
-                                icon: ArrowRight,
-                                height: 20,
-                                width: 20,
-                                stroke_width: 1,
-                                fill: "var(--text-tertiary)"
-                            }
-                        }
-                    }
+                //     div { class: "card__cta",
+                //         IconButton {
+                //             class: "button--avatar",
+                //             body: rsx!(
+                //                 Icon {
+                //                     icon: Compass,
+                //                     height: 32,
+                //                     width: 32,
+                //                     fill: "var(--fill-00)"
+                //                 }
+                //             ),
+                //             on_click: move |_| { }
+                //         }
+                //     }
+                // }
+                // section { class: "card card--reverse",
+                //     div { class: "card__container",
+                //         div { class: "card__head",
+                //             h3 { class: "card__title",
+                //                 {translate!(i18, "dashboard.cta_cards.create.title")}
+                //             }
+                //         }
+                //         p { class: "card__description",
+                //             {translate!(i18, "dashboard.cta_cards.create.description")}
+                //         }
+                //         div { class: "card__head",
+                //             a { class: "card__learn",
+                //                 {translate!(i18, "dashboard.cta_cards.create.cta")}
+                //             }
+                //             Icon {
+                //                 icon: ArrowRight,
+                //                 height: 20,
+                //                 width: 20,
+                //                 stroke_width: 1,
+                //                 fill: "var(--text-tertiary)"
+                //             }
+                //         }
+                //     }
 
-                    div { class: "card__cta",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Big,
-                            body: rsx!(
-                                Icon {
-                                    icon: AddPlus,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1.5,
-                                    fill: "var(--fill-00)"
-                                }
-                            ),
-                            on_click: move |_| { }
-                        }
-                    }
-                }
+                //     div { class: "card__cta",
+                //         IconButton {
+                //             class: "button--avatar",
+                //             size: ElementSize::Big,
+                //             body: rsx!(
+                //                 Icon {
+                //                     icon: AddPlus,
+                //                     height: 32,
+                //                     width: 32,
+                //                     stroke_width: 1.5,
+                //                     fill: "var(--fill-00)"
+                //                 }
+                //             ),
+                //             on_click: move |_| { }
+                //         }
+                //     }
+                // }
             }
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
                     span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "footer.paginator", from: current_page(), to: (((communities_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
+                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
                     }
                     div { class: "dashboard__footer__paginators",
                         IconButton {
@@ -464,7 +397,7 @@ pub fn Dashboard() -> Element {
                     }
                 }
                 span { class: "dashboard__footer__rights",
-                    {translate!(i18, "footer.rights")}
+                    {translate!(i18, "dashboard.footer.rights")}
                 }
             }
         }

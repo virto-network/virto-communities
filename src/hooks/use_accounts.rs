@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::services::pjs::PjsAccount;
+use pjs::Account as PjsAccount;
 
 pub type Account = PjsAccount;
 pub type Accounts = Vec<Account>;

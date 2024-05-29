@@ -35,18 +35,6 @@ pub fn Card(props: CardProps) -> Element {
                 div { class: "card__metrics",
                     span { class: "card__metric",
                         Icon {
-                            icon: Monetization,
-                            height: 16,
-                            width: 16,
-                            stroke_width: 1,
-                            fill: "var(--white)"
-                        }
-                        small {
-                            {nice_money(props.community.treasury)}
-                        }
-                    }
-                    span { class: "card__metric",
-                        Icon {
                             icon: UserGroup,
                             height: 16,
                             width: 16,

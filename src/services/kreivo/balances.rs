@@ -1,21 +1,7 @@
 use serde::Deserialize;
 use sube::{sube, Response};
 
-use crate::hooks::use_connect_wallet::Wallet;
-
 use super::community_track::ChainStateError;
-
-pub enum MultiAddress {
-    Id(u32),
-    Index(u16),
-    Raw(String),
-    Address32(u32),
-    Address20(u32),
-}
-
-pub async fn transferKeepAlive(wallet: Wallet, dest: MultiAddress, value: u128) {
-    let query = format!("wss://kreivo.kippu.rocks/balances/transferKeepAlive");
-}
 
 #[derive(Debug, Deserialize)]
 pub struct AccountInfo {

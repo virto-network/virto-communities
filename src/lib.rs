@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 pub mod pages {
     pub mod dashboard;
-    pub mod initiatives;
     pub mod not_found;
     pub mod route;
 }
@@ -32,11 +31,9 @@ pub mod components {
 }
 
 pub mod services {
-    pub mod pjs;
+    // pub mod pjs;
     pub mod kreivo {
         pub mod balances;
-        pub mod communities;
-        pub mod communities_manager;
         pub mod community_memberships;
         pub mod community_track;
     }

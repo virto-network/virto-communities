@@ -38,7 +38,7 @@ sube = { path = "../virto-sdk/sube", default-features = false, features = [
     "js",
     'wss',
 ] }
-pjs = { package = "pjs", git = "https://github.com/virto-network/virto-sdk.git", branch = "main"}
+pjs = { package = "pjs", git = "https://github.com/virto-network/virto-sdk.git", branch = "feat/pjs-vault" }
 libwallet = { package = "libwallet", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
     "substrate",
     "mnemonic",

@@ -245,7 +245,7 @@ $fw-bold: 700;
         "sidebar main"
         "sidebar footer";
     grid-template-rows: 90px auto auto;
-    
+
 }
 
 .grid-header {
@@ -263,7 +263,6 @@ $fw-bold: 700;
 .grid-footer {
     grid-area: footer;
 }
-
 
 .notification {
     background: var(--background-modal);
@@ -465,6 +464,18 @@ $fw-bold: 700;
 .icon-button--semi-round {
     border-radius: 40%;
 }
+
+// .commin-soon::after {
+//     @extend %text-sm-font-semibold;
+//     content: "Soon";
+//     position: absolute;
+//     top: 0;
+//     right: 0;
+//     padding: 2px;
+//     border-radius: 4px;
+//     color: var(--text-secondary);
+//     background: var(--fill-50);
+// }
 
 .button--floating {
     position: absolute;

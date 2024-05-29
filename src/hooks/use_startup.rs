@@ -1,12 +1,10 @@
 use dioxus::{hooks::use_context_provider, signals::Signal};
-
-use crate::services::pjs::Pjs;
+use pjs::PjsExtension;
 
 use super::{
     use_accounts::Account,
     use_attach::AttachFile,
     use_communities::{Communities, Community},
-    use_connect_wallet::Wallet,
     use_notification::NotificationItem,
     use_onboard::OnboardForm,
     use_paginator::Paginator,
@@ -27,8 +25,7 @@ pub fn use_startup() {
     use_context_provider::<Signal<Option<UserSession>>>(|| Signal::new(None));
     use_context_provider::<Signal<Vec<Account>>>(|| Signal::new(vec![]));
     use_context_provider::<Signal<Option<Account>>>(|| Signal::new(None));
-    use_context_provider::<Signal<Option<Wallet>>>(|| Signal::new(None));
-    use_context_provider::<Signal<Option<Pjs>>>(|| Signal::new(None));
+    use_context_provider::<Signal<Option<PjsExtension>>>(|| Signal::new(None));
 
     use_context_provider::<Signal<bool>>(|| Signal::new(false));
 }
