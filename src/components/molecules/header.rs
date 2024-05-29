@@ -76,7 +76,9 @@ pub fn Header() -> Element {
                     format!("{:.2}", unscaled_value[1]),
                 ));
                 usdt_balance.set((usdt_value[0].to_string(), format!("{:.2}", usdt_value[1])));
-                header_handled.set(true);
+                if !header_handled() {
+                    header_handled.set(true);
+                }
 
                 Ok::<(), String>(())
             }
@@ -152,6 +154,8 @@ pub fn Header() -> Element {
                 }
                 Err(_) => todo!(),
             }
+        } else {
+            header_handled.set(true);
         }
     });
 
