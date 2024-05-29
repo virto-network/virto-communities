@@ -31,7 +31,6 @@ pub mod components {
 }
 
 pub mod services {
-    // pub mod pjs;
     pub mod kreivo {
         pub mod balances;
         pub mod community_memberships;

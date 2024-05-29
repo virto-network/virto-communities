@@ -412,6 +412,23 @@ $fw-bold: 700;
     min-width: 48px;
     height: 48px;
     width: 48px;
+    position: relative;
+}
+
+.button--comming-soon {
+    opacity: .7;
+    filter: grayscale(1);
+}
+
+.button--comming-soon::after {
+    @extend %text-xs-font-regular;
+    content: "Soon";
+    position: absolute;
+    bottom: -12px;
+    padding: 0 4px;
+    border-radius: 4px;
+    color: var(--text-white);
+    background: var(--state-base-border);
 }
 
 .tabs {
@@ -464,18 +481,6 @@ $fw-bold: 700;
 .icon-button--semi-round {
     border-radius: 40%;
 }
-
-// .commin-soon::after {
-//     @extend %text-sm-font-semibold;
-//     content: "Soon";
-//     position: absolute;
-//     top: 0;
-//     right: 0;
-//     padding: 2px;
-//     border-radius: 4px;
-//     color: var(--text-secondary);
-//     background: var(--fill-50);
-// }
 
 .button--floating {
     position: absolute;
@@ -1174,6 +1179,23 @@ textarea::placeholder {
     box-shadow: none;
 }
 
+.card--comming-soon {
+    opacity: .7;
+    filter: grayscale(1);
+}
+
+.card--comming-soon::after {
+    @extend %text-xs-font-regular;
+    content: "Soon";
+    position: absolute;
+    bottom: 10%;
+    right: 5%;
+    padding: 0 8px;
+    border-radius: 4px;
+    color: var(--text-white);
+    background: var(--state-base-border);
+}
+
 .card__container {
     display: flex;
     flex-direction: column;
@@ -1208,6 +1230,7 @@ textarea::placeholder {
 .card__metrics {
     display: flex;
     gap: 8px;
+    flex-direction: column;
 }
 
 .card__metric {
@@ -1217,7 +1240,7 @@ textarea::placeholder {
 }
 
 .card__metric>small {
-    @extend %text-sm-font-medium;
+    @extend %text-base-font-medium;
     color: var(--text-primary);
 }
 

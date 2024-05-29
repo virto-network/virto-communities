@@ -41,7 +41,7 @@ pub struct Community {
     pub members: u16,
 }
 
-static SKIP: u8 = 8;
+static SKIP: u8 = 6;
 
 #[component]
 pub fn Dashboard() -> Element {
@@ -195,6 +195,20 @@ pub fn Dashboard() -> Element {
                         on_keypress: move |_| {},
                         on_click: move |_| {},
                     }
+                    IconButton {
+                        class: "button--avatar desktop button--comming-soon",
+                        size: ElementSize::Medium,
+                        body: rsx!(
+                            Icon {
+                                icon: AddPlus,
+                                height: 26,
+                                width: 26,
+                                stroke_width: 1.5,
+                                fill: "var(--fill-00)"
+                            }
+                        ),
+                        on_click: move |_| { }
+                    }
                 }
             }
             div { class: "dashboard__communities",
@@ -231,7 +245,7 @@ pub fn Dashboard() -> Element {
                                         fill: "var(--text-primary)"
                                     }
                                     small {
-                                        "{community.memberships}"
+                                        "{community.memberships} Memberships"
                                     }
                                 }
                                 span { class: "card__metric",
@@ -243,7 +257,7 @@ pub fn Dashboard() -> Element {
                                         fill: "var(--text-primary)"
                                     }
                                     small {
-                                        "{community.members}"
+                                        "{community.members} Members"
                                     }
                                 }
                             }
@@ -266,91 +280,91 @@ pub fn Dashboard() -> Element {
                             }
                         }
 
-                        // div { class: "card__cta",
-                        //     IconButton {
-                        //         class: "button--avatar",
-                        //         body: rsx!(
-                        //             Icon {
-                        //                 icon: ArrowRight,
-                        //                 height: 32,
-                        //                 width: 32,
-                        //                 stroke_width: 2,
-                        //                 fill: "var(--fill-00)"
-                        //             }
-                        //         ),
-                        //         on_click: move |_| { }
-                        //     }
-                        // }
+                        div { class: "card__cta",
+                            IconButton {
+                                class: "button--avatar buttom--comming-soon",
+                                body: rsx!(
+                                    Icon {
+                                        icon: ArrowRight,
+                                        height: 32,
+                                        width: 32,
+                                        stroke_width: 2,
+                                        fill: "var(--fill-00)"
+                                    }
+                                ),
+                                on_click: move |_| { }
+                            }
+                        }
                     }
                 }
-                // section { class: "card card--reverse",
-                //     div { class: "card__container",
-                //         div { class: "card__head",
-                //             h3 { class: "card__title",
-                //                 {translate!(i18, "dashboard.cta_cards.explore.title")}
-                //             }
-                //         }
-                //         p { class: "card__description",
-                //             {translate!(i18, "dashboard.cta_cards.explore.description")}
-                //         }
-                //     }
+                section { class: "card card--reverse card--comming-soon",
+                    div { class: "card__container",
+                        div { class: "card__head",
+                            h3 { class: "card__title",
+                                {translate!(i18, "dashboard.cta_cards.explore.title")}
+                            }
+                        }
+                        p { class: "card__description",
+                            {translate!(i18, "dashboard.cta_cards.explore.description")}
+                        }
+                    }
 
-                //     div { class: "card__cta",
-                //         IconButton {
-                //             class: "button--avatar",
-                //             body: rsx!(
-                //                 Icon {
-                //                     icon: Compass,
-                //                     height: 32,
-                //                     width: 32,
-                //                     fill: "var(--fill-00)"
-                //                 }
-                //             ),
-                //             on_click: move |_| { }
-                //         }
-                //     }
-                // }
-                // section { class: "card card--reverse",
-                //     div { class: "card__container",
-                //         div { class: "card__head",
-                //             h3 { class: "card__title",
-                //                 {translate!(i18, "dashboard.cta_cards.create.title")}
-                //             }
-                //         }
-                //         p { class: "card__description",
-                //             {translate!(i18, "dashboard.cta_cards.create.description")}
-                //         }
-                //         div { class: "card__head",
-                //             a { class: "card__learn",
-                //                 {translate!(i18, "dashboard.cta_cards.create.cta")}
-                //             }
-                //             Icon {
-                //                 icon: ArrowRight,
-                //                 height: 20,
-                //                 width: 20,
-                //                 stroke_width: 1,
-                //                 fill: "var(--text-tertiary)"
-                //             }
-                //         }
-                //     }
+                    div { class: "card__cta",
+                        IconButton {
+                            class: "button--avatar",
+                            body: rsx!(
+                                Icon {
+                                    icon: Compass,
+                                    height: 32,
+                                    width: 32,
+                                    fill: "var(--fill-00)"
+                                }
+                            ),
+                            on_click: move |_| { }
+                        }
+                    }
+                }
+                section { class: "card card--reverse card--comming-soon",
+                    div { class: "card__container",
+                        div { class: "card__head",
+                            h3 { class: "card__title",
+                                {translate!(i18, "dashboard.cta_cards.create.title")}
+                            }
+                        }
+                        p { class: "card__description",
+                            {translate!(i18, "dashboard.cta_cards.create.description")}
+                        }
+                        div { class: "card__head",
+                            a { class: "card__learn",
+                                {translate!(i18, "dashboard.cta_cards.create.cta")}
+                            }
+                            Icon {
+                                icon: ArrowRight,
+                                height: 20,
+                                width: 20,
+                                stroke_width: 1,
+                                fill: "var(--text-tertiary)"
+                            }
+                        }
+                    }
 
-                //     div { class: "card__cta",
-                //         IconButton {
-                //             class: "button--avatar",
-                //             size: ElementSize::Big,
-                //             body: rsx!(
-                //                 Icon {
-                //                     icon: AddPlus,
-                //                     height: 32,
-                //                     width: 32,
-                //                     stroke_width: 1.5,
-                //                     fill: "var(--fill-00)"
-                //                 }
-                //             ),
-                //             on_click: move |_| { }
-                //         }
-                //     }
-                // }
+                    div { class: "card__cta",
+                        IconButton {
+                            class: "button--avatar",
+                            size: ElementSize::Big,
+                            body: rsx!(
+                                Icon {
+                                    icon: AddPlus,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1.5,
+                                    fill: "var(--fill-00)"
+                                }
+                            ),
+                            on_click: move |_| { }
+                        }
+                    }
+                }
             }
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
