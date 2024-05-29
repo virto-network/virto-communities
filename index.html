@@ -8,8 +8,8 @@
   <meta charset="UTF-8" />
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="/public/main.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css-out/main.css">
   <style>
     * {
       box-sizing: border-box;
@@ -158,6 +158,50 @@
       --gradient-pink: linear-gradient(45deg, #E4B3C1, #ECBCCC);
       --gradient-green: linear-gradient(45deg, #30D34D, #66FFA1);
 
+      --border-rgba-light: rgba(0, 0, 0, 0.25);
+      --border-rgba-dark: rgba(255, 255, 255, 0.25);
+
+      /* New design */
+
+      --olive-5: #f3f5f4;
+      --olive-25: #c4ccca;
+      --olive-50: #889a95;
+      --olive-75: #4d6760;
+      --olive-90: #2A4940;
+      --olive-100: #12352b;
+
+      --blue-light: #BFEAF7;
+      --blue-dark: #00A9E0;
+
+      --lavanda-light: #E6C9ED;
+      --lavanda-dark: #9B26B6;
+
+      --green-light: #B2EDAF;
+      --green-dark: #56C95F;
+
+      --black: #000000;
+      --white: #ffffff;
+
+      --text-primary: #12352B;
+      --text-secondary: #1B5F51;
+      --text-tertiary: #227A6B;
+      --text-primary-alt: #FFFFFF;
+      
+      --fill-00: #E7F7E8;
+      --fill-50: #C6EBC7;
+      --fill-100: #A1DFA4;
+      --fill-200: #1D1E1F;
+      --fill-600: #006B0A;
+      --fill-00-alt: #141414;
+      --fill-100-alt: #171819;
+      --fill-600-alt: #5F5F5F;
+      
+      --color-blue-300: #52C2E6;
+      --color-green-300: #78D37D;
+
+      --state-base-border: #1D1E1F;
+      --state-destructive-active: #DC2828;
+      --state-primary-active: #56C960;
     }
 
     :root {
@@ -172,6 +216,7 @@
       --background-modal: var(--neutral-solid-50);
 
       --border: var(--border-normal);
+      --border-rgba: var(var(var(--border-rgba-light)));
     }
 
     @media (prefers-color-scheme: dark) {
@@ -187,6 +232,7 @@
         --background-modal: var(--neutral-solid-700);
 
         --border: var(--border-muted);
+        --border-rgba: var(var(var(--border-rgba-dark)));
       }
     }
 
@@ -217,7 +263,6 @@
 
     #main {
       display: flex;
-      flex-direction: column;
       min-height: 100vh;
       min-height: 100dvh;
     }

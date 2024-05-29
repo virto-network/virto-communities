@@ -1,6 +1,170 @@
 {
     "id": "es-ES",
     "texts": {
-        
+        "sidebar": {
+            "cta": "Agregar comunidad"
+        },
+        "header": {
+            "cta": {
+                "connect": "Conectar",
+                "account": "Selecciona..."
+            },
+            "menu": {
+                "invitations": "Invitaciones",
+                "messages": "Mensajes",
+                "profile": "Perfil",
+                "settings": "Configuración"
+            }
+        },
+        "dashboard": {
+            "tabs": {
+                "all": "DAOS",
+                "owned": "Mis DAOS"
+            },
+            "tips": {
+                "loading": {
+                    "title": "Trayendo las comunidades",
+                    "description": "Esto puede tomar un momento"
+                }
+            },
+            "cta_header": {
+                "filter": {
+                    "title": "Filtrar",
+                    "options": {}
+                },
+                "search": "Buscar"
+            },
+            "cta_cards": {
+                "explore": {
+                    "title": "Explorar DAOs",
+                    "description": "Un ecosistema global de organizaciones autónomas"
+                },
+                "create": {
+                    "title": "Crear una DAO",
+                    "description": "Una gobernanza abierta y descentralizada para todas tus ideas",
+                    "cta": "Aprender más"
+                }
+            },
+            "footer": {
+                "paginator": "{from} of {to}",
+                "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
+            }
+        },
+        "errors": {
+            "session": {
+                "persist": "No se ha podido guardar la sesión"
+            },
+            "wallet": {
+                "accounts_not_found": "No se han encontrado cuentas",
+                "account_address": "No se ha encontrado la dirección pública",
+                "connection_failed": "La conexión ha fallado, si el problema persiste comunícate con nosotros"
+            },
+            "communities": {
+                "query_failed": "No se ha podido traer comunidades"
+            }
+        },        
+        "home": {
+            "title": "¡Hola, 👋!",
+            "form": {
+                "username": {
+                    "label": "Escribe tu nombre de usuario",
+                    "placeholder": "Ej: pepe"
+                },
+                "account": {
+                    "label": "Selecciona una cuenta a usar"
+                },
+                "cta_send": "Continuar"
+            }
+        },
+        "discover": {
+            "title": "Crea tu propia \ncomunidad 🙌",
+            "form": {
+                "name": {
+                    "label": "Escribe el nombre de tu comunidad",
+                    "placeholder": "Ej: PartyCalls"
+                },
+                "industry": {
+                    "label": "Industria",
+                    "placeholder": "Selecciona...",
+                    "options": {
+                        "commerce": "Comercio",
+                        "political": "Político",
+                        "gaming": "Video juegos",
+                        "education": "Educación",
+                        "custom": "Prefiero escribirlo"
+                    }
+                },
+                "custom_industry": {
+                    "label": "Escribe la industria",
+                    "placeholder": "Ej: Marketing"
+                },
+                "description": {
+                    "label": "Descripción",
+                    "placeholder": "Cuéntanos por qué tu comunidad es única y todos deberían unirse"
+                },
+                "logo": {
+                    "label": "Personaliza tu comunidad con el logo",
+                    "placeholder": "Lo tengo"
+                },
+                "cta_send": "Continuar"
+            }
+        },
+        "governance": {
+            "title": "Configura las decisiones \nen tu comunidad 🎡",
+            "form": {
+                "voting": {
+                    "label": "Método de votación",
+                    "placeholder": "Selecciona...",
+                    "options": {
+                        "membership": "Membresías",
+                        "ranked": "Ranking",
+                        "community-asset": "Asset de la comunidad",
+                        "native-asset": "Asset nativo de la blockchain"
+                    }
+                },
+                "cta_send": "Continuar"
+            }
+        },
+        "custom": {
+            "title": "Configura tu DAO, \nVirto 🚧️",
+            "subtitle": "Virto te ofrece gran posibilidad de soluciones",
+            "form": {
+                "solutions": {
+                    "label": "Selecciona las que son de tu mayor interés y potencia tu organización.",
+                    "options": {
+                        "token": "Token",
+                        "treasury": "Tesorería",
+                        "chat": "Chat"
+                    }
+                },
+                "cta_send": "Finalizar"
+            }
+        },
+        "success": {
+            "title": "¡Perfecto! \n¡Haz creado tu comunidad!🚀",
+            "subtitle": "Virto te da la bienvenida a un mundo lleno de posibilidades para tu organización.",
+            "form": {
+                "cta_send": "Continuar"
+            }
+        },
+        "dash": {
+            "title": "¿Qué quieres hacer ahora?",
+            "form": {
+                "options": {
+                    "add_member": "Agregar miembro 💁",
+                    "chat": "Ir al chat 👋"
+                }
+            }
+        },
+        "member": {
+            "title": "Agregar miembro 💁",
+            "form": {
+                "address": {
+                    "label": "Escribe la dirección de billetera del nuevo miembro",
+                    "placeholder": "Ej: 5h1xa..."
+                },
+                "cta_send": "Continuar"
+            }
+        }
     }
 }

@@ -1,6 +1,172 @@
 {
     "id": "en-US",
     "texts": {
+        "sidebar": {
+            "cta": "Add community"
+        },
+        "header": {
+            "cta": {
+                "connect": "Connect",
+                "account": "Select..."
+            },
+            "menu": {
+                "invitations": "Invitations",
+                "messages": "Messages",
+                "profile": "Profile",
+                "settings": "Settings"
+            }
+        },
+        "dashboard":  {
+            "tabs": {
+                "all": "All DAOs",
+                "owned": "Your DAOs"
+            },
+            "tips": {
+                "loading": {
+                    "title": "Fetching communities",
+                    "description": "This may take a moment"
+                }
+            },
+            "cta_header": {
+                "filter": {
+                    "title": "Filter",
+                    "options": {
         
+                    }
+                },
+                "search": "Search"
+            },
+            "cta_cards": {
+                "explore": {
+                    "title": "Explore DAOs",
+                    "description": "A Global Ecosystem of autonomous infrastructure."
+                },
+                "create": {
+                    "title": "Create a DAO",
+                    "description": "A Decentralized and open governed entity for all of your Ideas.",
+                    "cta": "Learn more"
+                }
+            },
+            "footer": {
+                "paginator": "{from} of {to}",
+                "rights": "Virto PROD V.0.0.1. 2024 All rights reserved"
+            }
+        },
+        "errors": {
+            "session": {
+                "persist": "Failed to save session"
+            },
+            "wallet": {
+                "accounts_not_found": "No accounts found",
+                "account_address": "Public address not found",
+                "connection_failed": "Connection failed, if the problem persists please contact us"
+            },
+            "communities": {
+                "query_failed": "Failed to fetch communities"
+            }
+        },
+        "home": {
+            "title": "Hello, 👋!",
+            "form": {
+                "username": {
+                    "label": "Enter your username",
+                    "placeholder": "E.g: pepe"
+                },
+                "account": {
+                    "label": "Select an account to use"
+                },
+                "cta_send": "Continue"
+            }
+        },
+        "discover": {
+            "title": "Create your own \ncommunity 🙌",
+            "form": {
+                "name": {
+                    "label": "Enter the name of your community",
+                    "placeholder": "E.g: PartyCalls"
+                },
+                "industry": {
+                    "label": "Industry",
+                    "placeholder": "Select...",
+                    "options": {
+                        "commerce": "Commerce",
+                        "political": "Political",
+                        "gaming": "Video Games",
+                        "education": "Education",
+                        "custom": "I prefer to write it"
+                    }
+                },
+                "custom_industry": {
+                    "label": "Write the industry",
+                    "placeholder": "E.g: Marketing"
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Tell us why your community is unique and everyone should join"
+                },
+                "logo": {
+                    "label": "Customize your community with a logo",
+                    "placeholder": "I have it"
+                },
+                "cta_send": "Continue"
+            }
+        },
+        "governance": {
+            "title": "Set up the decisions \nin your community 🎡",
+            "form": {
+                "voting": {
+                    "label": "Voting method",
+                    "placeholder": "Select...",
+                    "options": {
+                        "membership": "Memberships",
+                        "ranked": "Ranked",
+                        "community-asset": "Community asset",
+                        "native-asset": "Native blockchain asset"
+                    }
+                },
+                "cta_send": "Continue"
+            }
+        },
+        "custom": {
+            "title": "Set up your DAO, \nVirto 🚧️",
+            "subtitle": "Virto offers you a great possibility of solutions",
+            "form": {
+                "solutions": {
+                    "label": "Select those that are of your greatest interest and enhance your organization.",
+                    "options": {
+                        "token": "Token",
+                        "treasury": "Treasury",
+                        "chat": "Chat"
+                    }
+                },
+                "cta_send": "Finish"
+            }
+        },
+        "success": {
+            "title": "Perfect! \nYou have created your community!🚀",
+            "subtitle": "Virto welcomes you to a world full of possibilities for your organization.",
+            "form": {
+                "cta_send": "Continue"
+            }
+        },
+        "dash": {
+            "title": "What do you want to do now?",
+            "form": {
+                "options": {
+                    "add_member": "Add member 💁",
+                    "chat": "Go to chat 👋"
+                }
+            }
+        },
+        "member": {
+            "title": "Add member 💁",
+            "form": {
+                "address": {
+                    "label": "Enter the wallet address of the new member",
+                    "placeholder": "E.g: 5h1xa..."
+                },
+                "cta_send": "Continue"
+            }
+        }
     }
 }
