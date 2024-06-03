@@ -6,7 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
 use crate::{
-    components::atoms::{button::Variant, Button},
+    components::atoms::{button::Variant, dropdown::ElementSize, Button, Icon, UploadExport},
     hooks::use_attach::{use_attach, AttachFile},
 };
 
@@ -31,9 +31,10 @@ pub struct AttachProps {
 }
 
 pub fn Attach(props: AttachProps) -> Element {
-    let mut textarea_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
-    let mut preview_url = use_signal(|| None);
     let mut attach = use_attach();
+
+    let mut textarea_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
+    let mut preview_url = use_signal(|| attach.get_file().ok());
 
     let on_handle_attach = move |_| {
         if let Some(input_element) = textarea_ref() {
@@ -101,20 +102,16 @@ pub fn Attach(props: AttachProps) -> Element {
                 label { class: "input__label", "{value}" }
             }
 
-            div {
-                class: "attach__wrapper",
-                match preview_url() {
-                    Some(url) => rsx!(
-                        img {
-                            class: "attach__preview",
-                            src: "{url}"
-                        }
-                    ),
-                    None => rsx!(
-                        div {
-                            class: "attach__preview"
-                        }
-                    )
+            div { class: "attach__wrapper",
+                {
+                    preview_url().map(|url| {
+                        rsx!(
+                            img {
+                                class: "attach__preview",
+                                src: "{url}"
+                            }
+                        )
+                    }) 
                 }
 
                 div {
@@ -122,8 +119,17 @@ pub fn Attach(props: AttachProps) -> Element {
                     Button {
                         text: "{props.cta_text}",
                         status: None,
+                        size: ElementSize::Big,
                         variant: Variant::Secondary,
-                        on_click: on_handle_attach
+                        on_click: on_handle_attach,
+                        right_icon: rsx!(
+                            Icon {
+                                height: 24,
+                                width: 24,
+                                fill: "var(--fill-600)",
+                                icon: UploadExport
+                            }
+                        )
                     }
                 }
             }

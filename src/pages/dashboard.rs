@@ -9,7 +9,7 @@ use crate::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
             input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Button, Chat, Compass,
-            Filter, Icon, IconButton, MessageInput, Monetization, Suitcase, Tab, UserGroup,
+            Filter, Icon, IconButton, Monetization, SearchInput, Suitcase, Tab, UserGroup,
         },
         molecules::tabs::TabItem,
     },
@@ -177,7 +177,7 @@ pub fn Dashboard() -> Element {
                     }
                 }
                 div { class: "head__actions",
-                    MessageInput {
+                    SearchInput {
                         message: search_word(),
                         itype: InputType::Search,
                         placeholder: translate!(i18, "dashboard.cta_header.search"),
@@ -196,7 +196,7 @@ pub fn Dashboard() -> Element {
                         on_click: move |_| {},
                     }
                     IconButton {
-                        class: "button--avatar desktop button--comming-soon",
+                        class: "button--avatar desktop",
                         size: ElementSize::Medium,
                         body: rsx!(
                             Icon {
@@ -207,7 +207,10 @@ pub fn Dashboard() -> Element {
                                 fill: "var(--fill-00)"
                             }
                         ),
-                        on_click: move |_| { }
+                        on_click: move |_| {
+                            tooltip.hide();
+                            nav.push("/onboarding");
+                        }
                     }
                 }
             }
@@ -324,7 +327,7 @@ pub fn Dashboard() -> Element {
                         }
                     }
                 }
-                section { class: "card card--reverse card--comming-soon",
+                section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
@@ -361,7 +364,10 @@ pub fn Dashboard() -> Element {
                                     fill: "var(--fill-00)"
                                 }
                             ),
-                            on_click: move |_| { }
+                            on_click: move |_| {
+                                tooltip.hide();
+                                nav.push("/onboarding");
+                             }
                         }
                     }
                 }

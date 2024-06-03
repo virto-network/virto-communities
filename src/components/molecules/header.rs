@@ -188,7 +188,7 @@ pub fn Header() -> Element {
                             Button {
                                 text: translate!(i18, "header.cta.connect"),
                                 status: None,
-                                icon: rsx!(
+                                right_icon: rsx!(
                                     Icon {
                                         icon: ArrowUp,
                                         height: 14,

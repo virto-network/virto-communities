@@ -52,6 +52,77 @@
                 "rights": "Virto PROD V.0.0.1. 2024 All rights reserved"
             }
         },
+        "onboard": {
+            "basics": {
+                "label": "Welcome! First Things First...",
+                "title": "Create your Organization",
+                "form": {
+                    "logo": {
+                        "placeholder": "Logo (Optional)"
+                    },
+                    "name": {
+                        "placeholder": "Enter your Organization Name"
+                    },
+                    "description": {
+                        "placeholder": "A short Description of your organization..."
+                    },
+                    "industry": {
+                        "placeholder": "Your Organization Industry Field"
+                    }
+                },
+                "cta": {
+                    "next": "Continue"
+                }
+            },
+            "management": {
+                "label": "Now Define Your Team",
+                "title": "Setup the Organization Management",
+                "form": {
+                    "membership": {
+                        "title": "Membership",
+                        "description": "Any member can vote and take decisions."
+                    },
+                    "rank": {
+                        "title": "Membership-Rank",
+                        "description": "Members with specific roles can vote and take decisions."
+                    },
+                    "native_token": {
+                        "title": "Kusama Token",
+                        "description": "Any token holder can vote and take decisions."
+                    },
+                    "own_token": {
+                        "title": "Own Token (Advanced)",
+                        "description": "You configure the token and holders to vote or take decisions."
+                    }
+                },
+                "cta": {
+                    "back": "Back",
+                    "next": "Continue"
+                }
+            },
+            "invite": {
+                "label": "Now Invite Your Team",
+                "title": "Invite your Members",
+                "form": {
+                    "wallet": {
+                        "label": "Wallet",
+                        "placeholder": "Write an address"
+                    },
+                    "email": {
+                        "label": "Email",
+                        "placeholder": "user@virto.com"
+                    },
+                    "phone": {
+                        "label": "Telegram",
+                        "placeholder": "+57 322 1230000"
+                    }
+                },
+                "cta": {
+                    "back": "Back",
+                    "next": "Create Org"
+                }
+            }
+        },
         "errors": {
             "session": {
                 "persist": "Failed to save session"

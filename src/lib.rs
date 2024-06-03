@@ -2,6 +2,7 @@
 pub mod pages {
     pub mod dashboard;
     pub mod not_found;
+    pub mod onboarding;
     pub mod route;
 }
 

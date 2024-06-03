@@ -2,18 +2,10 @@ use dioxus::prelude::*;
 
 use crate::components::atoms::{Icon, IconButton, Search};
 
-use super::dropdown::ElementSize;
-
-#[derive(PartialEq, Clone)]
-pub enum InputType {
-    Text,
-    Message,
-    Search,
-    Password,
-}
+use super::{dropdown::ElementSize, input::InputType};
 
 #[derive(PartialEq, Props, Clone)]
-pub struct InputProps {
+pub struct SearchInputProps {
     #[props(default = InputType::Text)]
     itype: InputType,
     message: String,
@@ -28,7 +20,7 @@ pub struct InputProps {
     on_click: EventHandler<MouseEvent>,
 }
 
-pub fn Input(props: InputProps) -> Element {
+pub fn SearchInput(props: SearchInputProps) -> Element {
     let input_error_container = if let Some(_) = props.error {
         "input--error-container"
     } else {
