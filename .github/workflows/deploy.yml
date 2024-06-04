@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup GitHub CLI
+        run: |
+          echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
+          gh auth login --with-token < ~/.github_token
+
+      - name: Extract artifact URL
+        id: extract_url
+        run: |
+          ARTIFACT_URL=$(jq -r '.artifacts[] | select(.name=="build-artifact") | .archive_download_url' artifacts.json | head -n 1)
+          echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
+
+      - name: Download artifact
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          mkdir -p dist
+          curl -L -H "Authorization: token $GH_TOKEN" -o artifact.zip ${{ env.ARTIFACT_URL }}
+          unzip artifact.zip -d dist
+
+      - name: Publish Cloudflare
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: virto-communities
+          directory: dist
+          gitHubToken: ${{ secrets.GH_TOKEN }}
