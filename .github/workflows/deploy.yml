@@ -18,7 +18,7 @@ jobs:
 
       - name: Setup GitHub CLI
         run: |
-          echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
+          echo "${{ secrets.GITHUB_TOKEN }}" > ~/.github_token
           gh auth login --with-token < ~/.github_token
 
       - name: Extract artifact URL
@@ -29,10 +29,10 @@ jobs:
 
       - name: Download artifact
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p dist
-          curl -L -H "Authorization: token $GH_TOKEN" -o artifact.zip ${{ env.ARTIFACT_URL }}
+          curl -L -H "Authorization: token $GITHUB_TOKEN" -o artifact.zip ${{ env.ARTIFACT_URL }}
           unzip artifact.zip -d dist
 
       - name: Publish Cloudflare
@@ -42,4 +42,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: virto-communities
           directory: dist
-          gitHubToken: ${{ secrets.GH_TOKEN }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
