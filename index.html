@@ -1,291 +1,313 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>{app_title}</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
 
-<head>
-  <title>{app_title}</title>
-  <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta charset="UTF-8" />
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css-out/main.css">
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Inter', Arial, Helvetica, sans-serif;
-    }
-
-    :where(html) {
-      /* sizes */
-      --size-0: clamp(.25rem, .5vw, 1rem);
-      --size-1: clamp(.5rem, 1vw, 1rem);
-      --size-2: clamp(1rem, 2vw, 1.5rem);
-      --size-3: clamp(1.5rem, 3vw, 2rem);
-      --size-4: clamp(2.5rem, 4vw, 4rem);
-      --size-5: clamp(4rem, 5vw, 5rem);
-      --size-6: clamp(5rem, 7vw, 7.5rem);
-      --size-7: clamp(7.5rem, 10vw, 10rem);
-      --size-8: clamp(10rem, 20vw, 15rem);
-      --size-9: clamp(15rem, 30vw, 20rem);
-      --size-10: clamp(20rem, 40vw, 30rem);
-      --size-laptop: 1280px;
-      --size-mobile: 767px;
-      --font-size-0: clamp(.75rem, 2vw, 1rem);
-      --font-size-1: clamp(1rem, 4vw, 1.5rem);
-      --font-size-2: clamp(1.5rem, 6vw, 2.5rem);
-      --font-size-3: clamp(2rem, 9vw, 3.5rem);
-      --avatar-default-size: 30px;
-
-      --ratio-square: 1;
-      --ratio-landscape: 4/3;
-      --ratio-portrait: 3/4;
-      --ratio-widescreen: 16/9;
-      --ratio-ultrawide: 18/5;
-      --ratio-golden: 1.618/1;
-
-      /* Vars figma */
-
-      /* Neutral/Solid */
-      --neutral-solid-0: #F8F9FB;
-      --neutral-solid-25: #F6F8FA;
-      --neutral-solid-50: #ECEFF3;
-      --neutral-solid-100: #DFE1E6;
-      --neutral-solid-200: #C1C7CF;
-      --neutral-solid-300: #A4ABB8;
-      --neutral-solid-400: #808897;
-      --neutral-solid-500: #666D80;
-      --neutral-solid-600: #353849;
-      --neutral-solid-700: #272835;
-      --neutral-solid-800: #1A1B25;
-      --neutral-solid-900: #0D0D12;
-
-      /* Neutral/Alpha */
-      --neutral-alpha-0: #16587908;
-      --neutral-alpha-25: #1D4F810A;
-      --neutral-alpha-50: #12376914;
-      --neutral-alpha-100: #09194821;
-      --neutral-alpha-200: #07204540;
-      --neutral-alpha-300: #02173B5C;
-      --neutral-alpha-400: #03103080;
-      --neutral-alpha-500: #000C2999;
-      --neutral-alpha-600: #010419C9;
-      --neutral-alpha-700: #010213D9;
-      --neutral-alpha-800: #01020EE5;
-      --neutral-alpha-900: #000005F2;
-
-      /* Background */
-
-      --background-white: #FFFFFF;
-      --background-disabled: #F8F9FB;
-      --background-normal: #F6F8FA;
-      --background-hover: #ECEFF3;
-      --background-pressed: #DFE1E6;
-      --background-loud: #0D0D12;
-
-      /* Border */
-
-      --border-white: #FFFFFF;
-      --border-disabled: #F6F8FA;
-      --border-normal: #ECEFF3;
-      --border-hover: #DFE1E6;
-      --border-pressed: #C1C7CF;
-      --border-muted: #353849;
-
-      /* Icon */
-
-      --icon-white: #FFFFFF;
-      --icon-disabled: #A4ABB8;
-      --icon-subdued: #818898;
-      --icon-normal: #666D80;
-      --icon-muted: #353849;
-      --icon-loud: #0D0D12;
-
-      /* Text */
-
-      --text-white: #FFFFFF;
-      --text-disabled: #A4ABB8;
-      --text-subdued: #818898;
-      --text-normal: #666D80;
-      --text-muted: #353849;
-      --text-loud: #0D0D12;
-
-      /* Primary */
-      --primary-0: #F0EFFF;
-      --primary-25: #E5E4FB;
-      --primary-50: #A19CF0;
-      --primary-100: #5E56FF;
-      --primary-200: #312BA0;
-      --primary-300: #201C6C;
-
-      /* Accent/Aqua */
-      --accent-aqua-0: #EFFBFF;
-      --accent-aqua-25: #D1F0F9;
-      --accent-aqua-50: #7EDCF1;
-      --accent-aqua-100: #33CFFF;
-      --accent-aqua-200: #106A97;
-      --accent-aqua-300: #0C4D6E;
-
-      /* Secondary/Red */
-      --secondary-red-0: #FEEFF2;
-      --secondary-red-25: #FADAE1;
-      --secondary-red-50: #ED8296;
-      --secondary-red-100: #DF1C41;
-      --secondary-red-200: #95122B;
-      --secondary-red-300: #710E21;
-
-      /* Secondary/Yellow */
-      --secondary-yellow-0: #FFF6E0;
-      --secondary-yellow-25: #F9ECCB;
-      --secondary-yellow-50: #FBD982;
-      --secondary-yellow-100: #FFBD4C;
-      --secondary-yellow-200: #956321;
-      --secondary-yellow-300: #5B3D1E;
-
-      /* Secondary-green */
-      --secondary-green-0: #EFFEFA;
-      --secondary-green-25: #DDF2EE;
-      --secondary-green-50: #9DE0D3;
-      --secondary-green-100: #40C4AA;
-      --secondary-green-200: #287F6E;
-      --secondary-green-300: #174E43;
-
-      /* Gradients */
-      --gradient-purple: linear-gradient(45deg, #8E70C6, #B09ADB);
-      --gradient-gray: linear-gradient(45deg, #E3E3E3, #EDEDED);
-      --gradient-yellow: linear-gradient(45deg, #FEC329, #F7DA72);
-      --gradient-blue: linear-gradient(45deg, #5CC1E1, #93F0FF);
-      --gradient-pink: linear-gradient(45deg, #E4B3C1, #ECBCCC);
-      --gradient-green: linear-gradient(45deg, #30D34D, #66FFA1);
-
-      --border-rgba-light: rgba(0, 0, 0, 0.25);
-      --border-rgba-dark: rgba(255, 255, 255, 0.25);
-
-      /* New design */
-
-      --olive-5: #f3f5f4;
-      --olive-25: #c4ccca;
-      --olive-50: #889a95;
-      --olive-75: #4d6760;
-      --olive-90: #2A4940;
-      --olive-100: #12352b;
-
-      --blue-light: #BFEAF7;
-      --blue-dark: #00A9E0;
-
-      --lavanda-light: #E6C9ED;
-      --lavanda-dark: #9B26B6;
-
-      --green-light: #B2EDAF;
-      --green-dark: #56C95F;
-
-      --black: #000000;
-      --white: #ffffff;
-
-      --text-primary: #12352B;
-      --text-secondary: #1B5F51;
-      --text-tertiary: #227A6B;
-      --text-primary-alt: #FFFFFF;
-
-      --fill-00: #E7F7E8;
-      --fill-50: #C6EBC7;
-      --fill-100: #A1DFA4;
-      --fill-200: #78D37D;
-      --fill-600: #006B0A;
-      --fill-00-alt: #141414;
-      --fill-100-alt: #171819;
-      --fill-200-alt: #1D1E1F;
-      --fill-600-alt: #5F5F5F;
-
-      --color-blue-300: #52C2E6;
-      --color-green-100: #C6EBC7;
-      --color-green-300: #78D37D;
-      --color-lavanda-400: #AB47C1;
-      --color-fuchsia-500: #D948EF;
-
-      --state-base-border: #78D37D;
-      --state-base-background: #E7F7E8;
-      --state-destructive-active: #DC2828;
-      --state-primary-active: #56C960;
-    }
-
-    :root {
-      --text-1: var(--text-loud);
-      --text-2: var(--text-muted);
-
-      --background: var(--background-white);
-      --background-button: var(--neutral-solid-900);
-      --background-input: var(--neutral-solid-25);
-      --background-message: var(--neutral-alpha-0);
-      --background-shadow: rgba(0, 0, 0, 30%);
-      --background-modal: var(--neutral-solid-50);
-
-      --border: var(--border-normal);
-      --border-rgba: var(var(var(--border-rgba-light)));
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --text-1: var(--text-white);
-        --text-2: var(--text-subdued);
-
-        --background: var(--background-loud);
-        --background-button: var(--neutral-solid-800);
-        --background-input: var(--neutral-solid-700);
-        --background-message: var(--neutral-solid-800);
-        --background-shadow: rgba(53, 56, 73, 30%);
-        --background-modal: var(--neutral-solid-700);
-
-        --border: var(--border-muted);
-        --border-rgba: var(var(var(--border-rgba-dark)));
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="css-out/main.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: "Inter", Arial, Helvetica, sans-serif;
       }
-    }
 
-    :where(:not(dialog)) {
-      margin: 0;
-    }
+      :where(html) {
+        /* sizes */
+        --size-0: clamp(0.25rem, 0.5vw, 1rem);
+        --size-1: clamp(0.5rem, 1vw, 1rem);
+        --size-2: clamp(1rem, 2vw, 1.5rem);
+        --size-3: clamp(1.5rem, 3vw, 2rem);
+        --size-4: clamp(2.5rem, 4vw, 4rem);
+        --size-5: clamp(4rem, 5vw, 5rem);
+        --size-6: clamp(5rem, 7vw, 7.5rem);
+        --size-7: clamp(7.5rem, 10vw, 10rem);
+        --size-8: clamp(10rem, 20vw, 15rem);
+        --size-9: clamp(15rem, 30vw, 20rem);
+        --size-10: clamp(20rem, 40vw, 30rem);
+        --size-laptop: 1280px;
+        --size-mobile: 767px;
+        --font-size-0: clamp(0.75rem, 2vw, 1rem);
+        --font-size-1: clamp(1rem, 4vw, 1.5rem);
+        --font-size-2: clamp(1.5rem, 6vw, 2.5rem);
+        --font-size-3: clamp(2rem, 9vw, 3.5rem);
+        --avatar-default-size: 30px;
 
-    :where(a) {
-      color: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
+        --ratio-square: 1;
+        --ratio-landscape: 4/3;
+        --ratio-portrait: 3/4;
+        --ratio-widescreen: 16/9;
+        --ratio-ultrawide: 18/5;
+        --ratio-golden: 1.618/1;
 
-    :where(a):where(:not(:hover)) {
-      text-decoration: inherit;
-    }
+        /* Vars figma */
 
-    :where(:not(:active):focus-visible) {
-      outline-offset: 5px
-    }
+        /* Neutral/Solid */
+        --neutral-solid-0: #f8f9fb;
+        --neutral-solid-25: #f6f8fa;
+        --neutral-solid-50: #eceff3;
+        --neutral-solid-100: #dfe1e6;
+        --neutral-solid-200: #c1c7cf;
+        --neutral-solid-300: #a4abb8;
+        --neutral-solid-400: #808897;
+        --neutral-solid-500: #666d80;
+        --neutral-solid-600: #353849;
+        --neutral-solid-700: #272835;
+        --neutral-solid-800: #1a1b25;
+        --neutral-solid-900: #0d0d12;
 
-    :focus-visible {
-      outline: 2px dashed var(--alt);
-    }
+        /* Neutral/Alpha */
+        --neutral-alpha-0: #16587908;
+        --neutral-alpha-25: #1d4f810a;
+        --neutral-alpha-50: #12376914;
+        --neutral-alpha-100: #09194821;
+        --neutral-alpha-200: #07204540;
+        --neutral-alpha-300: #02173b5c;
+        --neutral-alpha-400: #03103080;
+        --neutral-alpha-500: #000c2999;
+        --neutral-alpha-600: #010419c9;
+        --neutral-alpha-700: #010213d9;
+        --neutral-alpha-800: #01020ee5;
+        --neutral-alpha-900: #000005f2;
 
-    body {
-      background: var(--background);
-    }
+        /* Background */
 
-    #main {
-      display: flex;
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
-  </style>
-  {style_include}
-</head>
+        --background-white: #ffffff;
+        --background-disabled: #f8f9fb;
+        --background-normal: #f6f8fa;
+        --background-hover: #eceff3;
+        --background-pressed: #dfe1e6;
+        --background-loud: #0d0d12;
 
-<body>
-  <div id="main">
-  </div>
-  <script type="module">
-    import init from "/{base_path}/assets/dioxus/{app_name}.js";
-    init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(wasm => {
-      if (wasm.__wbindgen_start == undefined) wasm.main();
-    });
-  </script>
-  <script src="/{base_path}/js/main-bundle.js"></script>
-  {script_include}
-</body>
+        /* Border */
 
+        --border-white: #ffffff;
+        --border-disabled: #f6f8fa;
+        --border-normal: #eceff3;
+        --border-hover: #dfe1e6;
+        --border-pressed: #c1c7cf;
+        --border-muted: #353849;
+
+        /* Icon */
+
+        --icon-white: #ffffff;
+        --icon-disabled: #a4abb8;
+        --icon-subdued: #818898;
+        --icon-normal: #666d80;
+        --icon-muted: #353849;
+        --icon-loud: #0d0d12;
+
+        /* Text */
+
+        --text-white: #ffffff;
+        --text-disabled: #a4abb8;
+        --text-subdued: #818898;
+        --text-normal: #666d80;
+        --text-muted: #353849;
+        --text-loud: #0d0d12;
+
+        /* Primary */
+        --primary-0: #f0efff;
+        --primary-25: #e5e4fb;
+        --primary-50: #a19cf0;
+        --primary-100: #5e56ff;
+        --primary-200: #312ba0;
+        --primary-300: #201c6c;
+
+        /* Accent/Aqua */
+        --accent-aqua-0: #effbff;
+        --accent-aqua-25: #d1f0f9;
+        --accent-aqua-50: #7edcf1;
+        --accent-aqua-100: #33cfff;
+        --accent-aqua-200: #106a97;
+        --accent-aqua-300: #0c4d6e;
+
+        /* Secondary/Red */
+        --secondary-red-0: #feeff2;
+        --secondary-red-25: #fadae1;
+        --secondary-red-50: #ed8296;
+        --secondary-red-100: #df1c41;
+        --secondary-red-200: #95122b;
+        --secondary-red-300: #710e21;
+
+        /* Secondary/Yellow */
+        --secondary-yellow-0: #fff6e0;
+        --secondary-yellow-25: #f9eccb;
+        --secondary-yellow-50: #fbd982;
+        --secondary-yellow-100: #ffbd4c;
+        --secondary-yellow-200: #956321;
+        --secondary-yellow-300: #5b3d1e;
+
+        /* Secondary-green */
+        --secondary-green-0: #effefa;
+        --secondary-green-25: #ddf2ee;
+        --secondary-green-50: #9de0d3;
+        --secondary-green-100: #40c4aa;
+        --secondary-green-200: #287f6e;
+        --secondary-green-300: #174e43;
+
+        /* Gradients */
+        --gradient-purple: linear-gradient(45deg, #8e70c6, #b09adb);
+        --gradient-gray: linear-gradient(45deg, #e3e3e3, #ededed);
+        --gradient-yellow: linear-gradient(45deg, #fec329, #f7da72);
+        --gradient-blue: linear-gradient(45deg, #5cc1e1, #93f0ff);
+        --gradient-pink: linear-gradient(45deg, #e4b3c1, #ecbccc);
+        --gradient-green: linear-gradient(45deg, #30d34d, #66ffa1);
+
+        --border-rgba-light: rgba(0, 0, 0, 0.25);
+        --border-rgba-dark: rgba(255, 255, 255, 0.25);
+
+        /* New design */
+
+        --olive-5: #f3f5f4;
+        --olive-25: #c4ccca;
+        --olive-50: #889a95;
+        --olive-75: #4d6760;
+        --olive-90: #2a4940;
+        --olive-100: #12352b;
+
+        --blue-light: #bfeaf7;
+        --blue-dark: #00a9e0;
+
+        --lavanda-light: #e6c9ed;
+        --lavanda-dark: #9b26b6;
+
+        --green-light: #b2edaf;
+        --green-dark: #56c95f;
+
+        --black: #000000;
+        --white: #ffffff;
+
+        --text-primary: #12352b;
+        --text-secondary: #1b5f51;
+        --text-tertiary: #227a6b;
+        --text-primary-alt: #ffffff;
+
+        --fill-00: #e7f7e8;
+        --fill-50: #c6ebc7;
+        --fill-100: #a1dfa4;
+        --fill-200: #78d37d;
+        --fill-600: #006b0a;
+        --fill-00-alt: #141414;
+        --fill-100-alt: #171819;
+        --fill-200-alt: #1d1e1f;
+        --fill-600-alt: #5f5f5f;
+
+        --color-blue-300: #52c2e6;
+        --color-green-100: #c6ebc7;
+        --color-green-300: #78d37d;
+        --color-lavanda-400: #ab47c1;
+        --color-fuchsia-500: #d948ef;
+
+        --state-base-border: #78d37d;
+        --state-base-background: #e7f7e8;
+        --state-destructive-active: #dc2828;
+        --state-primary-active: #56c960;
+      }
+
+      :root {
+        --text-1: var(--text-loud);
+        --text-2: var(--text-muted);
+
+        --background: var(--background-white);
+        --background-button: var(--neutral-solid-900);
+        --background-input: var(--neutral-solid-25);
+        --background-message: var(--neutral-alpha-0);
+        --background-shadow: rgba(0, 0, 0, 30%);
+        --background-modal: var(--neutral-solid-50);
+
+        --border: var(--border-normal);
+        --border-rgba: var(var(var(--border-rgba-light)));
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text-1: var(--text-white);
+          --text-2: var(--text-subdued);
+
+          --background: var(--background-loud);
+          --background-button: var(--neutral-solid-800);
+          --background-input: var(--neutral-solid-700);
+          --background-message: var(--neutral-solid-800);
+          --background-shadow: rgba(53, 56, 73, 30%);
+          --background-modal: var(--neutral-solid-700);
+
+          --border: var(--border-muted);
+          --border-rgba: var(var(var(--border-rgba-dark)));
+        }
+      }
+
+      :where(:not(dialog)) {
+        margin: 0;
+      }
+
+      :where(a) {
+        color: inherit;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :where(a):where(:not(:hover)) {
+        text-decoration: inherit;
+      }
+
+      :where(:not(:active):focus-visible) {
+        outline-offset: 5px;
+      }
+
+      :focus-visible {
+        outline: 2px dashed var(--alt);
+      }
+
+      body {
+        background: var(--background);
+      }
+
+      #main {
+        display: flex;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+    </style>
+    {style_include}
+  </head>
+
+  <body>
+    <div id="main"></div>
+    <script type="module">
+      import {
+        XcmProgramsExecutor,
+        globallyInjectPrograms,
+      } from "/{base_path}/js/main-bundle.js";
+      import init from "/{base_path}/assets/dioxus/{app_name}.js";
+
+      const executor = new XcmProgramsExecutor({
+        kusama: ["ws://localhost:10000"],
+        kreivo: ["ws://localhost:12281"],
+        kusamaPeople: ["ws://localhost:11004"],
+      });
+
+      globallyInjectPrograms(executor);
+      globalThis.setSigner = async (address) => {
+        await executor.setSigner(address);
+      };
+
+      init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(
+        async (wasm) => {
+          await executor.initialize("virto");
+
+          if (wasm.__wbindgen_start == undefined) {
+            wasm.main();
+          }
+        }
+      );
+    </script>
+
+    {script_include}
+  </body>
 </html>

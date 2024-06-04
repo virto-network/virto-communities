@@ -28,7 +28,7 @@ pub enum OnboardingStep {
 
 #[derive(Serialize)]
 struct Identity {
-    name: String,
+    pub name: String,
     description: Option<String>,
     image: Option<String>,
 }
@@ -58,11 +58,10 @@ fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = window)]
-    async fn topupThenCreateCommunity(
-        from: String,
-        app: String,
+    #[wasm_bindgen(js_namespace = window, js_name = topupThenCreateCommunity)]
+    async fn topup_then_create_community(
         communityId: JsValue,
+        name: String,
         decisionMethod: JsValue,
         identity: JsValue,
     );
@@ -119,7 +118,7 @@ pub fn Onboarding() -> Element {
 
                     let community_id_js = JsValue::from(123);
 
-                    let response = topupThenCreateCommunity(account.address(), "virto".to_string(), community_id_js, decision_method_js, identity_js).await;
+                    let response = topup_then_create_community(community_id_js, identity.name.clone(), decision_method_js, identity_js).await;
                     // TODO: notify an error with an unwrap_or_else
                 });
             },
@@ -156,7 +155,7 @@ pub fn Onboarding() -> Element {
                             }
                         }
                         match *onboarding_step.read() {
-                            OnboardingStep::Basics => rsx!(OnboardingBasics {}),
+                            OnboardingStep::Basics => rsx!{OnboardingBasics {}},
                             OnboardingStep::Management => rsx!(OnboardingManagement {}),
                             OnboardingStep::Invite => rsx!(OnboardingInvite {}),
                         }

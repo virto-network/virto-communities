@@ -19,8 +19,17 @@ use crate::{
     },
     services::kreivo::balances::account,
 };
+use wasm_bindgen::prelude::*;
 
 use pjs::PjsExtension;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = globalThis, js_name = setSigner)]
+    fn set_signer(
+        address: String,
+    );
+}
 
 #[component]
 pub fn Header() -> Element {
@@ -120,6 +129,8 @@ pub fn Header() -> Element {
 
         session.persist_session_file(&serialized_session);
         session.update_account(event);
+
+        set_signer(account.address().clone());
 
         let account = get_account().and_then(|account| {
             Some(DropdownItem {
