@@ -2,6 +2,9 @@ use std::ops::Deref;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
+use futures_util::TryFutureExt;
+use gloo::utils::format::JsValueSerdeExt;
+use serde::Serialize;
 
 use crate::{
     components::{
@@ -11,8 +14,10 @@ use crate::{
         },
         molecules::{OnboardingBasics, OnboardingInvite, OnboardingManagement},
     },
-    hooks::use_onboard::use_onboard,
+    hooks::{use_accounts::use_accounts, use_onboard::use_onboard, use_session::use_session},
 };
+use serde_json::{to_value, Error, Value as JsonValue};
+use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Debug)]
 pub enum OnboardingStep {
@@ -21,10 +26,54 @@ pub enum OnboardingStep {
     Invite,
 }
 
+#[derive(Serialize)]
+struct Identity {
+    name: String,
+    description: Option<String>,
+    image: Option<String>,
+}
+
+#[derive(Serialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+enum DecisionMethod {
+    Membership,
+    Rank,
+    NativeToken,
+    CommunityAsset { id: String, min_vote: i32 },
+}
+
+#[derive(Serialize)]
+struct CommunityData {
+    signer: String,
+    community_id: i32,
+    decision_method: DecisionMethod,
+    identity: Identity,
+}
+
+fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
+    to_value(value)
+        .map(|t: serde_json::Value| JsValue::from_serde(&t))
+        .unwrap_or_else(|e| Ok(JsValue::from_str("Error creating JsValue")))
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = window)]
+    async fn topupThenCreateCommunity(
+        from: String,
+        app: String,
+        communityId: JsValue,
+        decisionMethod: JsValue,
+        identity: JsValue,
+    );
+}
+
 #[component]
 pub fn Onboarding() -> Element {
     let i18 = use_i18();
     let mut onboard = use_onboard();
+    let mut accounts = use_accounts();
+    let mut session = use_session();
 
     let mut onboarding_step = use_signal::<OnboardingStep>(|| OnboardingStep::Basics);
     let mut onboarding_steps = use_signal::<Vec<OnboardingStep>>(|| {
@@ -37,7 +86,45 @@ pub fn Onboarding() -> Element {
 
     onboard.default();
 
+    let get_account = move || {
+        let Some(user_session) = session.get() else {
+            return None;
+        };
+
+        accounts.get_one(user_session.account_id)
+    };
+
     rsx! {
+        button {
+            onclick: move |_| {
+                spawn(async move {
+                    let identity = Identity {
+                        name: "Example Community".to_string(),
+                        description: Some("A new community for examples.".to_string()),
+                        image: None,
+                    };
+                    let decision_method = DecisionMethod::Membership;
+
+                    let Ok(identity_js) = convert_to_jsvalue(&identity) else {
+                        return;
+                    };
+
+                    let Ok(decision_method_js) = convert_to_jsvalue(&decision_method) else {
+                        return;
+                    };
+
+                    let Some(account) = get_account() else {
+                        return;
+                    };
+
+                    let community_id_js = JsValue::from(123);
+
+                    let response = topupThenCreateCommunity(account.address(), "virto".to_string(), community_id_js, decision_method_js, identity_js).await;
+                    // TODO: notify an error with an unwrap_or_else
+                });
+            },
+            "click me",
+        }
         div { class: "page page--onboarding",
             div { class: "row",
                 div { class: "onboarding__form",
