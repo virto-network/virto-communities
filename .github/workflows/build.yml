@@ -1,4 +1,4 @@
-name: ci
+name: Build
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  ci:
+  build:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v2
 
       - name: Install latest
         uses: actions-rs/toolchain@v1
@@ -34,11 +34,9 @@ jobs:
       - name: Build
         run: dx build --release
 
-      - name: Publish Cloudflare
-        uses: cloudflare/pages-action@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: Communities
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          name: build-artifact
+          path: ./dist
+  
