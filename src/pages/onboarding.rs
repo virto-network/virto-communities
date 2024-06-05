@@ -28,9 +28,16 @@ pub enum OnboardingStep {
 
 #[derive(Serialize)]
 struct Identity {
-    pub name: String,
-    description: Option<String>,
-    image: Option<String>,
+    pub display: String,
+    // TODO: enable this to integrate the actual required fields by blockchain
+    // pub legal: Option<String>,
+    // pub web: Option<String>,
+    // pub matrix: Option<String>,
+    // pub pgpFingerprint: Option<JsValue>,
+    // pub image: Option<JsValue>,
+    // pub twitter: Option<JsValue>,
+    // pub github: Option<JsValue>,
+    // pub discord: Option<JsValue>,
 }
 
 #[derive(Serialize)]
@@ -98,9 +105,7 @@ pub fn Onboarding() -> Element {
             onclick: move |_| {
                 spawn(async move {
                     let identity = Identity {
-                        name: "Example Community".to_string(),
-                        description: Some("A new community for examples.".to_string()),
-                        image: None,
+                        display: "Example Community".to_string(),
                     };
                     let decision_method = DecisionMethod::Membership;
 
@@ -118,7 +123,7 @@ pub fn Onboarding() -> Element {
 
                     let community_id_js = JsValue::from(123);
 
-                    let response = topup_then_create_community(community_id_js, identity.name.clone(), decision_method_js, identity_js).await;
+                    let response = topup_then_create_community(community_id_js, identity.display.clone(), decision_method_js, identity_js).await;
                     // TODO: notify an error with an unwrap_or_else
                 });
             },

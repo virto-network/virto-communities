@@ -24,7 +24,12 @@ title = "virto-communities"
 reload_html = true
 
 # which files or dirs will be watcher monitoring
-watch_path = ["src", "public", "index.html"]
+watch_path = [
+  "src",
+  "public",
+  "index.html",
+  # '../xcm-programs/dist/xcm-programs.js',
+]
 
 # include `assets` in web platform
 [web.resource]
