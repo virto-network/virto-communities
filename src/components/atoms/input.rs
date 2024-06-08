@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::atoms::{Icon, IconButton, Search};
+use crate::components::atoms::{Icon, IconButton, Search, WarningSign};
 
 use super::dropdown::ElementSize;
 
@@ -23,6 +23,8 @@ pub struct InputProps {
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
     label: Option<String>,
+    #[props(default = false)]
+    required: bool,
     on_input: EventHandler<FormEvent>,
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
@@ -69,7 +71,8 @@ pub fn Input(props: InputProps) -> Element {
                     r#type: "{input_type}",
                     class: "input",
                     value: props.message,
-                    placeholder: "{props.placeholder}",
+                    required: props.required,
+                    placeholder: if props.required { format!("{}*", props.placeholder) } else { format!("{}", props.placeholder) },
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)
                 }
@@ -95,6 +98,12 @@ pub fn Input(props: InputProps) -> Element {
             if let Some(error) = props.error {
                 div {
                     class: "input--error",
+                    Icon {
+                        icon: WarningSign,
+                        height: 24,
+                        width: 24,
+                        fill: "var(--state-destructive-active)"
+                    }
                     "{error}"
                 }
             }

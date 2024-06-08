@@ -48,6 +48,7 @@ pub fn use_onboard() -> UseOnboardState {
     let basics = consume_context::<Signal<BasicsForm>>();
     let management = consume_context::<Signal<ManagementForm>>();
     let invitations = consume_context::<Signal<InvitationForm>>();
+    let name = consume_context::<Signal<String>>();
 
     use_hook(|| UseOnboardState {
         inner: UseOnboardInner {
@@ -79,8 +80,13 @@ impl UseOnboardState {
         self.inner.basics.read().clone()
     }
 
+    pub fn set_basics(&mut self, basics: BasicsForm) {
+        let mut inner = self.inner.basics.write();
+        *inner = basics;
+    }
+
     pub fn basics_mut(&mut self) -> Signal<BasicsForm> {
-        self.inner.basics
+        self.inner.basics.clone()
     }
 
     pub fn get_management(&self) -> ManagementForm {

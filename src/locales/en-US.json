@@ -16,7 +16,7 @@
                 "settings": "Settings"
             }
         },
-        "dashboard":  {
+        "dashboard": {
             "tabs": {
                 "all": "All DAOs",
                 "owned": "Your DAOs"
@@ -30,9 +30,7 @@
             "cta_header": {
                 "filter": {
                     "title": "Filter",
-                    "options": {
-        
-                    }
+                    "options": {}
                 },
                 "search": "Search"
             },
@@ -121,6 +119,12 @@
                     "back": "Back",
                     "next": "Create Org"
                 }
+            },
+            "tips": {
+                "loading": {
+                    "title": "Create your Organization",
+                    "description": "This may take a moment"
+                }
             }
         },
         "errors": {
@@ -134,6 +138,24 @@
             },
             "communities": {
                 "query_failed": "Failed to fetch communities"
+            },
+            "attach": {
+                "title": "Failed to upload",
+                "not_found": {
+                    "explanation": "File not found.",
+                    "details": "We were unable to find the file."
+                },
+                "size": {
+                    "explanation": "File exceeds size limit.",
+                    "details": "Upload a file that is less than 2 MB in size."
+                },
+                "mime": {
+                    "explanation": "File invalid format.",
+                    "details": "Upload a file that is in .jpeg or .png"
+                }
+            },
+            "form": {
+                "not_empty": "Cannot be empty."
             }
         }
     }

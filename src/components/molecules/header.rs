@@ -19,8 +19,17 @@ use crate::{
     },
     services::kreivo::balances::account,
 };
+use wasm_bindgen::prelude::*;
 
 use pjs::PjsExtension;
+
+// #[wasm_bindgen]
+// extern "C" {
+//     #[wasm_bindgen(js_namespace = globalThis, js_name = setSigner)]
+//     fn set_signer(address: String);
+// }
+
+const APP_NAME: &str = "Virto";
 
 #[component]
 pub fn Header() -> Element {
@@ -121,6 +130,8 @@ pub fn Header() -> Element {
         session.persist_session_file(&serialized_session);
         session.update_account(event);
 
+        // set_signer(account.address().clone());
+
         let account = get_account().and_then(|account| {
             Some(DropdownItem {
                 key: account.address().clone(),
@@ -134,7 +145,7 @@ pub fn Header() -> Element {
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         if session.is_logged() {
-            match PjsExtension::connect("virto").await {
+            match PjsExtension::connect(APP_NAME).await {
                 Ok(mut vault) => {
                     let Ok(_) = vault.fetch_accounts().await else {
                         notification

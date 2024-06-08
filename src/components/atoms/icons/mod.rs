@@ -29,6 +29,7 @@ pub mod user;
 pub mod user_group;
 pub mod virto_logo;
 pub mod votes;
+pub mod warning_sign;
 
 pub use add_plus::AddPlus;
 pub use arrow::Arrow;
@@ -61,3 +62,4 @@ pub use user::User;
 pub use user_group::UserGroup;
 pub use virto_logo::VirtoLogo;
 pub use votes::Votes;
+pub use warning_sign::WarningSign;

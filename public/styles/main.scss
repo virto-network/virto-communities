@@ -188,6 +188,13 @@ $fw-bold: 700;
     line-height: $lh-18;
 }
 
+%text-base-font-regular {
+    font-family: $font-family;
+    font-size: $fs-16;
+    font-weight: $fw-regular;
+    line-height: $lh-24;
+}
+
 .bg--transparent {
     background: transparent !important;
 }
@@ -395,29 +402,38 @@ $fw-bold: 700;
     left: 0;
 }
 
-.notification--error {
-    background: var(--secondary-red-100);
-}
-
-.notification--warning {
-    background: var(--secondary-yellow-100);
-}
-
-.notification--success {
-    background: var(--olive-100);
-}
-
 .notification__title {
-    font-size: var(--font-size-0);
-    font-weight: bold;
+    @extend %text-base-font-medium;
+    color: var(--text-primary);
 }
 
 .notification__body {
-    font-size: var(--font-size-0);
+    @extend %text-base-font-regular;
+    color: var(--text-tertiary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: var(--size-0);
+}
+
+.notification--error {
+    background: var(--color-red-50);
+}
+
+.notification--error>.notification__title {
+    color: var(--color-red-700);
+}
+
+.notification--error>.notification__body {
+    color: var(--state-destructive-hover);
+}
+
+.notification--warning {
+    background: var(--secondary-yellow-25);
+}
+
+.notification--success {
+    background: var(--fill-50);
 }
 
 .tooltip {
@@ -806,19 +822,14 @@ textarea::placeholder {
 }
 
 .input--error-container {
-    box-shadow: 0px 0px 0px 1px var(--secondary-red-100), 0px 0px 0px 2px var(--background-white),
-        0px 0px 0px 3px rgba(223, 28, 65, 0.24), 0px 1px 2px 0px rgba(150, 19, 44, 0.32);
+    border: 2px solid var(--state-destructive-active);
 }
 
 .input--error {
+    @extend %text-base-font-medium;
+    color: var(--state-destructive-active);
     display: flex;
     gap: 2px;
-    color: var(--secondary-red-100);
-    font-family: 'Inter', Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px;
     align-items: center;
     padding-top: 6px;
 }
@@ -854,7 +865,7 @@ textarea::placeholder {
 }
 
 .sidebar__container {
-    background: var(--olive-100);
+    background: var(--text-primary);
     box-shadow: 1px 2px 8px var(--border--rgba);
     height: 100vh;
 }
@@ -956,6 +967,36 @@ textarea::placeholder {
     gap: 10px;
     width: 100%;
     color: var(--text-secondary);
+}
+
+.attach__wrapper--error {
+    padding: 16px 16px 24px;
+    border-radius: 12px;
+    background: var(--color-red-50);
+    flex-direction: column;
+    align-items: normal;
+    gap: 0;
+}
+
+.attach__error__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.attach__error__title {
+    @extend %text-base-font-medium;
+    color: var(--color-red-900);
+}
+
+.attach__error__explanation {
+    @extend %text-base-font-medium;
+    color: var(--color-red-700);
+}
+
+.attach__error__details {
+    @extend %text-base-font-regular;
+    color: var(--state-destructive-hover);
 }
 
 .checkbox-card {
@@ -1243,27 +1284,6 @@ textarea::placeholder {
     flex-direction: column;
 }
 
-.welcome__title {
-    font-family: 'Inter', Arial, Helvetica, sans-serif;
-    font-size: 64px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: auto;
-    vertical-align: text-top;
-    color: var(--text-3);
-    position: relative;
-}
-
-.welcome__subtitle {
-    font-family: 'Inter', Arial, Helvetica, sans-serif;
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: auto;
-    vertical-align: text-top;
-    color: var(--text-primary);
-}
-
 .dashboard__header__right {
     display: flex;
     width: max-content;
@@ -1339,16 +1359,6 @@ textarea::placeholder {
 .dashboard__head {
     display: flex;
     justify-content: space-between;
-}
-
-.head__title {
-    font-family: 'Inter', Arial, Helvetica, sans-serif;
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: auto;
-    vertical-align: text-top;
-    color: #FFFFFFBF;
 }
 
 .head__actions {

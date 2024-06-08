@@ -19,9 +19,12 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     pages::route::Route,
-    services::kreivo::{
-        community_memberships::{collection, item},
-        community_track::{tracks, tracksIds},
+    services::{
+        bot::{create::CommunitySpace, get_by_id::get_by_id},
+        kreivo::{
+            community_memberships::{collection, item},
+            community_track::{tracks, tracksIds},
+        },
     },
 };
 
@@ -37,7 +40,7 @@ pub struct Community {
     pub name: String,
     pub description: String,
     pub memberships: u16,
-    pub tags: Vec<CommunityTag>,
+    pub tags: Vec<String>,
     pub members: u16,
 }
 
@@ -56,7 +59,7 @@ pub fn Dashboard() -> Element {
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
 
-    theme.set_background(String::from("var(--olive-100)"));
+    theme.set_background(String::from("var(--text-primary)"));
 
     let tab_items = vec![TabItem {
         k: String::from("all"),
@@ -109,16 +112,27 @@ pub fn Dashboard() -> Element {
                     Err(_) => 0u16,
                 };
 
-                communities.with_mut(|c| {
-                    c.push(Community {
-                        icon: None,
-                        name: String::from_utf8_lossy(filtered_name).to_string(),
-                        description: String::from(""),
-                        tags: vec![],
-                        memberships: collection_items,
-                        members: item_details,
-                    })
-                })
+                let mut community = Community {
+                    icon: None,
+                    name: String::from_utf8_lossy(filtered_name).to_string(),
+                    description: String::from(""),
+                    tags: vec![],
+                    memberships: collection_items,
+                    members: item_details,
+                };
+
+                // TODO: replace this to get the real identity
+                // let response_identity = identity().await;
+                let response_identity = Some("!OtgrPmyTQDnHulMFIL:matrix.org");
+                if let Some(matrix) = response_identity {
+                    if let Ok(response) = get_by_id(matrix).await {
+                        community.icon = response.logo;
+                        community.tags.push(response.industry);
+                        community.description = response.description.unwrap_or("".to_string());
+                    }
+                };
+
+                communities.with_mut(|c| c.push(community))
             }
             tooltip.hide();
             filtered_communities.set(communities())
@@ -267,15 +281,10 @@ pub fn Dashboard() -> Element {
                             div { class: "card__tags",
                                 for tag in community.tags {
                                     {
-                                        let (badge_class, badge_text) = match tag {
-                                            CommunityTag::Neighborhood => ("badge--lavanda-dark", "Neighborhood"),
-                                            CommunityTag::SocialImpact => ("badge--lavanda-light", "Social Impact"),
-                                        };
-
                                         rsx!(
                                             Badge {
-                                                class: badge_class,
-                                                text: badge_text
+                                                class: "badge--lavanda-dark",
+                                                text: tag
                                             }
                                         )
                                     }

@@ -33,4 +33,5 @@ pub fn use_startup() {
     use_context_provider::<Signal<Option<PjsExtension>>>(|| Signal::new(None));
 
     use_context_provider::<Signal<bool>>(|| Signal::new(false));
+    use_context_provider::<Signal<String>>(|| Signal::new(String::new()));
 }

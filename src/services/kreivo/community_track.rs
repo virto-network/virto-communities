@@ -15,7 +15,7 @@ pub enum ChainStateError {
 }
 
 pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
-    let query = format!("wss://kreivo.kippu.rocks/communityTracks/tracksIds");
+    let query = format!("http://127.0.0.1:12281/communityTracks/tracksIds");
 
     let response = sube!(&query)
         .await
@@ -41,7 +41,7 @@ pub struct TrackInfo {
 }
 
 pub async fn tracks(track: u16) -> Result<TrackInfo, ChainStateError> {
-    let query = format!("wss://kreivo.kippu.rocks/communityTracks/tracks/{}", track);
+    let query = format!("http://127.0.0.1:12281/communityTracks/tracks/{}", track);
 
     let response = sube!(&query).await.map_err(|e| {
         log::info!("{}", e);

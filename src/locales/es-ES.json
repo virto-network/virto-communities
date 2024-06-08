@@ -119,6 +119,12 @@
                     "back": "Regresar",
                     "next": "Crear Org"
                 }
+            },
+            "tips": {
+                "loading": {
+                    "title": "Crea tu Organización",
+                    "description": "Esto puede tomar un momento"
+                }
             }
         },        
         "errors": {
@@ -132,6 +138,24 @@
             },
             "communities": {
                 "query_failed": "No se ha podido traer comunidades"
+            },
+            "attach": {
+                "title": "Error al subir",
+                "not_found": {
+                    "explanation": "Archivo no encontrado.",
+                    "details": "No hemos podido encontrar el archivo."
+                },
+                "size": {
+                    "explanation": "El archivo excede el límite de tamaño.",
+                    "details": "Sube un archivo que sea menor de 2 MB."
+                },
+                "mime": {
+                    "explanation": "Formato de archivo inválido.",
+                    "details": "Sube un archivo que esté en formato .jpeg o .png"
+                }
+            },
+            "form": {
+                "not_empty": "No puede estar vacío."
             }
         }
     }

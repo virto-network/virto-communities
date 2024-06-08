@@ -32,6 +32,11 @@ pub mod components {
 }
 
 pub mod services {
+    pub mod bot {
+        pub mod create;
+        pub mod get_by_id;
+        pub mod upload;
+    }
     pub mod kreivo {
         pub mod balances;
         pub mod community_memberships;

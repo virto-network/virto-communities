@@ -12,7 +12,7 @@ pub struct Theme {
 impl Default for Theme {
     fn default() -> Self {
         Self {
-            background: String::from("var(--olive-100)"),
+            background: String::from("var(--text-primary)"),
             text_1: String::from("var(--white)"),
             text_2: String::from("#FFFFFF7F"),
             text_3: String::from("var(--green-dark)"),
