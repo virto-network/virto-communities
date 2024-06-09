@@ -27,11 +27,19 @@ pub enum OnboardingStep {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TopupDetails {
+    pub signer_in_kreivo: u32,
+    pub community_account_in_kreivo: u32,
+    pub community_account_in_people: u32,
+}
+
+#[derive(Serialize)]
 struct Identity {
     pub display: String,
     // TODO: enable this to integrate the actual required fields by blockchain
     // pub legal: Option<String>,
-    // pub web: Option<String>,
+    pub web: Option<String>,
     // pub matrix: Option<String>,
     // pub pgpFingerprint: Option<JsValue>,
     // pub image: Option<JsValue>,
@@ -67,10 +75,12 @@ fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
 extern "C" {
     #[wasm_bindgen(js_namespace = window, js_name = topupThenCreateCommunity)]
     async fn topup_then_create_community(
-        communityId: JsValue,
+        community_id: u16,
         name: String,
-        decisionMethod: JsValue,
-        identity: JsValue,
+        decision_method: JsValue,
+        maybe_identity: JsValue,
+        maybe_memberships: JsValue,
+        maybe_topup: JsValue,
     );
 }
 
@@ -104,16 +114,15 @@ pub fn Onboarding() -> Element {
         button {
             onclick: move |_| {
                 spawn(async move {
-                    let identity = Identity {
-                        display: "Example Community".to_string(),
-                    };
-                    let decision_method = DecisionMethod::Membership;
-
-                    let Ok(identity_js) = convert_to_jsvalue(&identity) else {
+                    let Ok(decision_method) = convert_to_jsvalue(&DecisionMethod::Membership) else {
                         return;
                     };
 
-                    let Ok(decision_method_js) = convert_to_jsvalue(&decision_method) else {
+                    let identity = Identity {
+                        display: "Example Community".to_string(),
+                        web: None
+                    };
+                    let Ok(encoded_identity) = convert_to_jsvalue(&identity) else {
                         return;
                     };
 
@@ -121,9 +130,18 @@ pub fn Onboarding() -> Element {
                         return;
                     };
 
-                    let community_id_js = JsValue::from(123);
+                    let Ok(membership_accounts) = convert_to_jsvalue(&vec![
+                        "5Dk4Zd2sGdTmVoQQqCpmDLhs8TgbsmWnHiNaR4VF9cuqvJw3".to_string(),
+                    ]) else { return; };
 
-                    let response = topup_then_create_community(community_id_js, identity.display.clone(), decision_method_js, identity_js).await;
+                    let response = topup_then_create_community(
+                        123,
+                        identity.display.clone(),
+                        decision_method,
+                        encoded_identity,
+                        membership_accounts,
+                        JsValue::UNDEFINED
+                    ).await;
                     // TODO: notify an error with an unwrap_or_else
                 });
             },
