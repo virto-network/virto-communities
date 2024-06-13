@@ -28,13 +28,17 @@ impl CommunityMatrixId {
 pub async fn create(community: CommunitySpace) -> Result<CommunityMatrixId, reqwest::Error> {
     let client = reqwest::Client::new();
 
-    let response = client
-        .post("http://127.0.0.1:8000/room/create")
-        .json(&community)
-        .send()
-        .await?
-        .json::<CommunityMatrixId>()
-        .await?;
+    // let response = client
+    //     .post("http://127.0.0.1:8000/room/create")
+    //     .json(&community)
+    //     .send()
+    //     .await?
+    //     .json::<CommunityMatrixId>()
+    //     .await?;
 
-    Ok(response)
+    // Ok(response)
+
+    Ok(CommunityMatrixId {
+        id: "!qkcwNmOSpnWjTgOHoW:matrix.org".to_string(),
+    })
 }

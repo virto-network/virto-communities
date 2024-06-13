@@ -212,26 +212,26 @@
   <div id="main">
   </div>
   <script type="module">
-    // import {
-    //   XcmProgramsExecutor,
-    //   globallyInjectPrograms,
-    // } from "/{base_path}/js/xcm-program.js";
+    import {
+      XcmProgramsExecutor,
+      globallyInjectPrograms,
+    } from "/{base_path}/js/xcm-programs.js";
     import init from "/{base_path}/assets/dioxus/{app_name}.js";
 
-    // const executor = new XcmProgramsExecutor({
-    //   kusama: ["ws://localhost:10000"],
-    //   kreivo: ["ws://localhost:12281"],
-    //   kusamaPeople: ["ws://localhost:11004"],
-    // });
+    const executor = new XcmProgramsExecutor({
+      kusama: ["ws://localhost:10000"],
+      kreivo: ["ws://localhost:12281"],
+      kusamaPeople: ["ws://localhost:11004"],
+    });
 
-    // globallyInjectPrograms(executor);
-    // globalThis.setSigner = async (address) => {
-    //   await executor.setSigner(address);
-    // };
+    globallyInjectPrograms(executor);
+    globalThis.setSigner = async (address) => {
+      await executor.setSigner(address);
+    };
 
     init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(
       async (wasm) => {
-        // await executor.initialize("virto");
+        await executor.initialize("virto");
 
         if (wasm.__wbindgen_start == undefined) {
           wasm.main();

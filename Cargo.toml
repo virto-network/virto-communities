@@ -34,10 +34,11 @@ mime = "0.3.17"
 futures-util = "0.3.30"
 uuid = { version = "1.8.0", features = ["v4"] }
 
-sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "fix/dependencies", default-features = false, features = [
+sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git?alksdjf", branch = "main", default-features = false, features = [
     "js",
-    'wss',
+    "wss",
 ] }
+
 pjs = { package = "pjs", git = "https://github.com/virto-network/virto-sdk.git", branch = "feat/pjs-vault", default-features = false }
 libwallet = { package = "libwallet", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
     "substrate",

@@ -8,6 +8,7 @@ use crate::services::kreivo::community_track::ChainStateError;
 pub struct CollectionDetails {
     pub items: u16,
     pub item_metadatas: u16,
+    pub owner: Vec<u8>,
 }
 
 pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainStateError> {
@@ -32,10 +33,7 @@ pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainState
 }
 
 pub async fn item(item: u16, member: Option<u16>) -> Result<u16, ChainStateError> {
-    let query = format!(
-        "http://127.0.0.1:12281/communityMemberships/item/{}",
-        item
-    );
+    let query = format!("http://127.0.0.1:12281/communityMemberships/item/{}", item);
 
     let response = sube!(&query)
         .await

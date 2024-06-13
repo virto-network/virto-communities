@@ -34,4 +34,5 @@ pub fn use_startup() {
 
     use_context_provider::<Signal<bool>>(|| Signal::new(false));
     use_context_provider::<Signal<String>>(|| Signal::new(String::new()));
+    use_context_provider::<Signal<f64>>(|| Signal::new(0.0));
 }

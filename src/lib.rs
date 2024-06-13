@@ -41,5 +41,6 @@ pub mod services {
         pub mod balances;
         pub mod community_memberships;
         pub mod community_track;
+        pub mod identity;
     }
 }

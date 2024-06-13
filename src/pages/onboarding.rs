@@ -17,7 +17,11 @@ use crate::{
     hooks::{
         use_accounts::use_accounts,
         use_attach::use_attach,
-        use_onboard::{use_onboard, BasicsForm},
+        use_notification::{
+            use_notification, NotificationHandle, NotificationHandler, NotificationItem,
+            NotificationVariant,
+        },
+        use_onboard::{use_onboard, BasicsForm, Invitations},
         use_session::use_session,
         use_tooltip::{use_tooltip, TooltipItem},
     },
@@ -34,12 +38,20 @@ pub enum OnboardingStep {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TopupDetails {
+    pub signer_in_kreivo: u32,
+    pub community_account_in_kreivo: u32,
+    pub community_account_in_people: u32,
+}
+
+#[derive(Serialize)]
 struct Identity {
     pub display: String,
     // TODO: enable this to integrate the actual required fields by blockchain
     // pub legal: Option<String>,
-    // pub web: Option<String>,
-    pub matrix: Option<String>,
+    pub web: Option<String>,
+    // pub matrix: Option<String>,
     // pub pgpFingerprint: Option<JsValue>,
     // pub image: Option<JsValue>,
     // pub twitter: Option<JsValue>,
@@ -74,21 +86,26 @@ fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
 extern "C" {
     #[wasm_bindgen(js_namespace = window, js_name = topupThenCreateCommunity)]
     async fn topup_then_create_community(
-        communityId: JsValue,
+        community_id: u16,
         name: String,
-        decisionMethod: JsValue,
-        identity: JsValue,
+        decision_method: JsValue,
+        maybe_identity: JsValue,
+        maybe_memberships: JsValue,
+        maybe_topup: JsValue,
     );
 }
 
 #[component]
 pub fn Onboarding() -> Element {
     let i18 = use_i18();
+    let nav = use_navigator();
     let mut onboard = use_onboard();
     let mut accounts = use_accounts();
     let mut session = use_session();
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
+    let mut notification = use_notification();
+    let mut to_pay = consume_context::<Signal<f64>>();
 
     let mut onboarding_step = use_signal::<OnboardingStep>(|| OnboardingStep::Basics);
     let mut onboarding_steps = use_signal::<Vec<OnboardingStep>>(|| {
@@ -200,77 +217,142 @@ pub fn Onboarding() -> Element {
                                 ),
                             }
                         }
-                        Button {
-                            class: "",
-                            text: "Continue",
-                            size: ElementSize::Big,
-                            on_click: move |_| {
-                                if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
-                                    onboarding_step.set(OnboardingStep::Basics);
-                                    handle_required_inputs.set(true);
-                                    return;
-                                } else {
-                                    handle_required_inputs.set(false);
-                                }
 
-                                let step = onboarding_step();
-                                match step {
-                                    OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Management),
-                                    OnboardingStep::Management => onboarding_step.set(OnboardingStep::Invite),
-                                    OnboardingStep::Invite => {
-                                        spawn(async move {
-                                            let community = CommunitySpace {
-                                                name: onboard.get_basics().name,
-                                                logo: onboard.get_basics().logo,
-                                                description: if onboard.get_basics().description.is_empty() {None} else {Some(onboard.get_basics().description)},
-                                                industry: onboard.get_basics().industry
-                                            };
-                                            log::info!("{:?}", community);
-                                            tooltip.handle_tooltip(TooltipItem {
-                                                title: translate!(i18, "onboard.tips.loading.title"),
-                                                body: translate!(i18, "onboard.tips.loading.description"),
-                                                show: true
+                        if !matches!(onboarding_step(), OnboardingStep::Invite) {
+                            Button {
+                                class: "",
+                                text: "Continue",
+                                size: ElementSize::Big,
+                                on_click: move |_| {
+                                    if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
+                                        onboarding_step.set(OnboardingStep::Basics);
+                                        handle_required_inputs.set(true);
+                                        return;
+                                    } else {
+                                        handle_required_inputs.set(false);
+                                    }
+
+                                    let step = onboarding_step();
+                                    match step {
+                                        OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Management),
+                                        OnboardingStep::Management => onboarding_step.set(OnboardingStep::Invite),
+                                        OnboardingStep::Invite => {
+
+                                        },
+                                    };
+                                },
+                                status: None,
+                                right_icon: rsx!(
+                                    Icon {
+                                        icon: ArrowRight,
+                                        height: 32,
+                                        width: 32,
+                                        stroke_width: 1,
+                                        fill: "var(--white)"
+                                    }
+                                ),
+                            }
+                        } else {
+                            Button {
+                                class: "",
+                                text: format!("Pay: {:.2} KSM", to_pay()),
+                                size: ElementSize::Big,
+                                on_click: move |_| {
+                                    if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
+                                        onboarding_step.set(OnboardingStep::Basics);
+                                        handle_required_inputs.set(true);
+                                        return;
+                                    } else {
+                                        handle_required_inputs.set(false);
+                                    }
+
+                                    let step = onboarding_step();
+                                    match step {
+                                        OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Management),
+                                        OnboardingStep::Management => onboarding_step.set(OnboardingStep::Invite),
+                                        OnboardingStep::Invite => {
+                                            spawn(async move {
+                                                let community = CommunitySpace {
+                                                    name: onboard.get_basics().name,
+                                                    logo: onboard.get_basics().logo,
+                                                    description: if onboard.get_basics().description.is_empty() {None} else {Some(onboard.get_basics().description)},
+                                                    industry: onboard.get_basics().industry
+                                                };
+
+                                                tooltip.handle_tooltip(TooltipItem {
+                                                    title: translate!(i18, "onboard.tips.loading.title"),
+                                                    body: translate!(i18, "onboard.tips.loading.description"),
+                                                    show: true
+                                                });
+
+                                                let Ok(decision_method) = convert_to_jsvalue(&DecisionMethod::Membership) else {
+                                                    return;
+                                                };
+
+                                                let response = create(community).await.expect("Should return the room id");
+
+                                                let identity = Identity {
+                                                    display: onboard.get_basics().name,
+                                                    web: Some(response.get_id())
+                                                };
+
+                                                let Ok(encoded_identity) = convert_to_jsvalue(&identity) else {
+                                                    return;
+                                                };
+
+                                                let Some(account) = get_account() else {
+                                                    return;
+                                                };
+
+                                                let members = onboard.get_invitations()
+                                                    .into_iter()
+                                                    .filter_map(|invitation| if !invitation.account.is_empty() { Some(invitation.account) } else { None })
+                                                    .collect::<Vec<String>>();
+
+                                                log::info!("{:?}", members);
+
+                                                let Ok(membership_accounts) = convert_to_jsvalue(&members) else { return; };
+
+                                                let response = topup_then_create_community(
+                                                    1000,
+                                                    identity.display.clone(),
+                                                    decision_method,
+                                                    encoded_identity,
+                                                    membership_accounts,
+                                                    JsValue::UNDEFINED
+                                                ).await;
+
+                                                log::info!("response create community onchain: {:?}", response);
+
+                                                tooltip.hide();
+                                                notification.handle_notification(
+                                                    NotificationItem {
+                                                        title: "Community has been created".to_string(),
+                                                        body: "Community has been created".to_string(),
+                                                        variant: NotificationVariant::Success,
+                                                        show: true,
+                                                        handle: NotificationHandle {value: NotificationHandler::None}
+                                                    }
+                                                );
+                                                nav.push("/");
+                                                // TODO: notify an error with an unwrap_or_else
                                             });
-
-                                            let response = create(community).await.expect("Should return the room id");
-
-                                            let identity = Identity {
-                                                display: onboard.get_basics().name,
-                                                matrix: Some(response.get_id())
-                                            };
-                                            let decision_method = DecisionMethod::Membership;
-
-                                            let Ok(identity_js) = convert_to_jsvalue(&identity) else {
-                                                return;
-                                            };
-
-                                            let Ok(decision_method_js) = convert_to_jsvalue(&decision_method) else {
-                                                return;
-                                            };
-
-                                            let Some(account) = get_account() else {
-                                                return;
-                                            };
-
-                                            let community_id_js = JsValue::from(123);
-
-                                            let response = topup_then_create_community(community_id_js, identity.display.clone(), decision_method_js, identity_js).await;
-                                            // TODO: notify an error with an unwrap_or_else
-                                        });
-                                    },
-                                };
-                            },
-                            status: None,
-                            right_icon: rsx!(
-                                Icon {
-                                    icon: ArrowRight,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1,
-                                    fill: "var(--white)"
-                                }
-                            ),
+                                        },
+                                    };
+                                },
+                                status: None,
+                                right_icon: rsx!(
+                                    Icon {
+                                        icon: ArrowRight,
+                                        height: 32,
+                                        width: 32,
+                                        stroke_width: 1,
+                                        fill: "var(--white)"
+                                    }
+                                ),
+                            }
                         }
+
                     }
                 }
                 div { class: "onboarding__image",

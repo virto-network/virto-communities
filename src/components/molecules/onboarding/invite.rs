@@ -17,6 +17,23 @@ pub fn OnboardingInvite() -> Element {
     let mut onboard = use_onboard();
 
     let members_lock = onboard.get_invitations();
+    let mut to_pay = consume_context::<Signal<f64>>();
+
+    use_effect(use_reactive(&onboard.get_invitations().len(), move |_| {
+        let members = onboard
+            .get_invitations()
+            .into_iter()
+            .filter_map(|invitation| {
+                if !invitation.account.is_empty() {
+                    Some(invitation.account)
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<String>>();
+
+        to_pay.set(0.5 + 0.4 + members.len() as f64 * 0.3)
+    }));
 
     rsx!(
         div { class: "form__title",
