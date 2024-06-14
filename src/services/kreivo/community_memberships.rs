@@ -12,7 +12,7 @@ pub struct CollectionDetails {
 
 pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainStateError> {
     let query = format!(
-        "wss://kreivo.kippu.rocks/communityMemberships/collection/{}",
+        "wss://kreivo.io/communityMemberships/collection/{}",
         collection
     );
 
@@ -33,7 +33,7 @@ pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainState
 
 pub async fn item(item: u16, member: Option<u16>) -> Result<u16, ChainStateError> {
     let query = format!(
-        "wss://kreivo.kippu.rocks/communityMemberships/item/{}",
+        "wss://kreivo.io/communityMemberships/item/{}",
         item
     );
 
