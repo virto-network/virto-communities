@@ -23,7 +23,8 @@ pub struct ButtonProps {
     on_click: EventHandler<MouseEvent>,
     #[props(!optional)]
     status: Option<String>,
-    icon: Option<Element>,
+    left_icon: Option<Element>,
+    right_icon: Option<Element>,
 }
 
 pub fn Button(props: ButtonProps) -> Element {
@@ -61,8 +62,9 @@ pub fn Button(props: ButtonProps) -> Element {
                     class: "button {props.class} {variant} {size} {disabled}",
                     disabled: props.disabled,
                     onclick: move |event| props.on_click.call(event),
-                    {props.icon}
+                    {props.left_icon}
                     "{props.text}"
+                    {props.right_icon}
                 }
             )
         }

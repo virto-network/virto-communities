@@ -6,15 +6,20 @@ use super::{
     use_attach::AttachFile,
     use_communities::{Communities, Community},
     use_notification::NotificationItem,
-    use_onboard::OnboardForm,
+    use_onboard::{BasicsForm, InvitationForm, ManagementForm},
     use_paginator::Paginator,
     use_session::UserSession,
-    use_theme::Theme, use_tooltip::TooltipItem,
+    use_theme::Theme,
+    use_tooltip::TooltipItem,
 };
 
 pub fn use_startup() {
     use_context_provider::<Signal<Theme>>(|| Signal::new(Theme::default()));
-    use_context_provider::<Signal<OnboardForm>>(|| Signal::new(OnboardForm::default()));
+
+    use_context_provider::<Signal<BasicsForm>>(|| Signal::new(BasicsForm::default()));
+    use_context_provider::<Signal<ManagementForm>>(|| Signal::new(ManagementForm::default()));
+    use_context_provider::<Signal<InvitationForm>>(|| Signal::new(InvitationForm::default()));
+
     use_context_provider::<Signal<Communities>>(|| Signal::new(vec![]));
     use_context_provider::<Signal<Community>>(|| Signal::new(Community::default()));
     use_context_provider::<Signal<Option<AttachFile>>>(|| Signal::new(None));
@@ -28,4 +33,6 @@ pub fn use_startup() {
     use_context_provider::<Signal<Option<PjsExtension>>>(|| Signal::new(None));
 
     use_context_provider::<Signal<bool>>(|| Signal::new(false));
+    use_context_provider::<Signal<String>>(|| Signal::new(String::new()));
+    use_context_provider::<Signal<f64>>(|| Signal::new(0.0));
 }

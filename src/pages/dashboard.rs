@@ -1,15 +1,17 @@
-use std::thread::spawn;
+use std::{str::FromStr, thread::spawn};
+use sube::{sube, Response};
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;
+use sp_core::crypto::Ss58AddressFormat;
 
 use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
             input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Button, Chat, Compass,
-            Filter, Icon, IconButton, MessageInput, Monetization, Suitcase, Tab, UserGroup,
+            Filter, Icon, IconButton, Monetization, SearchInput, Suitcase, Tab, UserGroup,
         },
         molecules::tabs::TabItem,
     },
@@ -19,9 +21,13 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     pages::route::Route,
-    services::kreivo::{
-        community_memberships::{collection, item},
-        community_track::{tracks, tracksIds},
+    services::{
+        bot::{create::CommunitySpace, get_by_id::get_by_id},
+        kreivo::{
+            community_memberships::{collection, item},
+            community_track::{tracks, tracksIds},
+            identity::{identityOf, superOf},
+        },
     },
 };
 
@@ -37,7 +43,7 @@ pub struct Community {
     pub name: String,
     pub description: String,
     pub memberships: u16,
-    pub tags: Vec<CommunityTag>,
+    pub tags: Vec<String>,
     pub members: u16,
 }
 
@@ -56,7 +62,7 @@ pub fn Dashboard() -> Element {
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
 
-    theme.set_background(String::from("var(--olive-100)"));
+    theme.set_background(String::from("var(--text-primary)"));
 
     let tab_items = vec![TabItem {
         k: String::from("all"),
@@ -100,7 +106,7 @@ pub fn Dashboard() -> Element {
                 let filtered_name: &[u8] = &filtered_name;
 
                 let collection_items = match response_collection {
-                    Ok(details) => details.items,
+                    Ok(ref details) => details.items.clone(),
                     Err(_) => 0u16,
                 };
 
@@ -109,16 +115,16 @@ pub fn Dashboard() -> Element {
                     Err(_) => 0u16,
                 };
 
-                communities.with_mut(|c| {
-                    c.push(Community {
-                        icon: None,
-                        name: String::from_utf8_lossy(filtered_name).to_string(),
-                        description: String::from(""),
-                        tags: vec![],
-                        memberships: collection_items,
-                        members: item_details,
-                    })
-                })
+                let mut community = Community {
+                    icon: None,
+                    name: String::from_utf8_lossy(filtered_name).to_string(),
+                    description: String::from(""),
+                    tags: vec![],
+                    memberships: collection_items,
+                    members: item_details,
+                };
+
+                communities.with_mut(|c| c.push(community))
             }
             tooltip.hide();
             filtered_communities.set(communities())
@@ -177,7 +183,7 @@ pub fn Dashboard() -> Element {
                     }
                 }
                 div { class: "head__actions",
-                    MessageInput {
+                    SearchInput {
                         message: search_word(),
                         itype: InputType::Search,
                         placeholder: translate!(i18, "dashboard.cta_header.search"),
@@ -196,7 +202,7 @@ pub fn Dashboard() -> Element {
                         on_click: move |_| {},
                     }
                     IconButton {
-                        class: "button--avatar desktop button--comming-soon",
+                        class: "button--avatar desktop",
                         size: ElementSize::Medium,
                         body: rsx!(
                             Icon {
@@ -207,7 +213,10 @@ pub fn Dashboard() -> Element {
                                 fill: "var(--fill-00)"
                             }
                         ),
-                        on_click: move |_| { }
+                        on_click: move |_| {
+                            tooltip.hide();
+                            nav.push("/onboarding");
+                        }
                     }
                 }
             }
@@ -264,15 +273,10 @@ pub fn Dashboard() -> Element {
                             div { class: "card__tags",
                                 for tag in community.tags {
                                     {
-                                        let (badge_class, badge_text) = match tag {
-                                            CommunityTag::Neighborhood => ("badge--lavanda-dark", "Neighborhood"),
-                                            CommunityTag::SocialImpact => ("badge--lavanda-light", "Social Impact"),
-                                        };
-
                                         rsx!(
                                             Badge {
-                                                class: badge_class,
-                                                text: badge_text
+                                                class: "badge--lavanda-dark",
+                                                text: tag
                                             }
                                         )
                                     }
@@ -324,7 +328,7 @@ pub fn Dashboard() -> Element {
                         }
                     }
                 }
-                section { class: "card card--reverse card--comming-soon",
+                section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
@@ -361,7 +365,10 @@ pub fn Dashboard() -> Element {
                                     fill: "var(--fill-00)"
                                 }
                             ),
-                            on_click: move |_| { }
+                            on_click: move |_| {
+                                tooltip.hide();
+                                nav.push("/onboarding");
+                             }
                         }
                     }
                 }

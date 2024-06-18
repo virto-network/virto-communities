@@ -69,7 +69,7 @@ pub fn Card(props: CardProps) -> Element {
                             height: 16,
                             width: 16,
                             stroke_width: 2,
-                            stroke: "var(--olive-100)"
+                            stroke: "var(--text-primary)"
                         }
                     ),
                     on_click: move |_| { }

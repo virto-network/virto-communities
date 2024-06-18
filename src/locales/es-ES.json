@@ -50,6 +50,87 @@
                 "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
             }
         },
+        "onboard": {
+            "basics": {
+                "label": "¡Bienvenido! Primero lo primero...",
+                "title": "Crea tu Organización",
+                "form": {
+                    "logo": {
+                        "placeholder": "Logo (Opcional)"
+                    },
+                    "name": {
+                        "placeholder": "Ingresa el nombre de tu organización"
+                    },
+                    "description": {
+                        "placeholder": "Una breve descripción de tu organización..."
+                    },
+                    "industry": {
+                        "placeholder": "Industria de tu organización"
+                    }
+                },
+                "cta": {
+                    "next": "Continuar"
+                }
+            },
+            "management": {
+                "label": "Ahora define tu equipo",
+                "title": "Configura la gestión de la organización",
+                "form": {
+                    "membership": {
+                        "title": "Membresía",
+                        "description": "Cualquier miembro puede votar y tomar decisiones."
+                    },
+                    "rank": {
+                        "title": "Rango de Membresía",
+                        "description": "Miembros con roles específicos pueden votar y tomar decisiones."
+                    },
+                    "native_token": {
+                        "title": "Token Kusama",
+                        "description": "Cualquier poseedor de tokens puede votar y tomar decisiones."
+                    },
+                    "own_token": {
+                        "title": "Token Propio (Avanzado)",
+                        "description": "Configuras el token y los poseedores para votar o tomar decisiones."
+                    }
+                },
+                "cta": {
+                    "back": "Regresar",
+                    "next": "Continuar"
+                }
+            },
+            "invite": {
+                "label": "Ahora invita a tu equipo",
+                "title": "Invita a tus miembros",
+                "form": {
+                    "wallet": {
+                        "label": "Billetera",
+                        "placeholder": "Escribe una dirección"
+                    },
+                    "email": {
+                        "label": "Correo electrónico",
+                        "placeholder": "usuario@virto.com"
+                    },
+                    "phone": {
+                        "label": "Teléfono",
+                        "placeholder": "+57 322 1230000"
+                    }
+                },
+                "cta": {
+                    "back": "Regresar",
+                    "next": "Pagar"
+                }
+            },
+            "tips": {
+                "loading": {
+                    "title": "Crea tu Organización",
+                    "description": "Esto puede tomar un momento"
+                },
+                "created": {
+                    "title": "Todo ha salido bien",
+                    "description": "La comunidad ha sido creada"
+                }
+            }
+        },        
         "errors": {
             "session": {
                 "persist": "No se ha podido guardar la sesión"
@@ -61,6 +142,26 @@
             },
             "communities": {
                 "query_failed": "No se ha podido traer comunidades"
+            },
+            "attach": {
+                "title": "Error al subir",
+                "not_found": {
+                    "explanation": "Archivo no encontrado.",
+                    "details": "No hemos podido encontrar el archivo."
+                },
+                "size": {
+                    "explanation": "El archivo excede el límite de tamaño.",
+                    "details": "Sube un archivo que sea menor de 2 MB."
+                },
+                "mime": {
+                    "explanation": "Formato de archivo inválido.",
+                    "details": "Sube un archivo que esté en formato .jpeg o .png"
+                }
+            },
+            "form": {
+                "not_empty": "No puede estar vacío.",
+                "upload_fail": "No se ha podido subir el archivo",
+                "community_creation": "No se ha podido crear la comunidad"
             }
         }
     }

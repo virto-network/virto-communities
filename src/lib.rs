@@ -2,6 +2,7 @@
 pub mod pages {
     pub mod dashboard;
     pub mod not_found;
+    pub mod onboarding;
     pub mod route;
 }
 
@@ -31,9 +32,16 @@ pub mod components {
 }
 
 pub mod services {
+    pub mod bot {
+        pub mod create;
+        pub mod get_by_id;
+        pub mod upload;
+    }
     pub mod kreivo {
         pub mod balances;
+        pub mod communities;
         pub mod community_memberships;
         pub mod community_track;
+        pub mod identity;
     }
 }

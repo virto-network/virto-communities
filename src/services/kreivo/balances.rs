@@ -32,7 +32,7 @@ pub async fn account(account: &str) -> Result<AccountInfo, ChainStateError> {
         return Err(ChainStateError::InternalError);
     };
 
-    let value = serde_json::to_value(&value).expect("it must be a serialized object");
+    let value = serde_json::to_value(&value).map_err(|_| ChainStateError::FailedDecode)?;
     let account_info =
         serde_json::from_value::<AccountInfo>(value).map_err(|_| ChainStateError::FailedDecode)?;
 

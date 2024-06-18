@@ -36,9 +36,10 @@ uuid = { version = "1.8.0", features = ["v4"] }
 
 sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "fix/dependencies", default-features = false, features = [
     "js",
-    'wss',
+    "wss",
 ] }
-pjs = { package = "pjs", git = "https://github.com/virto-network/virto-sdk.git", branch = "feat/pjs-vault", default-features=false }
+
+pjs = { package = "pjs", git = "https://github.com/virto-network/virto-sdk.git", branch = "feat/pjs-vault", default-features = false }
 libwallet = { package = "libwallet", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
     "substrate",
     "mnemonic",
@@ -54,6 +55,7 @@ wasm-bindgen-futures = "0.4.42"
 sp-core = "32.0.0"
 manganis = "0.2.2"
 grass = "0.13.2"
+reqwest = { version = "0.12.4", features = ["multipart", "json"] }
 
 [patch.crates-io]
 cookie = { git = "https://github.com/S0c5/cookie-rs.git" }
