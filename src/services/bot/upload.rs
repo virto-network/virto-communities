@@ -21,7 +21,7 @@ pub async fn upload(content: Vec<u8>, name: String) -> Result<String, reqwest::E
     let form = reqwest::multipart::Form::new().part("file", part);
 
     let response = client
-        .post("http://127.0.0.1:8000/room/upload")
+        .post("https://bot-api.virto.app/room/upload")
         .multipart(form)
         .send()
         .await?

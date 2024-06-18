@@ -21,7 +21,7 @@ pub struct AccountData {
 }
 
 pub async fn account(account: &str) -> Result<AccountInfo, ChainStateError> {
-    let query = format!("http://127.0.0.1:12281/system/account/{}", account);
+    let query = format!("wss://kreivo.io/system/account/{}", account);
 
     log::info!("query: {:#?}", query);
     let response = sube!(&query).await.map_err(|_| {
@@ -32,7 +32,7 @@ pub async fn account(account: &str) -> Result<AccountInfo, ChainStateError> {
         return Err(ChainStateError::InternalError);
     };
 
-    let value = serde_json::to_value(&value).expect("it must be a serialized object");
+    let value = serde_json::to_value(&value).map_err(|_| ChainStateError::FailedDecode)?;
     let account_info =
         serde_json::from_value::<AccountInfo>(value).map_err(|_| ChainStateError::FailedDecode)?;
 

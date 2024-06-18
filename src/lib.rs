@@ -39,6 +39,7 @@ pub mod services {
     }
     pub mod kreivo {
         pub mod balances;
+        pub mod communities;
         pub mod community_memberships;
         pub mod community_track;
         pub mod identity;

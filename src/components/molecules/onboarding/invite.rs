@@ -32,7 +32,7 @@ pub fn OnboardingInvite() -> Element {
             })
             .collect::<Vec<String>>();
 
-        to_pay.set(0.5 + 0.4 + members.len() as f64 * 0.3)
+        to_pay.set(0.51 + 0.11 + members.len() as f64 * 0.3)
     }));
 
     rsx!(

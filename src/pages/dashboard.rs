@@ -87,71 +87,45 @@ pub fn Dashboard() -> Element {
             };
             let range = &communities_ids()[from as usize..to as usize];
 
-            // let response_super = superOf(&"".to_string()).await;
-            // log::info!("{:?}", response_super);
+            for track in range {
+                let response_track = tracks(*track).await;
+                let response_collection = collection(*track).await;
+                let response_item = item(*track, None).await;
 
-            // for track in range {
-            //     let response_track = tracks(*track).await;
-            //     let response_collection = collection(*track).await;
-            //     let response_item = item(*track, None).await;
+                let Ok(track_info) = response_track else {
+                    continue;
+                };
 
-            //     let Ok(track_info) = response_track else {
-            //         continue;
-            //     };
+                let filtered_name = track_info
+                    .name
+                    .iter()
+                    .filter(|b| **b != 0)
+                    .cloned()
+                    .collect::<Vec<_>>();
 
-            //     let filtered_name = track_info
-            //         .name
-            //         .iter()
-            //         .filter(|b| **b != 0)
-            //         .cloned()
-            //         .collect::<Vec<_>>();
+                let filtered_name: &[u8] = &filtered_name;
 
-            //     let filtered_name: &[u8] = &filtered_name;
+                let collection_items = match response_collection {
+                    Ok(ref details) => details.items.clone(),
+                    Err(_) => 0u16,
+                };
 
-            //     let collection_items = match response_collection {
-            //         Ok(ref details) => details.items.clone(),
-            //         Err(_) => 0u16,
-            //     };
+                let item_details = match response_item {
+                    Ok(items) => items,
+                    Err(_) => 0u16,
+                };
 
-            //     let item_details = match response_item {
-            //         Ok(items) => items,
-            //         Err(_) => 0u16,
-            //     };
+                let mut community = Community {
+                    icon: None,
+                    name: String::from_utf8_lossy(filtered_name).to_string(),
+                    description: String::from(""),
+                    tags: vec![],
+                    memberships: collection_items,
+                    members: item_details,
+                };
 
-            //     let mut community = Community {
-            //         icon: None,
-            //         name: String::from_utf8_lossy(filtered_name).to_string(),
-            //         description: String::from(""),
-            //         tags: vec![],
-            //         memberships: collection_items,
-            //         members: item_details,
-            //     };
-
-            //     // TODO: replace this to get the real identity
-            //     log::info!("{:?}", response_collection);
-            //     if let Ok(ref details) = response_collection {
-            //         let address = format!("0x{}", hex::encode(details.owner.clone()));
-            //         let response_super = superOf(&address).await;
-
-            //         log::info!("{:?}", response_super);
-
-            //         if let Ok(x) = response_super {
-            //             let address = format!("0x{}", hex::encode(x.address));
-            //             let response_identity = identityOf(&address).await;
-            //             // let response_identity = Some("!OtgrPmyTQDnHulMFIL:matrix.org");
-            //             if let Ok(matrix) = response_identity {
-            //                 if let Ok(response) = get_by_id(&matrix).await {
-            //                     community.icon = response.logo;
-            //                     community.tags.push(response.industry);
-            //                     community.description =
-            //                         response.description.unwrap_or("".to_string());
-            //                 }
-            //             };
-            //         };
-            //     }
-
-            //     communities.with_mut(|c| c.push(community))
-            // }
+                communities.with_mut(|c| c.push(community))
+            }
             tooltip.hide();
             filtered_communities.set(communities())
         }

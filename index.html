@@ -219,9 +219,9 @@
     import init from "/{base_path}/assets/dioxus/{app_name}.js";
 
     const executor = new XcmProgramsExecutor({
-      kusama: ["ws://localhost:10000"],
-      kreivo: ["ws://localhost:12281"],
-      kusamaPeople: ["ws://localhost:11004"],
+      kusama: ["wss://kusama-rpc.dwellir.com", "wss://kusama-rpc-tn.dwellir.com", "wss://kusama-public-rpc.blockops.network/ws"],
+      kreivo: ["wss://kreivo.io", "wss://kreivo.kippu.rocks/"],
+      kusamaPeople: ["wss://people-kusama-rpc.dwellir.com", "wss://ksm-rpc.stakeworld.io/people", "wss://kusama-people-rpc.polkadot.io"],
     });
 
     globallyInjectPrograms(executor);

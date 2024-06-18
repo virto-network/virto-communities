@@ -3,8 +3,9 @@ use std::ops::Deref;
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::TryFutureExt;
-use gloo::utils::format::JsValueSerdeExt;
+use gloo::{console::warn, utils::format::JsValueSerdeExt};
 use serde::Serialize;
+use web_sys::console::info;
 
 use crate::{
     components::{
@@ -25,7 +26,10 @@ use crate::{
         use_session::use_session,
         use_tooltip::{use_tooltip, TooltipItem},
     },
-    services::bot::create::{create, CommunitySpace},
+    services::{
+        bot::create::{create, CommunitySpace},
+        kreivo::{communities::communityIdForSigned, community_track::tracksIds},
+    },
 };
 use serde_json::{to_value, Error, Value as JsonValue};
 use wasm_bindgen::prelude::*;
@@ -50,8 +54,8 @@ struct Identity {
     pub display: String,
     // TODO: enable this to integrate the actual required fields by blockchain
     // pub legal: Option<String>,
-    pub web: Option<String>,
-    // pub matrix: Option<String>,
+    // pub web: Option<String>,
+    pub matrix: Option<String>,
     // pub pgpFingerprint: Option<JsValue>,
     // pub image: Option<JsValue>,
     // pub twitter: Option<JsValue>,
@@ -107,6 +111,7 @@ pub fn Onboarding() -> Element {
     let mut notification = use_notification();
     let mut to_pay = consume_context::<Signal<f64>>();
 
+    let mut id_number = use_signal::<String>(|| String::new());
     let mut onboarding_step = use_signal::<OnboardingStep>(|| OnboardingStep::Basics);
     let mut onboarding_steps = use_signal::<Vec<OnboardingStep>>(|| {
         vec![
@@ -194,7 +199,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(*onboarding_step.read(), OnboardingStep::Basics) {
                             Button {
                                 class: "",
-                                text: "Back",
+                                text: translate!(i18, "onboard.invite.back"),
                                 size: ElementSize::Big,
                                 variant: Variant::Secondary,
                                 on_click: move |_| {
@@ -202,7 +207,7 @@ pub fn Onboarding() -> Element {
                                     match step {
                                         OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Basics),
                                         OnboardingStep::Management => onboarding_step.set(OnboardingStep::Basics),
-                                        OnboardingStep::Invite => onboarding_step.set(OnboardingStep::Management),
+                                        OnboardingStep::Invite => {},
                                     }
                                 },
                                 status: None,
@@ -255,7 +260,7 @@ pub fn Onboarding() -> Element {
                         } else {
                             Button {
                                 class: "",
-                                text: format!("Pay: {:.2} KSM", to_pay()),
+                                text: format!("{}: {:.2} KSM", translate!(i18, "onboard.cta.invite.next"), to_pay()),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
@@ -268,74 +273,94 @@ pub fn Onboarding() -> Element {
 
                                     let step = onboarding_step();
                                     match step {
-                                        OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Management),
-                                        OnboardingStep::Management => onboarding_step.set(OnboardingStep::Invite),
+                                        OnboardingStep::Basics => {
+                                            onboarding_step.set(OnboardingStep::Management);
+                                        },
+                                        OnboardingStep::Management => {
+                                            onboarding_step.set(OnboardingStep::Invite);
+                                        },
                                         OnboardingStep::Invite => {
-                                            spawn(async move {
-                                                let community = CommunitySpace {
-                                                    name: onboard.get_basics().name,
-                                                    logo: onboard.get_basics().logo,
-                                                    description: if onboard.get_basics().description.is_empty() {None} else {Some(onboard.get_basics().description)},
-                                                    industry: onboard.get_basics().industry
-                                                };
+                                            spawn({
+                                                async move {
+                                                    let community = CommunitySpace {
+                                                        name: onboard.get_basics().name,
+                                                        logo: onboard.get_basics().logo,
+                                                        description: if onboard.get_basics().description.is_empty() { None } else { Some(onboard.get_basics().description) },
+                                                        industry: onboard.get_basics().industry
+                                                    };
 
-                                                tooltip.handle_tooltip(TooltipItem {
-                                                    title: translate!(i18, "onboard.tips.loading.title"),
-                                                    body: translate!(i18, "onboard.tips.loading.description"),
-                                                    show: true
-                                                });
+                                                    let response_track_ids = tracksIds().await.map_err(|_| translate!(i18, "errors.form.community_creation"))?;
 
-                                                let Ok(decision_method) = convert_to_jsvalue(&DecisionMethod::Membership) else {
-                                                    return;
-                                                };
+                                                    let name_bytes = Vec::from(onboard.get_basics().name);
+                                                    let community_id = name_bytes.into_iter().fold(0u16, |acc, elem| acc + elem as u16);
+                                                    let mut offset = 0u16;
 
-                                                let response = create(community).await.expect("Should return the room id");
-
-                                                let identity = Identity {
-                                                    display: onboard.get_basics().name,
-                                                    web: Some(response.get_id())
-                                                };
-
-                                                let Ok(encoded_identity) = convert_to_jsvalue(&identity) else {
-                                                    return;
-                                                };
-
-                                                let Some(account) = get_account() else {
-                                                    return;
-                                                };
-
-                                                let members = onboard.get_invitations()
-                                                    .into_iter()
-                                                    .filter_map(|invitation| if !invitation.account.is_empty() { Some(invitation.account) } else { None })
-                                                    .collect::<Vec<String>>();
-
-                                                log::info!("{:?}", members);
-
-                                                let Ok(membership_accounts) = convert_to_jsvalue(&members) else { return; };
-
-                                                let response = topup_then_create_community(
-                                                    1000,
-                                                    identity.display.clone(),
-                                                    decision_method,
-                                                    encoded_identity,
-                                                    membership_accounts,
-                                                    JsValue::UNDEFINED
-                                                ).await;
-
-                                                log::info!("response create community onchain: {:?}", response);
-
-                                                tooltip.hide();
-                                                notification.handle_notification(
-                                                    NotificationItem {
-                                                        title: "Community has been created".to_string(),
-                                                        body: "Community has been created".to_string(),
-                                                        variant: NotificationVariant::Success,
-                                                        show: true,
-                                                        handle: NotificationHandle {value: NotificationHandler::None}
+                                                    while response_track_ids.communities.contains(&(community_id + offset)) {
+                                                        offset += 1u16;
                                                     }
-                                                );
-                                                nav.push("/");
-                                                // TODO: notify an error with an unwrap_or_else
+
+                                                    let current_id = community_id + offset;
+                                                    id_number.set(current_id.to_string());
+
+                                                    tooltip.handle_tooltip(TooltipItem {
+                                                        title: translate!(i18, "onboard.tips.loading.title"),
+                                                        body: translate!(i18, "onboard.tips.loading.description"),
+                                                        show: true
+                                                    });
+
+                                                    let decision_method = convert_to_jsvalue(&DecisionMethod::Membership).map_err(|_| {
+                                                        log::warn!("Malformed decision method");
+                                                        translate!(i18, "errors.form.community_creation")
+                                                    })?;
+
+                                                    let response = create(community).await.map_err(|_| translate!(i18, "errors.form.community_creation"))?;
+
+                                                    let identity = Identity {
+                                                        display: onboard.get_basics().name,
+                                                        matrix: Some(response.get_id())
+                                                    };
+
+                                                    let encoded_identity = convert_to_jsvalue(&identity).map_err(|_| {
+                                                        log::warn!("Malformed identity");
+                                                        translate!(i18, "errors.form.community_creation")
+                                                    })?;
+
+                                                    let members = onboard.get_invitations()
+                                                        .into_iter()
+                                                        .filter_map(|invitation| if !invitation.account.is_empty() { Some(invitation.account) } else { None })
+                                                        .collect::<Vec<String>>();
+
+                                                    let membership_accounts = convert_to_jsvalue(&members).map_err(|_| {
+                                                        log::warn!("Malformed membership accounts");
+                                                        translate!(i18, "errors.form.community_creation")
+                                                    })?;
+
+                                                    let response = topup_then_create_community(
+                                                        current_id,
+                                                        identity.display.clone(),
+                                                        decision_method,
+                                                        encoded_identity,
+                                                        membership_accounts,
+                                                        JsValue::UNDEFINED
+                                                    ).await;
+
+                                                    tooltip.hide();
+                                                    notification.handle_notification(
+                                                        NotificationItem {
+                                                            title: translate!(i18, "onboard.tips.created.title"),
+                                                            body: translate!(i18, "onboard.tips.created.description"),
+                                                            variant: NotificationVariant::Success,
+                                                            show: true,
+                                                            handle: NotificationHandle {value: NotificationHandler::None}
+                                                        }
+                                                    );
+                                                    nav.push("/");
+
+                                                    Ok::<(), String>(())
+                                                }
+                                                .unwrap_or_else(move |e: String| {
+                                                    notification.handle_error(&e);
+                                                })
                                             });
                                         },
                                     };

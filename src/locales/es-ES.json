@@ -117,13 +117,17 @@
                 },
                 "cta": {
                     "back": "Regresar",
-                    "next": "Crear Org"
+                    "next": "Pagar"
                 }
             },
             "tips": {
                 "loading": {
                     "title": "Crea tu Organización",
                     "description": "Esto puede tomar un momento"
+                },
+                "created": {
+                    "title": "Todo ha salido bien",
+                    "description": "La comunidad ha sido creada"
                 }
             }
         },        
@@ -155,7 +159,9 @@
                 }
             },
             "form": {
-                "not_empty": "No puede estar vacío."
+                "not_empty": "No puede estar vacío.",
+                "upload_fail": "No se ha podido subir el archivo",
+                "community_creation": "No se ha podido crear la comunidad"
             }
         }
     }

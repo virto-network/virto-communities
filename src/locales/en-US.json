@@ -117,13 +117,17 @@
                 },
                 "cta": {
                     "back": "Back",
-                    "next": "Create Org"
+                    "next": "Pay"
                 }
             },
             "tips": {
                 "loading": {
                     "title": "Create your Organization",
                     "description": "This may take a moment"
+                },
+                "created": {
+                    "title": "Everything went well",
+                    "description": "The community has been created"
                 }
             }
         },
@@ -155,7 +159,9 @@
                 }
             },
             "form": {
-                "not_empty": "Cannot be empty."
+                "not_empty": "Cannot be empty.",
+                "upload_fail": "The file could not be uploaded",
+                "community_creation": "The community could not be created"
             }
         }
     }

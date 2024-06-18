@@ -10,7 +10,7 @@ pub async fn get_by_id(id: &str) -> Result<CommunitySpace, reqwest::Error> {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!("http://127.0.0.1:8000/room/{}", id))
+        .get(format!("https://bot-api.virto.app/room/{}", id))
         .send()
         .await?
         .json::<CommunitySpace>()

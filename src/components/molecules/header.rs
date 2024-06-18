@@ -130,6 +130,7 @@ pub fn Header() -> Element {
         session.persist_session_file(&serialized_session);
         session.update_account(event);
 
+        accounts.set_account(Some(account.clone()));
         set_signer(account.address().clone());
 
         let account = get_account().and_then(|account| {

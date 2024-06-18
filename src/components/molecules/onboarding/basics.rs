@@ -2,9 +2,10 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
-    components::atoms::{dropdown::ElementSize, Attach, Input, TextareaInput, Title},
+    components::atoms::{dropdown::ElementSize, notification, Attach, Input, TextareaInput, Title},
     hooks::{
         use_attach::{use_attach, AttachFile},
+        use_notification::use_notification,
         use_onboard::{use_onboard, BasicsForm},
     },
     services::bot::upload::upload,
@@ -14,6 +15,7 @@ use crate::{
 pub fn OnboardingBasics(error: bool) -> Element {
     let i18 = use_i18();
     let mut onboard = use_onboard();
+    let mut notification = use_notification();
 
     rsx!(
         div { class: "form__title",
@@ -30,7 +32,10 @@ pub fn OnboardingBasics(error: bool) -> Element {
                 supported_types: vec![String::from("image/png"), String::from("image/png")],
                 on_change: move |event: AttachFile| {
                     spawn(async move {
-                        let uri = upload(event.data, event.name).await.expect("Should return a uri");
+                        let Ok(uri) = upload(event.data, event.name).await else {
+                            notification.handle_error(&translate!(i18, "errors.form.upload_fail"));
+                            return
+                        };
                         onboard.basics_mut().with_mut(|basics| basics.logo = Some(uri))
                     });
                 }
