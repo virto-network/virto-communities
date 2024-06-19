@@ -58,7 +58,7 @@ pub fn OnboardingBasics(error: bool) -> Element {
                     if event.value().as_bytes().len() < 24usize {
                         onboard.basics_mut().with_mut(|basics| basics.name = event.value());
                     } else {
-                        name_maxlength.set(event.value().chars().count() as u8);
+                        name_maxlength.set(event.value().chars().count().try_into().expect("Should convert usize into u8") );
                     }
                 },
                 on_keypress: move |_| {},
