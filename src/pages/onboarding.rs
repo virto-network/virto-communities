@@ -199,7 +199,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(*onboarding_step.read(), OnboardingStep::Basics) {
                             Button {
                                 class: "",
-                                text: translate!(i18, "onboard.invite.back"),
+                                text: translate!(i18, "onboard.management.cta.back"),
                                 size: ElementSize::Big,
                                 variant: Variant::Secondary,
                                 on_click: move |_| {
@@ -207,7 +207,7 @@ pub fn Onboarding() -> Element {
                                     match step {
                                         OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Basics),
                                         OnboardingStep::Management => onboarding_step.set(OnboardingStep::Basics),
-                                        OnboardingStep::Invite => {},
+                                        OnboardingStep::Invite => onboarding_step.set(OnboardingStep::Management),
                                     }
                                 },
                                 status: None,
@@ -226,7 +226,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(onboarding_step(), OnboardingStep::Invite) {
                             Button {
                                 class: "",
-                                text: "Continue",
+                                text: translate!(i18, "onboard.management.cta.next"),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
@@ -260,7 +260,7 @@ pub fn Onboarding() -> Element {
                         } else {
                             Button {
                                 class: "",
-                                text: format!("{}: {:.2} KSM", translate!(i18, "onboard.cta.invite.next"), to_pay()),
+                                text: format!("{}: {:.2} KSM", translate!(i18, "onboard.invite.cta.next"), to_pay()),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
