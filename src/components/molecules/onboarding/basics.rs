@@ -16,6 +16,7 @@ pub fn OnboardingBasics(error: bool) -> Element {
     let i18 = use_i18();
     let mut onboard = use_onboard();
     let mut notification = use_notification();
+    let mut name_maxlength = use_signal(|| 24);
 
     rsx!(
         div { class: "form__title",
@@ -50,10 +51,15 @@ pub fn OnboardingBasics(error: bool) -> Element {
                     } else {
                         None
                     }
-                 } else { None },
+                } else { None },
+                maxlength: name_maxlength(),
                 required: true,
                 on_input: move |event: Event<FormData>| {
-                    onboard.basics_mut().with_mut(|basics| basics.name = event.value());
+                    if event.value().as_bytes().len() < 24usize {
+                        onboard.basics_mut().with_mut(|basics| basics.name = event.value());
+                    } else {
+                        name_maxlength.set(event.value().chars().count().try_into().expect("Should convert usize into u8") );
+                    }
                 },
                 on_keypress: move |_| {},
                 on_click: move |_| {},
@@ -67,6 +73,7 @@ pub fn OnboardingBasics(error: bool) -> Element {
                 on_keypress: move |_| {},
                 on_click: move |_| {},
             }
+
             Input {
                 message: onboard.get_basics().industry,
                 size: ElementSize::Big,

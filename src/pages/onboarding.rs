@@ -88,7 +88,7 @@ fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = window, js_name = topupThenCreateCommunity)]
+    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenCreateCommunity)]
     async fn topup_then_create_community(
         community_id: u16,
         name: String,
@@ -96,7 +96,7 @@ extern "C" {
         maybe_identity: JsValue,
         maybe_memberships: JsValue,
         maybe_topup: JsValue,
-    );
+    ) -> Result<JsValue, JsValue>;
 }
 
 #[component]
@@ -199,7 +199,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(*onboarding_step.read(), OnboardingStep::Basics) {
                             Button {
                                 class: "",
-                                text: translate!(i18, "onboard.invite.back"),
+                                text: translate!(i18, "onboard.management.cta.back"),
                                 size: ElementSize::Big,
                                 variant: Variant::Secondary,
                                 on_click: move |_| {
@@ -207,7 +207,7 @@ pub fn Onboarding() -> Element {
                                     match step {
                                         OnboardingStep::Basics => onboarding_step.set(OnboardingStep::Basics),
                                         OnboardingStep::Management => onboarding_step.set(OnboardingStep::Basics),
-                                        OnboardingStep::Invite => {},
+                                        OnboardingStep::Invite => onboarding_step.set(OnboardingStep::Management),
                                     }
                                 },
                                 status: None,
@@ -226,7 +226,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(onboarding_step(), OnboardingStep::Invite) {
                             Button {
                                 class: "",
-                                text: "Continue",
+                                text: translate!(i18, "onboard.management.cta.next"),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
@@ -260,7 +260,7 @@ pub fn Onboarding() -> Element {
                         } else {
                             Button {
                                 class: "",
-                                text: format!("{}: {:.2} KSM", translate!(i18, "onboard.cta.invite.next"), to_pay()),
+                                text: format!("{}: {:.2} KSM", translate!(i18, "onboard.invite.cta.next"), to_pay()),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty() || onboard.get_basics().industry.is_empty() {
@@ -342,7 +342,10 @@ pub fn Onboarding() -> Element {
                                                         encoded_identity,
                                                         membership_accounts,
                                                         JsValue::UNDEFINED
-                                                    ).await;
+                                                    ).await.map_err(|_| {
+                                                        log::warn!("Error on xcm program");
+                                                        translate!(i18, "errors.form.community_creation")
+                                                    })?;
 
                                                     tooltip.hide();
                                                     notification.handle_notification(
@@ -359,6 +362,7 @@ pub fn Onboarding() -> Element {
                                                     Ok::<(), String>(())
                                                 }
                                                 .unwrap_or_else(move |e: String| {
+                                                    tooltip.hide();
                                                     notification.handle_error(&e);
                                                 })
                                             });
