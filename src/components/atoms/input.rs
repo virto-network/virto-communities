@@ -26,7 +26,7 @@ pub struct InputProps {
     #[props(default = false)]
     required: bool,
     #[props(default = 100)]
-    maxlength: i64,
+    maxlength: u8,
     on_input: EventHandler<FormEvent>,
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
@@ -74,7 +74,7 @@ pub fn Input(props: InputProps) -> Element {
                     class: "input",
                     value: props.message,
                     required: props.required,
-                    maxlength: props.maxlength,
+                    maxlength: <u8 as Into<i64>>::into(props.maxlength),
                     placeholder: if props.required { format!("{}*", props.placeholder) } else { format!("{}", props.placeholder) },
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)
