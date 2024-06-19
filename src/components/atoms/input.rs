@@ -74,7 +74,7 @@ pub fn Input(props: InputProps) -> Element {
                     class: "input",
                     value: props.message,
                     required: props.required,
-                    maxlength: <u8 as Into<i64>>::into(props.maxlength),
+                    maxlength: i64::from(props.maxlength),
                     placeholder: if props.required { format!("{}*", props.placeholder) } else { format!("{}", props.placeholder) },
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)
