@@ -88,7 +88,7 @@ fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = window, js_name = topupThenCreateCommunity)]
+    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenCreateCommunity)]
     async fn topup_then_create_community(
         community_id: u16,
         name: String,
@@ -96,7 +96,7 @@ extern "C" {
         maybe_identity: JsValue,
         maybe_memberships: JsValue,
         maybe_topup: JsValue,
-    );
+    ) -> Result<JsValue, JsValue>;
 }
 
 #[component]
@@ -342,7 +342,10 @@ pub fn Onboarding() -> Element {
                                                         encoded_identity,
                                                         membership_accounts,
                                                         JsValue::UNDEFINED
-                                                    ).await;
+                                                    ).await.map_err(|_| {
+                                                        log::warn!("Error on xcm program");
+                                                        translate!(i18, "errors.form.community_creation")
+                                                    })?;
 
                                                     tooltip.hide();
                                                     notification.handle_notification(
@@ -359,6 +362,7 @@ pub fn Onboarding() -> Element {
                                                     Ok::<(), String>(())
                                                 }
                                                 .unwrap_or_else(move |e: String| {
+                                                    tooltip.hide();
                                                     notification.handle_error(&e);
                                                 })
                                             });
