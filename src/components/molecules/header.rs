@@ -12,12 +12,12 @@ use crate::{
         Messages, Profile, Settings, Votes,
     },
     hooks::{
-        use_accounts::use_accounts,
+        use_accounts::{use_accounts, IsDaoOwner},
         use_connect_wallet::use_connect_wallet,
         use_notification::use_notification,
         use_session::{use_session, UserSession},
     },
-    services::kreivo::balances::account,
+    services::kreivo::{balances::account, communities::communityIdForSigned},
 };
 use wasm_bindgen::prelude::*;
 
@@ -63,11 +63,19 @@ pub fn Header() -> Element {
                         translate!(i18, "errors.wallet.account_address")
                     })?;
 
-                let Ok(account) = account(&format!("0x{}", hex::encode(address.0))).await else {
+                let hex_address = hex::encode(address.0);
+
+                let Ok(account) = account(&format!("0x{}", hex_address)).await else {
                     ksm_balance.set(('0'.to_string(), "00".to_string()));
                     usdt_balance.set(('0'.to_string(), "00".to_string()));
                     return Ok(());
                 };
+
+                let is_dao_owner = communityIdForSigned(&hex_address)
+                    .await
+                    .map_err(|_| translate!(i18, "errors.wallet.account_address"))?;
+
+                accounts.set_dao_owner(IsDaoOwner(is_dao_owner));
 
                 let unscaled_value = account.data.free as f64 / 10_f64.powf(12f64);
                 const KSM_PRICE: f64 = 32.11;

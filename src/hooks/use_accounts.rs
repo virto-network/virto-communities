@@ -5,13 +5,17 @@ use pjs::Account as PjsAccount;
 pub type Account = PjsAccount;
 pub type Accounts = Vec<Account>;
 
+pub struct IsDaoOwner(pub bool);
+
 pub fn use_accounts() -> UseAccountsState {
     let accounts = consume_context::<Signal<Vec<Account>>>();
     let account = consume_context::<Signal<Option<Account>>>();
+    let is_dao_owner = consume_context::<Signal<IsDaoOwner>>();
 
     use_hook(|| UseAccountsState {
         inner: accounts,
         account,
+        is_dao_owner,
     })
 }
 
@@ -19,6 +23,7 @@ pub fn use_accounts() -> UseAccountsState {
 pub struct UseAccountsState {
     inner: Signal<Accounts>,
     account: Signal<Option<Account>>,
+    is_dao_owner: Signal<IsDaoOwner>,
 }
 
 impl UseAccountsState {
@@ -44,6 +49,15 @@ impl UseAccountsState {
     pub fn set_account(&mut self, account: Option<Account>) {
         let mut c = self.account.write();
         *c = account;
+    }
+
+    pub fn get_dao_owner(&self) -> bool {
+        self.is_dao_owner.read().0.clone()
+    }
+
+    pub fn set_dao_owner(&mut self, is_dao_owner: IsDaoOwner) {
+        let mut c = self.is_dao_owner.write();
+        *c = is_dao_owner;
     }
 
     pub fn default(&mut self) {

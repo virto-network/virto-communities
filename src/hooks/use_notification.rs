@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub enum NotificationVariant {
@@ -69,7 +70,7 @@ impl UseNotificationState {
 
     pub fn handle_warning(&mut self, body: &str) {
         self.handle_notification(NotificationItem {
-            title: String::from("Atencion"),
+            title: translate!(use_i18(), "warnings.title"),
             body: String::from(body),
             variant: NotificationVariant::Warning,
             show: true,

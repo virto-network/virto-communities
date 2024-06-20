@@ -26,6 +26,7 @@ use crate::{
         use_session::use_session,
         use_tooltip::{use_tooltip, TooltipItem},
     },
+    middlewares::is_dao_owner::is_dao_owner,
     services::{
         bot::create::{create, CommunitySpace},
         kreivo::{communities::communityIdForSigned, community_track::tracksIds},
@@ -123,6 +124,8 @@ pub fn Onboarding() -> Element {
 
     let mut handle_required_inputs = use_signal::<bool>(|| false);
 
+    is_dao_owner();
+    
     use_before_render(move || {
         onboard.default();
     });

@@ -131,6 +131,12 @@
                 }
             }
         },
+        "warnings": {
+            "title": "Atention",
+            "middleware": {
+                "has_dao": "The account cannot create more DAOs"
+            }
+        },
         "errors": {
             "session": {
                 "persist": "Failed to save session"

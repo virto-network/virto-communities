@@ -6,6 +6,10 @@ pub mod pages {
     pub mod route;
 }
 
+pub mod middlewares {
+    pub mod is_dao_owner;
+}
+
 pub mod layouts {
     pub mod authenticated;
     pub mod onboard;
