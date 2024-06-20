@@ -132,7 +132,7 @@
             }
         },
         "warnings": {
-            "title": "Atention",
+            "title": "Warning",
             "middleware": {
                 "has_dao": "The account cannot create more DAOs"
             }
