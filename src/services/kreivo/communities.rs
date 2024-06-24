@@ -14,7 +14,7 @@ pub enum ChainStateError {
     FailedDecode,
 }
 
-pub async fn communityIdForSigned() -> Result<Vec<Vec<u8>>, ChainStateError> {
+pub async fn is_admin(address: &[u8]) -> Result<bool, ChainStateError> {
     let query = format!("wss://kreivo.io/communities/communityIdFor");
 
     let response = sube!(&query)
@@ -25,7 +25,6 @@ pub async fn communityIdForSigned() -> Result<Vec<Vec<u8>>, ChainStateError> {
         return Err(ChainStateError::InternalError);
     };
 
-    let mut values = vec![];
     for d in value.iter() {
         let Some(value) = d.0.get(0) else {
             continue;
@@ -49,8 +48,10 @@ pub async fn communityIdForSigned() -> Result<Vec<Vec<u8>>, ChainStateError> {
         let Ok(account_info) = serde_json::from_value::<Vec<u8>>(value) else {
             continue;
         };
-        values.push(account_info)
+        if address == account_info {
+            return Ok(true);
+        }
     }
 
-    Ok(values)
+    Ok(false)
 }

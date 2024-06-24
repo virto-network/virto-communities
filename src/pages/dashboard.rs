@@ -17,9 +17,11 @@ use crate::{
     },
     hooks::{
         use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
         use_theme::use_theme,
         use_tooltip::{use_tooltip, TooltipItem},
     },
+    middlewares::is_dao_owner::is_dao_owner,
     pages::route::Route,
     services::{
         bot::{create::CommunitySpace, get_by_id::get_by_id},
@@ -52,10 +54,10 @@ static SKIP: u8 = 6;
 #[component]
 pub fn Dashboard() -> Element {
     let i18 = use_i18();
-    let nav = use_navigator();
     let mut theme = use_theme();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
+    let mut nav = use_our_navigator();
 
     let header_handled = consume_context::<Signal<bool>>();
 
@@ -215,7 +217,7 @@ pub fn Dashboard() -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push("/onboarding");
+                            nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
                         }
                     }
                 }
@@ -367,7 +369,7 @@ pub fn Dashboard() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push("/onboarding");
+                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
                              }
                         }
                     }

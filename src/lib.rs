@@ -6,6 +6,10 @@ pub mod pages {
     pub mod route;
 }
 
+pub mod middlewares {
+    pub mod is_dao_owner;
+}
+
 pub mod layouts {
     pub mod authenticated;
     pub mod onboard;
@@ -19,6 +23,7 @@ pub mod hooks {
     pub mod use_language;
     pub mod use_notification;
     pub mod use_onboard;
+    pub mod use_our_navigator;
     pub mod use_paginator;
     pub mod use_session;
     pub mod use_startup;
