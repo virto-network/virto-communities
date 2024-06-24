@@ -18,24 +18,16 @@ use crate::{
     hooks::{
         use_accounts::use_accounts,
         use_attach::use_attach,
-        use_spaces_client::use_spaces_client,
         use_notification::{
             use_notification, NotificationHandle, NotificationHandler, NotificationItem,
             NotificationVariant,
         },
         use_onboard::{use_onboard, BasicsForm, Invitations},
         use_session::use_session,
+        use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
     },
-    services::{
-<<<<<<< HEAD
-        bot::create::{create, CommunitySpace},
-        kreivo::{communities::communityIdForSigned, community_track::tracksIds},
-=======
-        bot::types::CommunitySpace,
-        kreivo::{communities::is_admin, community_track::tracksIds},
->>>>>>> d587f5e (refactor: create space client)
-    },
+    services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
 use serde_json::{to_value, Error, Value as JsonValue};
 use wasm_bindgen::prelude::*;
@@ -115,7 +107,6 @@ pub fn Onboarding() -> Element {
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
-    let mut nav = use_our_navigator();
 
     let spaces_client = use_spaces_client();
 
