@@ -51,11 +51,11 @@ impl UseAccountsState {
         *c = account;
     }
 
-    pub fn get_dao_owner(&self) -> bool {
+    pub fn is_active_account_an_admin(&self) -> bool {
         self.is_dao_owner.read().0.clone()
     }
 
-    pub fn set_dao_owner(&mut self, is_dao_owner: IsDaoOwner) {
+    pub fn set_is_active_account_an_admin(&mut self, is_dao_owner: IsDaoOwner) {
         let mut c = self.is_dao_owner.write();
         *c = is_dao_owner;
     }

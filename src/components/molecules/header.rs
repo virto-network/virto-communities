@@ -17,7 +17,7 @@ use crate::{
         use_notification::use_notification,
         use_session::{use_session, UserSession},
     },
-    services::kreivo::{balances::account, communities::communityIdForSigned},
+    services::kreivo::{balances::account, communities::is_admin},
 };
 use wasm_bindgen::prelude::*;
 
@@ -71,11 +71,11 @@ pub fn Header() -> Element {
                     return Ok(());
                 };
 
-                let is_dao_owner = communityIdForSigned(&hex_address)
+                let is_dao_owner = is_admin(&address.0)
                     .await
                     .map_err(|_| translate!(i18, "errors.wallet.account_address"))?;
 
-                accounts.set_dao_owner(IsDaoOwner(is_dao_owner));
+                accounts.set_is_active_account_an_admin(IsDaoOwner(is_dao_owner));
 
                 let unscaled_value = account.data.free as f64 / 10_f64.powf(12f64);
                 const KSM_PRICE: f64 = 32.11;
