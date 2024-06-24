@@ -61,7 +61,7 @@ impl SpacesClient {
 
     pub async fn upload(&self, content: Vec<u8>, name: String) -> Result<String, reqwest::Error> {
         let path = format!("{}/room/upload", self.base_path);
-        let infered_type = infer::get(content.deref()).unwrap();
+        let infered_type = infer::get(content.deref()).expect("Should infer the content type");
 
         let part = reqwest::multipart::Part::stream(content)
             .file_name(name.clone())
