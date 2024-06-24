@@ -59,12 +59,12 @@ impl SpacesClient {
         Ok(response)
     }
 
-    pub async fn upload(&self, content: Vec<u8>, name: String) -> Result<String, reqwest::Error> {
+    pub async fn upload(&self, content: &[u8], name: &str) -> Result<String, reqwest::Error> {
         let path = format!("{}/room/upload", self.base_path);
-        let infered_type = infer::get(content.deref()).expect("Should infer the content type");
+        let infered_type = infer::get(content).expect("Should infer the content type");
 
-        let part = reqwest::multipart::Part::stream(content)
-            .file_name(name.clone())
+        let part = reqwest::multipart::Part::stream(content.to_vec())
+            .file_name(name.to_string())
             .mime_str(&infered_type.to_string())
             .expect("Couldn't set MIME type");
 

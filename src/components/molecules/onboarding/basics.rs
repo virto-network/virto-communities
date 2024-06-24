@@ -35,7 +35,7 @@ pub fn OnboardingBasics(error: bool) -> Element {
                 supported_types: vec![String::from("image/png"), String::from("image/png")],
                 on_change: move |event: AttachFile| {
                     spawn(async move {
-                        let Ok(uri) = spaces_client.get().upload(event.data, event.name).await else {
+                        let Ok(uri) = spaces_client.get().upload(&event.data, &event.name).await else {
                             notification.handle_error(&translate!(i18, "errors.form.upload_fail"));
                             return
                         };
