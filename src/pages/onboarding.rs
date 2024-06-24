@@ -18,6 +18,7 @@ use crate::{
     hooks::{
         use_accounts::use_accounts,
         use_attach::use_attach,
+        use_spaces_client::use_spaces_client,
         use_notification::{
             use_notification, NotificationHandle, NotificationHandler, NotificationItem,
             NotificationVariant,
@@ -27,8 +28,13 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     services::{
+<<<<<<< HEAD
         bot::create::{create, CommunitySpace},
         kreivo::{communities::communityIdForSigned, community_track::tracksIds},
+=======
+        bot::types::CommunitySpace,
+        kreivo::{communities::is_admin, community_track::tracksIds},
+>>>>>>> d587f5e (refactor: create space client)
     },
 };
 use serde_json::{to_value, Error, Value as JsonValue};
@@ -109,6 +115,10 @@ pub fn Onboarding() -> Element {
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
+    let mut nav = use_our_navigator();
+
+    let spaces_client = use_spaces_client();
+
     let mut to_pay = consume_context::<Signal<f64>>();
 
     let mut id_number = use_signal::<String>(|| String::new());
@@ -313,7 +323,7 @@ pub fn Onboarding() -> Element {
                                                         translate!(i18, "errors.form.community_creation")
                                                     })?;
 
-                                                    let response = create(community).await.map_err(|_| translate!(i18, "errors.form.community_creation"))?;
+                                                    let response = spaces_client.get().create(community).await.map_err(|_| translate!(i18, "errors.form.community_creation"))?;
 
                                                     let identity = Identity {
                                                         display: onboard.get_basics().name,

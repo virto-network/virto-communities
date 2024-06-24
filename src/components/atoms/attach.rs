@@ -12,7 +12,6 @@ use crate::{
         icon_button::Variant as IconButtonVariant, Button, Close, Icon, IconButton,
     },
     hooks::use_attach::{use_attach, AttachFile},
-    services::bot::upload::upload,
 };
 
 #[derive(Clone, Debug)]

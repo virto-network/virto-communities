@@ -1,8 +1,4 @@
-use std::ops::Deref;
-
 use serde::{Deserialize, Serialize};
-
-use crate::components::atoms::attach::AttachError;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CommunitySpace {
@@ -25,16 +21,13 @@ impl CommunityMatrixId {
     }
 }
 
-pub async fn create(community: CommunitySpace) -> Result<CommunityMatrixId, reqwest::Error> {
-    let client = reqwest::Client::new();
+#[derive(Deserialize)]
+pub struct Uri {
+    uri: String,
+}
 
-    let response = client
-        .post("https://bot-api.virto.app/room/create")
-        .json(&community)
-        .send()
-        .await?
-        .json::<CommunityMatrixId>()
-        .await?;
-
-    Ok(response)
+impl Uri {
+    pub fn get(self) -> String {
+        self.uri
+    }
 }

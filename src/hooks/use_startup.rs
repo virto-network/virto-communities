@@ -1,6 +1,8 @@
 use dioxus::{hooks::use_context_provider, signals::Signal};
 use pjs::PjsExtension;
 
+use crate::services::bot::client::SpacesClient;
+
 use super::{
     use_accounts::Account,
     use_attach::AttachFile,
@@ -12,6 +14,8 @@ use super::{
     use_theme::Theme,
     use_tooltip::TooltipItem,
 };
+
+const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
 
 pub fn use_startup() {
     use_context_provider::<Signal<Theme>>(|| Signal::new(Theme::default()));
@@ -35,4 +39,8 @@ pub fn use_startup() {
     use_context_provider::<Signal<bool>>(|| Signal::new(false));
     use_context_provider::<Signal<String>>(|| Signal::new(String::new()));
     use_context_provider::<Signal<f64>>(|| Signal::new(0.0));
+
+    // Clients
+
+    use_context_provider::<Signal<SpacesClient>>(|| Signal::new(SpacesClient::new(SPACES_CLIENT_URL)));
 }
