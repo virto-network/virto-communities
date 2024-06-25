@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use std::{ops::Deref, vec};
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -23,6 +23,7 @@ use crate::{
             NotificationVariant,
         },
         use_onboard::{use_onboard, BasicsForm, Invitations},
+        use_our_navigator::use_our_navigator,
         use_session::use_session,
         use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
@@ -100,15 +101,14 @@ extern "C" {
 #[component]
 pub fn Onboarding() -> Element {
     let i18 = use_i18();
-    let nav = use_navigator();
     let mut onboard = use_onboard();
     let mut accounts = use_accounts();
     let mut session = use_session();
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
-
     let spaces_client = use_spaces_client();
+    let mut nav = use_our_navigator();
 
     let mut to_pay = consume_context::<Signal<f64>>();
 
@@ -123,7 +123,7 @@ pub fn Onboarding() -> Element {
     });
 
     let mut handle_required_inputs = use_signal::<bool>(|| false);
-
+    
     use_before_render(move || {
         onboard.default();
     });
@@ -358,7 +358,7 @@ pub fn Onboarding() -> Element {
                                                             handle: NotificationHandle {value: NotificationHandler::None}
                                                         }
                                                     );
-                                                    nav.push("/");
+                                                    nav.push(Vec::new(), "/");
 
                                                     Ok::<(), String>(())
                                                 }

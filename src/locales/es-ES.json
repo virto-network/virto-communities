@@ -130,7 +130,13 @@
                     "description": "La comunidad ha sido creada"
                 }
             }
-        },        
+        },
+        "warnings": {
+            "title": "Atención",
+            "middleware": {
+                "has_dao": "La cuenta no puede crear más DAOs"
+            }
+        },
         "errors": {
             "session": {
                 "persist": "No se ha podido guardar la sesión"
