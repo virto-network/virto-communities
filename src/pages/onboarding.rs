@@ -25,13 +25,10 @@ use crate::{
         use_onboard::{use_onboard, BasicsForm, Invitations},
         use_our_navigator::use_our_navigator,
         use_session::use_session,
+        use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
     },
-    middlewares::is_dao_owner::is_dao_owner,
-    services::{
-        bot::create::{create, CommunitySpace},
-        kreivo::{communities::is_admin, community_track::tracksIds},
-    },
+    services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
 use serde_json::{to_value, Error, Value as JsonValue};
 use wasm_bindgen::prelude::*;
@@ -110,7 +107,9 @@ pub fn Onboarding() -> Element {
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
+    let spaces_client = use_spaces_client();
     let mut nav = use_our_navigator();
+
     let mut to_pay = consume_context::<Signal<f64>>();
 
     let mut id_number = use_signal::<String>(|| String::new());
@@ -315,7 +314,7 @@ pub fn Onboarding() -> Element {
                                                         translate!(i18, "errors.form.community_creation")
                                                     })?;
 
-                                                    let response = create(community).await.map_err(|_| translate!(i18, "errors.form.community_creation"))?;
+                                                    let response = spaces_client.get().create(community).await.map_err(|_| translate!(i18, "errors.form.community_creation"))?;
 
                                                     let identity = Identity {
                                                         display: onboard.get_basics().name,
