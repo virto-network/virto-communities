@@ -48,29 +48,27 @@ fn App() -> Element {
     });
 
     rsx! {
-        div { style: theme.get_style(),
-            if notification.get().show {
-                Notification {
-                    title: "{notification.get().title}",
-                    body: "{notification.get().body}",
-                    variant: notification.get().variant,
-                    on_click: move |_| {
-                        match notification.get().handle.value {
-                            NotificationHandler::Click => {}
-                            NotificationHandler::None => {}
-                        }
+        if notification.get().show {
+            Notification {
+                title: "{notification.get().title}",
+                body: "{notification.get().body}",
+                variant: notification.get().variant,
+                on_click: move |_| {
+                    match notification.get().handle.value {
+                        NotificationHandler::Click => {}
+                        NotificationHandler::None => {}
                     }
                 }
             }
-
-            if tooltip.get().show {
-                Tooltip {
-                    title: "{tooltip.get().title}",
-                    body: "{tooltip.get().body}",
-                }
-            }
-
-            Router::<Route> {}
         }
+
+        if tooltip.get().show {
+            Tooltip {
+                title: "{tooltip.get().title}",
+                body: "{tooltip.get().body}",
+            }
+        }
+
+        Router::<Route> {}
     }
 }

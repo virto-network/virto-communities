@@ -1,22 +1,38 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
+use futures_util::StreamExt;
 
 use crate::{
     components::atoms::{
-        avatar::Variant,
-        dropdown::ElementSize,
-        icon_button::{self},
-        AddPlus, Avatar, Compass, Hamburguer, Icon, IconButton,
+        avatar::Variant, dropdown::ElementSize, icon_button, AddPlus, Avatar, Compass, Hamburguer,
+        Home, Icon, IconButton,
     },
-    hooks::use_communities::use_communities,
+    hooks::{
+        use_accounts::use_accounts,
+        use_communities::use_communities,
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_tooltip::{use_tooltip, TooltipItem},
+    },
+    middlewares::is_dao_owner::is_dao_owner,
+    pages::dashboard::Community,
+    services::kreivo::community_memberships::get_communities_by_member,
 };
 
 #[component]
 pub fn Sidebar() -> Element {
     let i18 = use_i18();
     let communities = use_communities();
+    let accounts = use_accounts();
+    let mut tooltip = use_tooltip();
+    let mut nav = use_our_navigator();
+    let mut notification = use_notification();
 
+    let header_handled = consume_context::<Signal<bool>>();
     let mut is_active = use_signal(|| false);
+    let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
 
     let active_class = if is_active() { "sidebar--active" } else { "" };
 
@@ -66,7 +82,81 @@ pub fn Sidebar() -> Element {
                             }
                         }
                     }
-                    for community in communities.get() {
+                    li { class: "sidebar__item",
+                        onclick: move |_|{},
+                        IconButton {
+                            class: "button--icon bg--state-primary-active",
+                            size: ElementSize::Big,
+                            variant: icon_button::Variant::Round,
+                            body: rsx!(
+                                Icon {
+                                    icon: Home,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1,
+                                    fill: "var(--fill-00)"
+                                }
+                            ),
+                            on_click: move |_| {
+                                nav.push(vec![], "/");
+                            }
+                        }
+                        span {
+                            {translate!(i18, "sidebar.cta")}
+                        }
+                    }
+                    li { class: "sidebar__item",
+                        onclick: move |_|{},
+                        IconButton {
+                            class: "button--icon bg--state-primary-active",
+                            size: ElementSize::Big,
+                            variant: icon_button::Variant::Round,
+                            body: rsx!(
+                                Icon {
+                                    icon: Compass,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1.5,
+                                    fill: "var(--fill-00)"
+                                }
+                            ),
+                            on_click: move |_| {
+                                tooltip.hide();
+                                nav.push(vec![Box::new(is_dao_owner())], "/explore");
+                            }
+                        }
+                        span {
+                            {translate!(i18, "sidebar.cta")}
+                        }
+                    }
+                    li { class: "sidebar__item",
+                        onclick: move |_|{},
+                        IconButton {
+                            class: "button--icon bg--state-primary-active",
+                            size: ElementSize::Big,
+                            variant: icon_button::Variant::Round,
+                            body: rsx!(
+                                Icon {
+                                    icon: AddPlus,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1.5,
+                                    fill: "var(--fill-00)"
+                                }
+                            ),
+                            on_click: move |_| {
+                                tooltip.hide();
+                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                            }
+                        }
+                        span {
+                            {translate!(i18, "sidebar.cta")}
+                        }
+                    }
+
+                    hr { class: "sidebar__divider" }
+
+                    for community in communities_by_address.read().iter() {
                         li { class: "sidebar__item",
                             onclick: move |_|{},
                             IconButton {
@@ -75,87 +165,17 @@ pub fn Sidebar() -> Element {
                                     Avatar {
                                         name: "{community.name}",
                                         size: 60,
-                                        uri: community.logo,
-                                        variant: Variant::SemiRound
+                                        uri: None,
+                                        variant: Variant::Round
                                     }
                                 ),
                                 on_click: move |_| { }
                             }
                             span {
-                                {community.name}
+                                "{community.name}"
                             },
                         }
                     }
-                    li { class: "sidebar__item",
-                        onclick: move |_|{},
-                        IconButton {
-                            class: "button--icon bg--state-primary-active",
-                            size: ElementSize::Big,
-                            variant: icon_button::Variant::SemiRound,
-                            body: rsx!(
-                                Icon {
-                                    icon: AddPlus,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1,
-                                    stroke: "var(--text-white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                // nav.push(Route::Discover {});
-                            }
-                        }
-                        span {
-                            {translate!(i18, "sidebar.cta")}
-                        }
-                    }
-                    li { class: "sidebar__item",
-                        onclick: move |_|{},
-                        IconButton {
-                            class: "button--icon bg--state-primary-active",
-                            size: ElementSize::Big,
-                            variant: icon_button::Variant::SemiRound,
-                            body: rsx!(
-                                Icon {
-                                    icon: Compass,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1,
-                                    fill: "var(--text-white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                // nav.push(Route::Discover {});
-                            }
-                        }
-                        span {
-                            {translate!(i18, "sidebar.cta")}
-                        }
-                    }
-                    li { class: "sidebar__item",
-                        onclick: move |_|{},
-                        IconButton {
-                            class: "button--icon bg--state-primary-active",
-                            size: ElementSize::Big,
-                            variant: icon_button::Variant::SemiRound,
-                            body: rsx!(
-                                Icon {
-                                    icon: AddPlus,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1,
-                                    stroke: "var(--text-white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                // nav.push(Route::Discover {});
-                            }
-                        }
-                        span {
-                            {translate!(i18, "sidebar.cta")}
-                        }
-                    }
-
                 }
             }
        }

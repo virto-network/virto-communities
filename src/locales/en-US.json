@@ -50,6 +50,35 @@
                 "rights": "Virto PROD V.0.0.1. 2024 All rights reserved"
             }
         },
+        "dao": {
+            "tabs": {
+                "all": "All initiatives",
+                "owned": "Your initiatives"
+            },
+            "tips": {
+                "loading": {
+                    "title": "Fetching initiatives",
+                    "description": "This may take a moment"
+                }
+            },
+            "cta_header": {
+                "filter": {
+                    "title": "Filter",
+                    "options": {}
+                },
+                "search": "Search"
+            },
+            "cta_cards": {
+                "create": {
+                    "title": "Create an Initiative",
+                    "description": "A Decentralized and open governed entity for all of your Ideas.",
+                    "cta": "Learn more"
+                }
+            },
+            "footer": {
+                "paginator": "{from} of {to}"
+            }
+        },
         "onboard": {
             "basics": {
                 "label": "Welcome! First Things First...",

@@ -21,7 +21,7 @@ pub struct AccountData {
 }
 
 pub async fn account(account: &str) -> Result<AccountInfo, ChainStateError> {
-    let query = format!("wss://kreivo.io/system/account/{}", account);
+    let query = format!("ws://localhost:12281/system/account/{}", account);
 
     log::info!("query: {:#?}", query);
     let response = sube!(&query).await.map_err(|_| {

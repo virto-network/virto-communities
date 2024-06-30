@@ -23,7 +23,7 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::route::Route,
+    pages::{dashboard::Community, route::Route},
     services::kreivo::{
         community_memberships::{collection, get_communities_by_member, item},
         community_track::{tracks, tracksIds},
@@ -31,27 +31,10 @@ use crate::{
     },
 };
 
-#[derive(PartialEq, Clone)]
-pub enum CommunityTag {
-    Neighborhood,
-    SocialImpact,
-}
-
-#[derive(PartialEq, Clone)]
-pub struct Community {
-    pub id: u16,
-    pub icon: Option<String>,
-    pub name: String,
-    pub description: String,
-    pub memberships: u16,
-    pub tags: Vec<String>,
-    pub members: u16,
-}
-
 static SKIP: u8 = 6;
 
 #[component]
-pub fn Dashboard() -> Element {
+pub fn Initiatives(id: u16) -> Element {
     let i18 = use_i18();
     let mut theme = use_theme();
     let mut notification = use_notification();
@@ -68,13 +51,13 @@ pub fn Dashboard() -> Element {
 
     let tab_items = vec![TabItem {
         k: String::from("all"),
-        value: translate!(i18, "dashboard.tabs.all"),
+        value: translate!(i18, "dao.tabs.all"),
     }];
 
     let mut tab_value = use_signal::<String>(|| String::from("all"));
 
     let mut communities_ids = use_signal::<Vec<u16>>(|| vec![]);
-    let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
+    let mut communities = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
 
     // let mut items = vec![];
@@ -86,48 +69,6 @@ pub fn Dashboard() -> Element {
     //         },
     //     }))
     // }
-
-    let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
-            tooltip.handle_tooltip(TooltipItem {
-                title: translate!(i18, "dao.tips.loading.title"),
-                body: translate!(i18, "dao.tips.loading.description"),
-                show: true,
-            });
-
-            let Some(account) = accounts.get_account() else {
-                log::info!("error here by account");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                return;
-            };
-
-            let Ok(address) = sp_core::sr25519::Public::from_str(&account.address()) else {
-                log::info!("error here by address");
-                notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
-                tooltip.hide();
-                return;
-            };
-
-            let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
-                log::info!("error here by memeber");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                return;
-            };
-
-            communities_by_address.set(community_tracks.clone());
-            filtered_communities.set(community_tracks.clone());
-
-            tooltip.hide();
-        }
-    });
-
-    use_effect(use_reactive(&header_handled(), move |_| {
-        if header_handled() {
-            get_communities.send(())
-        }
-    }));
 
     rsx! {
         div {
@@ -149,16 +90,16 @@ pub fn Dashboard() -> Element {
                     SearchInput {
                         message: search_word(),
                         itype: InputType::Search,
-                        placeholder: translate!(i18, "dashboard.cta_header.search"),
+                        placeholder: translate!(i18, "dao.cta_header.search"),
                         error: None,
                         on_input: move |event: Event<FormData>| {
                             search_word.set(event.value());
 
                             if search_word().trim().is_empty() {
-                                filtered_communities.set(communities_by_address());
+                                filtered_communities.set(communities());
                             } else {
                                 let pattern = search_word().trim().to_lowercase();
-                                filtered_communities.set(communities_by_address().into_iter().filter(|community| community.name.to_lowercase().contains(&pattern)).collect::<Vec<Community>>());
+                                filtered_communities.set(communities().into_iter().filter(|community| community.name.to_lowercase().contains(&pattern)).collect::<Vec<Community>>());
                             }
                         },
                         on_keypress: move |_| {},
@@ -207,7 +148,6 @@ pub fn Dashboard() -> Element {
                                 "{community.description}"
                             }
                             div { class: "card__metrics",
-
                                 span { class: "card__metric",
                                     Icon {
                                         icon: UserGroup,
@@ -259,56 +199,24 @@ pub fn Dashboard() -> Element {
                                         fill: "var(--fill-00)"
                                     }
                                 ),
-                                on_click: move |_| {
-                                    let path = format!("/dao/{}", community.id);
-                                    nav.push(vec![], &path);
-                                }
+                                on_click: move |_| { }
                             }
                         }
                     }
                 }
-                section { class: "card card--reverse",
+                section { class: "card card--reverse card--comming-soon",
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.explore.title")}
+                                {translate!(i18, "dao.cta_cards.create.title")}
                             }
                         }
                         p { class: "card__description",
-                            {translate!(i18, "dashboard.cta_cards.explore.description")}
-                        }
-                    }
-
-                    div { class: "card__cta",
-                        IconButton {
-                            class: "button--avatar",
-                            body: rsx!(
-                                Icon {
-                                    icon: Compass,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-00)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                nav.push(vec![], "/explore");
-                            }
-                        }
-                    }
-                }
-                section { class: "card card--reverse",
-                    div { class: "card__container",
-                        div { class: "card__head",
-                            h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.create.title")}
-                            }
-                        }
-                        p { class: "card__description",
-                            {translate!(i18, "dashboard.cta_cards.create.description")}
+                            {translate!(i18, "dao.cta_cards.create.description")}
                         }
                         div { class: "card__head",
                             a { class: "card__learn",
-                                {translate!(i18, "dashboard.cta_cards.create.cta")}
+                                {translate!(i18, "dao.cta_cards.create.cta")}
                             }
                             Icon {
                                 icon: ArrowRight,
@@ -335,8 +243,7 @@ pub fn Dashboard() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
-                             }
+                            }
                         }
                     }
                 }
@@ -385,9 +292,6 @@ pub fn Dashboard() -> Element {
                         }
                     }
                 }
-                span { class: "dashboard__footer__rights",
-                    {translate!(i18, "dashboard.footer.rights")}
-                }
             }
         }
         div { class: "dashboard__floating",
@@ -409,25 +313,4 @@ pub fn Dashboard() -> Element {
             }
         }
     }
-}
-
-fn nice_money(value: u64) -> String {
-    let units = vec!["", "K", "M", "B"];
-    let mut l = 0;
-    let mut n = value as f64;
-
-    while n >= 1000.0 && l < units.len() - 1 {
-        n /= 1000.0;
-        l += 1;
-    }
-
-    format!(
-        "${:.2}{}",
-        n,
-        if n < 10.0 && l > 0 {
-            units[l]
-        } else {
-            units[l]
-        }
-    )
 }
