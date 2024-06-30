@@ -1,7 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_elements::geometry::euclid::default;
-
-use crate::components::molecules::management;
 
 #[derive(Clone, Default, Debug)]
 pub struct BasicsForm {

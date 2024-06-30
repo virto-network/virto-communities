@@ -1,17 +1,15 @@
-use std::{str::FromStr, thread::spawn};
-use sube::{sube, Response};
+use std::str::FromStr;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;
-use sp_core::crypto::Ss58AddressFormat;
 
 use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Button, Chat, Compass,
-            Filter, Icon, IconButton, Monetization, SearchInput, Suitcase, Tab, UserGroup,
+            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Compass, Icon,
+            IconButton, SearchInput, Suitcase, Tab, UserGroup,
         },
         molecules::tabs::TabItem,
     },
@@ -19,16 +17,10 @@ use crate::{
         use_accounts::use_accounts,
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
-        use_theme::use_theme,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::route::Route,
-    services::kreivo::{
-        community_memberships::{collection, get_communities_by_member, item},
-        community_track::{tracks, tracksIds},
-        identity::{identityOf, superOf},
-    },
+    services::kreivo::community_memberships::get_communities_by_member,
 };
 
 #[derive(PartialEq, Clone)]
@@ -53,10 +45,9 @@ static SKIP: u8 = 6;
 #[component]
 pub fn Dashboard() -> Element {
     let i18 = use_i18();
-    let mut theme = use_theme();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let mut nav = use_our_navigator();
+    let nav = use_our_navigator();
     let accounts = use_accounts();
 
     let header_handled = consume_context::<Signal<bool>>();
@@ -64,16 +55,13 @@ pub fn Dashboard() -> Element {
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
 
-    theme.set_background(String::from("var(--text-primary)"));
-
     let tab_items = vec![TabItem {
         k: String::from("all"),
         value: translate!(i18, "dashboard.tabs.all"),
     }];
 
-    let mut tab_value = use_signal::<String>(|| String::from("all"));
+    let tab_value = use_signal::<String>(|| String::from("all"));
 
-    let mut communities_ids = use_signal::<Vec<u16>>(|| vec![]);
     let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
 
@@ -344,7 +332,7 @@ pub fn Dashboard() -> Element {
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
                     span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
+                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_by_address.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
                     }
                     div { class: "dashboard__footer__paginators",
                         IconButton {

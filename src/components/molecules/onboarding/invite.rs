@@ -6,9 +6,9 @@ use crate::{
         combo_input::ComboInputValue,
         dropdown::{DropdownItem, ElementSize},
         icon_button::Variant,
-        AddPlus, Attach, ComboInput, Icon, IconButton, Input, MinusCircle, TextareaInput, Title,
+        AddPlus, ComboInput, Icon, IconButton, MinusCircle, Title,
     },
-    hooks::use_onboard::{use_onboard, InvitationItem, Invitations, MediumOptions},
+    hooks::use_onboard::{use_onboard, InvitationItem, MediumOptions},
 };
 
 #[component]

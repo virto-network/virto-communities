@@ -4,7 +4,7 @@ use sube::{sube, Response};
 
 use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
 
-use super::community_track::{tracks, tracksIds, TrackInfo};
+use super::community_track::{tracks, tracksIds};
 
 #[derive(Decode, Debug, Deserialize)]
 pub struct CollectionDetails {
@@ -97,7 +97,7 @@ pub async fn get_communities_by_member(member: &[u8]) -> Result<Vec<Community>, 
                 Err(_) => 0u16,
             };
 
-            let mut community = Community {
+            let community = Community {
                 id: *community,
                 icon: None,
                 name: String::from_utf8_lossy(filtered_name).to_string(),

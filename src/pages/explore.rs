@@ -1,32 +1,26 @@
-use std::{str::FromStr, thread::spawn};
-use sube::{sube, Response};
-
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;
-use sp_core::crypto::Ss58AddressFormat;
 
 use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Button, Chat, Compass,
-            Filter, Icon, IconButton, Monetization, SearchInput, Suitcase, Tab, UserGroup,
+            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon,
+            IconButton, SearchInput, Suitcase, Tab, UserGroup,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
-        use_theme::use_theme,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::{dashboard::Community, route::Route},
+    pages::dashboard::Community,
     services::kreivo::{
         community_memberships::{collection, item},
         community_track::{tracks, tracksIds},
-        identity::{identityOf, superOf},
     },
 };
 
@@ -35,7 +29,6 @@ static SKIP: u8 = 7;
 #[component]
 pub fn Explore() -> Element {
     let i18 = use_i18();
-    let mut theme = use_theme();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
     let mut nav = use_our_navigator();
@@ -44,8 +37,6 @@ pub fn Explore() -> Element {
 
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
-
-    theme.set_background(String::from("var(--text-primary)"));
 
     let tab_items = vec![TabItem {
         k: String::from("all"),
@@ -401,25 +392,4 @@ pub fn Explore() -> Element {
             }
         }
     }
-}
-
-fn nice_money(value: u64) -> String {
-    let units = vec!["", "K", "M", "B"];
-    let mut l = 0;
-    let mut n = value as f64;
-
-    while n >= 1000.0 && l < units.len() - 1 {
-        n /= 1000.0;
-        l += 1;
-    }
-
-    format!(
-        "${:.2}{}",
-        n,
-        if n < 10.0 && l > 0 {
-            units[l]
-        } else {
-            units[l]
-        }
-    )
 }

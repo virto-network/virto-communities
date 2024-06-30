@@ -1,17 +1,15 @@
-use std::{ops::Deref, vec};
+use std::vec;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::TryFutureExt;
-use gloo::{console::warn, utils::format::JsValueSerdeExt};
+use gloo::utils::format::JsValueSerdeExt;
 use serde::Serialize;
-use web_sys::console::info;
 
 use crate::{
     components::{
         atoms::{
-            button::Variant, dropdown::ElementSize, ArrowLeft, ArrowRight, Attach, Button, Icon,
-            Input, TextareaInput, Title, VirtoLogo,
+            button::Variant, dropdown::ElementSize, ArrowLeft, ArrowRight, Button, Icon, VirtoLogo,
         },
         molecules::{OnboardingBasics, OnboardingInvite, OnboardingManagement},
     },
@@ -22,7 +20,7 @@ use crate::{
             use_notification, NotificationHandle, NotificationHandler, NotificationItem,
             NotificationVariant,
         },
-        use_onboard::{use_onboard, BasicsForm, Invitations},
+        use_onboard::use_onboard,
         use_our_navigator::use_our_navigator,
         use_session::use_session,
         use_spaces_client::use_spaces_client,
@@ -30,7 +28,7 @@ use crate::{
     },
     services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
-use serde_json::{to_value, Error, Value as JsonValue};
+use serde_json::{to_value, Error};
 use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Debug)]
@@ -123,7 +121,7 @@ pub fn Onboarding() -> Element {
     });
 
     let mut handle_required_inputs = use_signal::<bool>(|| false);
-    
+
     use_before_render(move || {
         onboard.default();
     });

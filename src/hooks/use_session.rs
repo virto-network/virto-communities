@@ -19,6 +19,7 @@ pub struct UserSession {
     pub account_id: u8,
 }
 
+#[derive(Debug)]
 pub enum SessionError {
     SaveFailed,
     GetFailed,

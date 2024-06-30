@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
-use crate::components::atoms::{
-    dropdown::DropdownItem, AccountButton, Dropdown, Icon, IconButton, Input, Search,
-};
+use crate::components::atoms::{dropdown::DropdownItem, Dropdown, Input};
 
 use super::dropdown::ElementSize;
 
@@ -25,7 +23,9 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
 
     let mut dropdown_value = use_signal::<DropdownItem>(|| props.value.dropdown);
     let mut input_value = use_signal::<String>(|| props.value.input);
-    let mut soon = use_signal::<bool>(|| dropdown_value().key == "Email" || dropdown_value().key == "Telegram" );
+    let mut soon = use_signal::<bool>(|| {
+        dropdown_value().key == "Email" || dropdown_value().key == "Telegram"
+    });
 
     let mut items = vec![];
     let mut dropdown_options = vec![

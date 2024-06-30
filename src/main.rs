@@ -11,7 +11,6 @@ use virto_communities::{
         use_notification::{use_notification, NotificationHandler},
         use_session::{use_session, UserSession},
         use_startup::use_startup,
-        use_theme::use_theme,
         use_tooltip::use_tooltip,
     },
     pages::route::Route,
@@ -27,7 +26,6 @@ fn main() {
 fn App() -> Element {
     use_language();
     use_startup();
-    let theme = use_theme();
     let notification = use_notification();
     let tooltip = use_tooltip();
     let mut session = use_session();

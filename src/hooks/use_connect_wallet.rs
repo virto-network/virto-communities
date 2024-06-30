@@ -24,7 +24,7 @@ pub fn use_connect_wallet() {
             vault
                 .fetch_accounts()
                 .await
-                .map_err(|_| translate!(i18, "errors.wallet.accounts_not_found"));
+                .map_err(|_| PjsError::AccountsNotFound)?;
             let vault_accounts = vault.accounts();
 
             accounts.set(vault_accounts);

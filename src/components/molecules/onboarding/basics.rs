@@ -2,12 +2,10 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
-    components::atoms::{dropdown::ElementSize, notification, Attach, Input, TextareaInput, Title},
+    components::atoms::{dropdown::ElementSize, Attach, Input, TextareaInput, Title},
     hooks::{
-        use_attach::{use_attach, AttachFile},
+        use_attach::AttachFile, use_notification::use_notification, use_onboard::use_onboard,
         use_spaces_client::use_spaces_client,
-        use_notification::use_notification,
-        use_onboard::{use_onboard, BasicsForm},
     },
 };
 

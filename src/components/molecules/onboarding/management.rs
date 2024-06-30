@@ -3,9 +3,9 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        dropdown::ElementSize, ArrowLeft, Attach, CheckboxCard, Icon, Input, KeyFill, MedalFill, ShieldKeyholeFill, TeamFill, TextareaInput, Title
+        CheckboxCard, Icon, KeyFill, MedalFill, ShieldKeyholeFill, TeamFill, Title,
     },
-    hooks::use_onboard::{use_onboard, ManagementForm, ManagementOptions},
+    hooks::use_onboard::{use_onboard, ManagementOptions},
 };
 
 #[component]

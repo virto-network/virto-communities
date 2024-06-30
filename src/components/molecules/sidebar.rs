@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;

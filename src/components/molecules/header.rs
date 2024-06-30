@@ -135,8 +135,12 @@ pub fn Header() -> Element {
             return notification.handle_error(&translate!(i18, "errors.session.persist"));
         };
 
-        session.persist_session_file(&serialized_session);
-        session.update_account(event);
+        if let Err(e) = session.persist_session_file(&serialized_session) {
+            log::warn!("Failed to persist session {:?}", e)
+        };
+        if let Err(e) = session.update_account(event) {
+            log::warn!("Failed to update account {:?}", e)
+        };
 
         accounts.set_account(Some(account.clone()));
         set_signer(account.address().clone());
@@ -170,7 +174,9 @@ pub fn Header() -> Element {
                     }
                 }
                 Err(pjs::Error::NoPermission) => {
-                    session.persist_session_file("");
+                    if let Err(e) = session.persist_session_file("") {
+                        log::warn!("Failed to persist session {:?}", e);
+                    };
                 }
                 Err(_) => todo!(),
             }

@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use super::types::{CommunityMatrixId, CommunitySpace, Uri};
 
 #[derive(Clone)]

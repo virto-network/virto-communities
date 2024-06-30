@@ -1,34 +1,22 @@
-use std::{str::FromStr, thread::spawn};
-use sube::{sube, Response};
-
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;
-use sp_core::crypto::Ss58AddressFormat;
 
 use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Button, Chat, Compass,
-            Filter, Icon, IconButton, Monetization, SearchInput, Suitcase, Tab, UserGroup,
+            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon,
+            IconButton, SearchInput, Suitcase, Tab, UserGroup,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_accounts::use_accounts,
-        use_notification::use_notification,
-        use_our_navigator::use_our_navigator,
-        use_theme::use_theme,
-        use_tooltip::{use_tooltip, TooltipItem},
+        use_accounts::use_accounts, use_notification::use_notification,
+        use_our_navigator::use_our_navigator, use_tooltip::use_tooltip,
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::{dashboard::Community, route::Route},
-    services::kreivo::{
-        community_memberships::{collection, get_communities_by_member, item},
-        community_track::{tracks, tracksIds},
-        identity::{identityOf, superOf},
-    },
+    pages::dashboard::Community,
 };
 
 static SKIP: u8 = 6;
@@ -36,7 +24,6 @@ static SKIP: u8 = 6;
 #[component]
 pub fn Initiatives(id: u16) -> Element {
     let i18 = use_i18();
-    let mut theme = use_theme();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
     let mut nav = use_our_navigator();
@@ -46,8 +33,6 @@ pub fn Initiatives(id: u16) -> Element {
 
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
-
-    theme.set_background(String::from("var(--text-primary)"));
 
     let tab_items = vec![TabItem {
         k: String::from("all"),
