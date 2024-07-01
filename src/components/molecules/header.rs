@@ -68,6 +68,11 @@ pub fn Header() -> Element {
                 let Ok(account) = account(&format!("0x{}", hex_address)).await else {
                     ksm_balance.set(('0'.to_string(), "00".to_string()));
                     usdt_balance.set(('0'.to_string(), "00".to_string()));
+
+                    if !header_handled() {
+                        header_handled.set(true);
+                    }
+
                     return Ok(());
                 };
 
@@ -126,6 +131,8 @@ pub fn Header() -> Element {
     }
 
     let mut on_handle_account = move |event: u8| {
+        header_handled.set(false);
+        
         let account = &accounts.get()[event as usize];
 
         let Ok(serialized_session) = serde_json::to_string(&UserSession {
@@ -142,6 +149,7 @@ pub fn Header() -> Element {
             log::warn!("Failed to update account {:?}", e)
         };
 
+        log::info!("{:?}", account);
         accounts.set_account(Some(account.clone()));
         set_signer(account.address().clone());
 
@@ -289,7 +297,7 @@ pub fn Header() -> Element {
                                     ".{usdt_balance().1}"
                                 }
                                 span { class: "balance__asset",
-                                    "USDT"
+                                    "USD"
                                 }
                             }
                         }

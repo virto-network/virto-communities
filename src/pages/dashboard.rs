@@ -373,9 +373,6 @@ pub fn Dashboard() -> Element {
                         }
                     }
                 }
-                span { class: "dashboard__footer__rights",
-                    {translate!(i18, "dashboard.footer.rights")}
-                }
             }
         }
         div { class: "dashboard__floating",
