@@ -66,7 +66,7 @@ pub async fn get_communities_by_member(member: &[u8]) -> Result<Vec<Community>, 
             .map_err(|_| ChainStateError::FailedQuery)?;
 
         let Response::ValueSet(value) = response else {
-            return Err(ChainStateError::InternalError);
+            continue;
         };
 
         if value.len() > 0 {
