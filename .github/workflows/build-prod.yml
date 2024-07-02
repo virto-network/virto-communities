@@ -1,9 +1,9 @@
-name: Build
+name: Build Prod
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - created
 
 jobs:
   build:
@@ -15,15 +15,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install latest
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
             toolchain: nightly
-            override: true
             target: wasm32-unknown-unknown
-            default: true
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -35,8 +33,8 @@ jobs:
         run: dx build --release
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: build-artifact
+          name: build-artifact-prod
           path: ./dist
   
