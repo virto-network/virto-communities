@@ -7,6 +7,7 @@ pub mod pages {
 }
 
 pub mod middlewares {
+    pub mod is_chain_available;
     pub mod is_dao_owner;
 }
 
@@ -18,7 +19,6 @@ pub mod layouts {
 pub mod hooks {
     pub mod use_accounts;
     pub mod use_attach;
-    pub mod use_spaces_client;
     pub mod use_communities;
     pub mod use_connect_wallet;
     pub mod use_language;
@@ -27,8 +27,10 @@ pub mod hooks {
     pub mod use_our_navigator;
     pub mod use_paginator;
     pub mod use_session;
+    pub mod use_spaces_client;
     pub mod use_startup;
     pub mod use_theme;
+    pub mod use_timestamp;
     pub mod use_tooltip;
 }
 
@@ -48,5 +50,6 @@ pub mod services {
         pub mod community_memberships;
         pub mod community_track;
         pub mod identity;
+        pub mod timestamp;
     }
 }
