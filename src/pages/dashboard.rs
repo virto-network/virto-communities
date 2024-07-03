@@ -21,7 +21,7 @@ use crate::{
         use_theme::use_theme,
         use_tooltip::{use_tooltip, TooltipItem},
     },
-    middlewares::is_dao_owner::is_dao_owner,
+    middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
     pages::route::Route,
     services::kreivo::{
         community_memberships::{collection, item},
@@ -161,7 +161,7 @@ pub fn Dashboard() -> Element {
 
     use_effect(use_reactive(&header_handled(), move |_| {
         if header_handled() {
-            get_communities.send(())
+            get_communities.send(());
         }
     }));
 
@@ -214,7 +214,7 @@ pub fn Dashboard() -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                            nav.push(vec![Box::new(is_chain_available()), Box::new(is_dao_owner())], "/onboarding");
                         }
                     }
                 }
@@ -366,7 +366,7 @@ pub fn Dashboard() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                                nav.push(vec![Box::new(is_chain_available()), Box::new(is_dao_owner())], "/onboarding");
                              }
                         }
                     }

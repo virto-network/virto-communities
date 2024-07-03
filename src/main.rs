@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 use gloo::storage::{errors::StorageError, LocalStorage};
 
 use log::LevelFilter;
@@ -12,9 +13,11 @@ use virto_communities::{
         use_session::{use_session, UserSession},
         use_startup::use_startup,
         use_theme::use_theme,
+        use_timestamp::{use_timestamp, IsTimestampHandled, TimestampValue},
         use_tooltip::use_tooltip,
     },
     pages::route::Route,
+    services::kreivo::timestamp::now,
 };
 
 fn main() {
@@ -27,10 +30,25 @@ fn main() {
 fn App() -> Element {
     use_language();
     use_startup();
+
+    let i18 = use_i18();
     let theme = use_theme();
-    let notification = use_notification();
+    let mut notification = use_notification();
     let tooltip = use_tooltip();
     let mut session = use_session();
+    let mut timestamp = use_timestamp();
+    let mut is_timestamp_handled = consume_context::<Signal<IsTimestampHandled>>();
+
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        let Ok(result_now) = now().await else {
+            notification.handle_error(&translate!(i18, "errors.timestamp.query_failed"));
+            is_timestamp_handled.set(IsTimestampHandled(true));
+            return;
+        };
+
+        timestamp.set(TimestampValue(result_now));
+        is_timestamp_handled.set(IsTimestampHandled(true));
+    });
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         let serialized_session: Result<String, StorageError> =

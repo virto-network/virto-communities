@@ -12,6 +12,7 @@ use super::{
     use_paginator::Paginator,
     use_session::UserSession,
     use_theme::Theme,
+    use_timestamp::{IsTimestampHandled, TimestampValue},
     use_tooltip::TooltipItem,
 };
 
@@ -41,7 +42,12 @@ pub fn use_startup() {
     use_context_provider::<Signal<String>>(|| Signal::new(String::new()));
     use_context_provider::<Signal<f64>>(|| Signal::new(0.0));
 
+    use_context_provider::<Signal<TimestampValue>>(|| Signal::new(TimestampValue(0)));
+    use_context_provider::<Signal<IsTimestampHandled>>(|| Signal::new(IsTimestampHandled(false)));
+
     // Clients
 
-    use_context_provider::<Signal<SpacesClient>>(|| Signal::new(SpacesClient::new(SPACES_CLIENT_URL)));
+    use_context_provider::<Signal<SpacesClient>>(|| {
+        Signal::new(SpacesClient::new(SPACES_CLIENT_URL))
+    });
 }
