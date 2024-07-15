@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::StreamExt;
 
 use crate::{
     components::{
@@ -45,29 +44,16 @@ pub fn Initiatives(id: u16) -> Element {
     let mut communities = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
 
-    // let mut items = vec![];
-    // for item in tab_items.into_iter() {
-    //     items.push(rsx!(Tab {
-    //         text: item.value,
-    //         on_click: move |_| {
-    //             // tab_value.set(item.k);
-    //         },
-    //     }))
-    // }
-
     rsx! {
         div {
             class: "dashboard grid-main",
             div { class: "dashboard__head",
                 section { class: "tabs",
-                    // body: items
                     for item in tab_items.into_iter() {
                         Tab {
                             text: item.value,
                             is_active: if tab_value() == item.k {true} else {false},
-                            on_click: move |_| {
-                                // tab_value.set(item.k);
-                            },
+                            on_click: move |_| {},
                         }
                     }
                 }
@@ -104,7 +90,7 @@ pub fn Initiatives(id: u16) -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                            nav.push(vec![], "/initiative");
                         }
                     }
                 }
@@ -189,7 +175,51 @@ pub fn Initiatives(id: u16) -> Element {
                         }
                     }
                 }
-                section { class: "card card--reverse card--comming-soon",
+                section { class: "card ",
+                    div { class: "card__container",
+                        div { class: "card__head",
+                            h3 { class: "card__title",
+                                {translate!(i18, "dao.cta_cards.vote.title")}
+                            }
+                        }
+                        p { class: "card__description",
+                            {translate!(i18, "dao.cta_cards.vote.description")}
+                        }
+                        div { class: "card__head",
+                            a { class: "card__learn",
+                                {translate!(i18, "dao.cta_cards.vote.cta")}
+                            }
+                            Icon {
+                                icon: ArrowRight,
+                                height: 20,
+                                width: 20,
+                                stroke_width: 1,
+                                fill: "var(--text-tertiary)"
+                            }
+                        }
+                    }
+
+                    div { class: "card__cta",
+                        IconButton {
+                            class: "button--avatar",
+                            size: ElementSize::Big,
+                            body: rsx!(
+                                Icon {
+                                    icon: AddPlus,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1.5,
+                                    fill: "var(--fill-00)"
+                                }
+                            ),
+                            on_click: move |_| {
+                                tooltip.hide();
+                                nav.push(vec![], "/vote");
+                            }
+                        }
+                    }
+                }
+                section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
@@ -228,6 +258,7 @@ pub fn Initiatives(id: u16) -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
+                                nav.push(vec![], "/initiative");
                             }
                         }
                     }
@@ -253,8 +284,6 @@ pub fn Initiatives(id: u16) -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current - 1);
-
-                                // get_community_track.send(current_page())
                             }
                         }
                         IconButton {
@@ -271,8 +300,6 @@ pub fn Initiatives(id: u16) -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current + 1);
-
-                                // get_community_track.send(current_page())
                             }
                         }
                     }
@@ -292,9 +319,7 @@ pub fn Initiatives(id: u16) -> Element {
                         fill: "var(--fill-00)"
                     }
                 ),
-                on_click: move |_| {
-                    // nav.push()
-                }
+                on_click: move |_| {}
             }
         }
     }

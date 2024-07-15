@@ -50,6 +50,7 @@ pub fn OnboardingInvite() -> Element {
                     rsx!(
                         li {
                             ComboInput {
+                                size: ElementSize::Big,
                                 value: ComboInputValue { dropdown: DropdownItem { key: match member.medium {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
                                     MediumOptions::Email => translate!(i18, "onboard.invite.form.email.label"),

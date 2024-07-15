@@ -3,8 +3,8 @@ use dioxus::prelude::*;
 use crate::{
     layouts::{authenticated::Authenticated, onboard::Onboard},
     pages::{
-        dashboard::Dashboard, explore::Explore, initiatives::Initiatives, not_found::PageNotFound,
-        onboarding::Onboarding,
+        dashboard::Dashboard, explore::Explore, initiative::Initiative, initiatives::Initiatives,
+        not_found::PageNotFound, onboarding::Onboarding, vote::Vote,
     },
 };
 
@@ -19,8 +19,16 @@ pub enum Route {
         #[layout(Onboard)]
             #[route("/explore")]
             Explore {},
-            #[route("/dao/:id")]
-            Initiatives {id: u16},
+            #[nest("/dao")]
+                #[nest("/:id")]
+                    #[route("/")]
+                    Initiatives {id: u16},
+                    #[end_nest]
+                #[end_nest]
+            #[route("/initiative")]
+            Initiative {},
+            #[route("/vote")]
+            Vote {},
         #[end_layout]
     #[end_layout]
     #[route("/:..route")]

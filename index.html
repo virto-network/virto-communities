@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="css-out/main.css">
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.css" />
   <style>
     * {
       box-sizing: border-box;
@@ -44,7 +45,7 @@
       --ratio-ultrawide: 18/5;
       --ratio-golden: 1.618/1;
 
-      /* Vars figma */
+      /* lets figma */
 
       /* Neutral/Solid */
       --neutral-solid-25: #F6F8FA;
@@ -120,6 +121,7 @@
       --fill-50: #C6EBC7;
       --fill-100: #A1DFA4;
       --fill-200: #78D37D;
+      --fill-400: #24AF37;
       --fill-600: #006B0A;
       --fill-00-alt: #141414;
       --fill-100-alt: #171819;
@@ -140,37 +142,38 @@
       --state-destructive-active: #DC2828;
       --state-destructive-hover: #FF6565;
       --state-primary-active: #56C960;
+      --state-primary-selected: #A1DFA4;
     }
 
     :root {
-      --text-1: var(--text-loud);
-      --text-2: var(--text-muted);
+      --text-1: let(--text-loud);
+      --text-2: let(--text-muted);
 
-      --background: var(--background-white);
-      --background-button: var(--neutral-solid-900);
-      --background-input: var(--neutral-solid-25);
-      --background-message: var(--neutral-alpha-0);
+      --background: let(--background-white);
+      --background-button: let(--neutral-solid-900);
+      --background-input: let(--neutral-solid-25);
+      --background-message: let(--neutral-alpha-0);
       --background-shadow: rgba(0, 0, 0, 30%);
-      --background-modal: var(--neutral-solid-50);
+      --background-modal: let(--neutral-solid-50);
 
-      --border: var(--border-normal);
-      --border-rgba: var(var(var(--border-rgba-light)));
+      --border: let(--border-normal);
+      --border-rgba: let(let(let(--border-rgba-light)));
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --text-1: var(--text-white);
-        --text-2: var(--text-subdued);
+        --text-1: let(--text-white);
+        --text-2: let(--text-subdued);
 
-        --background: var(--background-loud);
-        --background-button: var(--neutral-solid-800);
-        --background-input: var(--neutral-solid-700);
-        --background-message: var(--neutral-solid-800);
+        --background: let(--background-loud);
+        --background-button: let(--neutral-solid-800);
+        --background-input: let(--neutral-solid-700);
+        --background-message: let(--neutral-solid-800);
         --background-shadow: rgba(53, 56, 73, 30%);
-        --background-modal: var(--neutral-solid-700);
+        --background-modal: let(--neutral-solid-700);
 
-        --border: var(--border-muted);
-        --border-rgba: var(var(var(--border-rgba-dark)));
+        --border: let(--border-muted);
+        --border-rgba: let(let(let(--border-rgba-dark)));
       }
     }
 
@@ -192,11 +195,11 @@
     }
 
     :focus-visible {
-      outline: 2px dashed var(--alt);
+      outline: 2px dashed let(--alt);
     }
 
     body {
-      background: var(--background);
+      background: let(--background);
     }
 
     #main {
@@ -239,7 +242,26 @@
       }
     );
   </script>
+  <script src="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.js"></script>
+  <script type="text/javascript">
+    function initMarkdownEditor() {
+      let tinyMDE = new TinyMDE.Editor({ element: document.getElementById("editor") });
+      let commandBar = new TinyMDE.CommandBar({
+        element: document.getElementById("toolbar"),
+        editor: tinyMDE,
+      });
 
+      window.initMarkdownEditor = function (callback) {
+        tinyMDE.addEventListener('change', function () {
+          let content = tinyMDE.getContent();
+          callback(content);
+        });
+      };
+
+      window.setContentMarkdownEditor = function (content) {
+        tinyMDE.setContent(content);
+      };
+    }
   </script>
   {script_include}
 </body>

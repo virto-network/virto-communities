@@ -79,6 +79,92 @@
                 "paginator": "{from} of {to}"
             }
         },
+        "initiative": {
+            "title": "Crear iniciativa",
+            "steps": {
+                "info": {
+                    "label": "Información",
+                    "name": {
+                        "label": "Nombre",
+                        "description": "Lorem Ipsum Dolor",
+                        "placeholder": "Escribe un nombre"
+                    },
+                    "description": {
+                        "label": "Descripción",
+                        "description": "Lorem Ipsum Dolor",
+                        "placeholder": "Escribe una descripción"
+                    },
+                    "categories": {
+                        "label": "Categorías",
+                        "description": "Utiliza palabras para categorizar tu iniciativa basada en su propósito, por ejemplo, 'Impacto Social', 'Finanzas', etc.",
+                        "placeholder": "Escribe categorías separadas por comas"
+                    }
+                },
+                "actions": {
+                    "label": "Acciones"
+                },
+                "settings": {
+                    "label": "Configuraciones"
+                },
+                "confirmation": {
+                    "label": "Confirmación"
+                }
+            },
+            "cta": {
+                "cancel": "Cancelar",
+                "continue": "Continuar"
+            },
+            "disclaimer": "Aviso: Esta sección está en desarrollo. ¡Siéntete libre de interactuar con ella!"
+        },
+        "governance": {
+            "title": "Votar iniciativa",
+            "description": {
+                "details": {
+                    "by": "Propuesto por",
+                    "start-date": "Fecha inicio",
+                    "end-date": "Fecha finalización",
+                    "status": {
+                        "title": "Estado",
+                        "options": {
+                            "voting": "En votación",
+                            "excecuted": "Ejecutada",
+                            "approved": "Aprobada",
+                            "rejected": "Fallida"
+                        }
+                    },
+                    "update": "Modificar",
+                    "cta": "Ver datos avanzados"
+                },
+                "voting": {
+                    "title": "Votación",
+                    "for": "A favor",
+                    "against": "Contra",
+                    "votes": "votos",
+                    "threshold": {
+                        "title": "Umbral superado",
+                        "description": "Es necesario pasar el 50% de los votos para ejecutar la propuesta. "
+                    },
+                    "total": {
+                        "title": "Votos",
+                        "voters": "votantes"
+                    },
+                    "amount": {
+                        "label": "Cuantos {asset} vas a utilizar?",
+                        "placeholder": "1.000"
+                    },
+                    "cta": {
+                        "for": "A favor",
+                        "against": "En contra"
+                    }
+                }
+            },
+            "success": {
+                "title": "Todo ha estado perfecto¡Haz creado un referendo! 🥳",
+                "form": {
+                    "cta_send": "Continuar"
+                }
+            }
+        },
         "onboard": {
             "basics": {
                 "label": "¡Bienvenido! Primero lo primero...",
@@ -158,6 +244,19 @@
                     "title": "Todo ha salido bien",
                     "description": "La comunidad ha sido creada"
                 }
+            }
+        },
+        "utils": {
+            "markdown": {
+                "cta": {
+                    "edit": "Editor",
+                    "preview": "Ver"
+                },
+                "value": "¡Modifícame!"
+            },
+            "vote_preview": {
+                "title": "Esta es la previsualización de una iniciativa",
+                "description": "Buscamos fondos para crear un sistema de gobernanza descentralizada en nuestra plataforma blockchain. Queremos permitir que nuestra comunidad participe activamente en la toma de decisiones.\n\n**Puntos importantes**\n\n- Desarrollo de herramientas de gobernanza\n- Educación y divulgación sobre gobernanza descentralizada\n- Investigación y desarrollo continuo del sistema de gobernanza\n\n**Uso de fondos**\n\n- Desarrollo de herramientas de gobernanza: 40%.\n- Educación y divulgación: 30%.\n- Investigación y desarrollo: 30%."
             }
         },
         "warnings": {

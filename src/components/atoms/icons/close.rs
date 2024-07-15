@@ -6,7 +6,7 @@ use super::icon::IconShape;
 pub struct Close;
 impl IconShape for Close {
     fn view_box(&self) -> String {
-        String::from("0 0 32 32")
+        String::from("0 0 24 24")
     }
     fn child_elements(&self) -> Element {
         rsx!(

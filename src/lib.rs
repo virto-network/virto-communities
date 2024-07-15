@@ -2,10 +2,12 @@
 pub mod pages {
     pub mod dashboard;
     pub mod explore;
+    pub mod initiative;
     pub mod initiatives;
     pub mod not_found;
     pub mod onboarding;
     pub mod route;
+    pub mod vote;
 }
 
 pub mod middlewares {
@@ -22,6 +24,7 @@ pub mod hooks {
     pub mod use_attach;
     pub mod use_communities;
     pub mod use_connect_wallet;
+    pub mod use_initiative;
     pub mod use_language;
     pub mod use_notification;
     pub mod use_onboard;
