@@ -45,7 +45,7 @@
       --ratio-ultrawide: 18/5;
       --ratio-golden: 1.618/1;
 
-      /* lets figma */
+      /* vars figma */
 
       /* Neutral/Solid */
       --neutral-solid-25: #F6F8FA;
@@ -146,34 +146,34 @@
     }
 
     :root {
-      --text-1: let(--text-loud);
-      --text-2: let(--text-muted);
+      --text-1: var(--text-loud);
+      --text-2: var(--text-muted);
 
-      --background: let(--background-white);
-      --background-button: let(--neutral-solid-900);
-      --background-input: let(--neutral-solid-25);
-      --background-message: let(--neutral-alpha-0);
+      --background: var(--background-white);
+      --background-button: var(--neutral-solid-900);
+      --background-input: var(--neutral-solid-25);
+      --background-message: var(--neutral-alpha-0);
       --background-shadow: rgba(0, 0, 0, 30%);
-      --background-modal: let(--neutral-solid-50);
+      --background-modal: var(--neutral-solid-50);
 
-      --border: let(--border-normal);
-      --border-rgba: let(let(let(--border-rgba-light)));
+      --border: var(--border-normal);
+      --border-rgba: var(var(var(--border-rgba-light)));
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --text-1: let(--text-white);
-        --text-2: let(--text-subdued);
+        --text-1: var(--text-white);
+        --text-2: var(--text-subdued);
 
-        --background: let(--background-loud);
-        --background-button: let(--neutral-solid-800);
-        --background-input: let(--neutral-solid-700);
-        --background-message: let(--neutral-solid-800);
+        --background: var(--background-loud);
+        --background-button: var(--neutral-solid-800);
+        --background-input: var(--neutral-solid-700);
+        --background-message: var(--neutral-solid-800);
         --background-shadow: rgba(53, 56, 73, 30%);
-        --background-modal: let(--neutral-solid-700);
+        --background-modal: var(--neutral-solid-700);
 
-        --border: let(--border-muted);
-        --border-rgba: let(let(let(--border-rgba-dark)));
+        --border: var(--border-muted);
+        --border-rgba: var(var(var(--border-rgba-dark)));
       }
     }
 
@@ -195,11 +195,11 @@
     }
 
     :focus-visible {
-      outline: 2px dashed let(--alt);
+      outline: 2px dashed var(--alt);
     }
 
     body {
-      background: let(--background);
+      background: var(--background);
     }
 
     #main {
