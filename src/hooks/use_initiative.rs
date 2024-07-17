@@ -141,10 +141,6 @@ impl ActionItem {
             ActionItem::Treasury(TreasuryAction::default()).option(),
         ]
     }
-
-    pub fn update(&mut self, index: usize, item: ActionItem) {
-        
-    }
 }
 
 #[derive(Clone, Default, Debug)]
