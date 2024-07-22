@@ -57,7 +57,7 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Trayendo las iniciativas",
+                    "title": "Trayendo las Iniciativas",
                     "description": "Esto puede tomar un momento"
                 }
             },
@@ -114,7 +114,17 @@
                 "cancel": "Cancelar",
                 "continue": "Continuar"
             },
-            "disclaimer": "Aviso: Esta sección está en desarrollo. ¡Siéntete libre de interactuar con ella!"
+            "disclaimer": "Aviso: Esta sección está en desarrollo. ¡Siéntete libre de interactuar con ella!",
+            "tips": {
+                "loading": {
+                    "title": "Crea tu Iniciativa",
+                    "description": "Esto puede tomar un momento"
+                },
+                "created": {
+                    "title": "Todo ha salido bien",
+                    "description": "La iniciativa ha sido creada"
+                }
+            }
         },
         "governance": {
             "title": "Votar iniciativa",
@@ -277,6 +287,9 @@
             "communities": {
                 "query_failed": "No se ha podido traer comunidades"
             },
+            "initiatives": {
+                "query_failed": "No se ha podido traer iniciativas"
+            },
             "attach": {
                 "title": "Error al subir",
                 "not_found": {
@@ -295,7 +308,8 @@
             "form": {
                 "not_empty": "No puede estar vacío.",
                 "upload_fail": "No se ha podido subir el archivo",
-                "community_creation": "No se ha podido crear la comunidad"
+                "community_creation": "No se ha podido crear la comunidad",
+                "initiative_creation": "No se ha podido crear la iniciativa"
             }
         }
     }

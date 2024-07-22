@@ -1,15 +1,16 @@
 use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::components::atoms::dropdown::DropdownItem;
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Deserialize, Serialize, Debug)]
 pub struct InfoForm {
     pub name: String,
     pub description: String,
-    pub categories: String,
+    pub categories: Vec<String>,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub enum MediumOptions {
     #[default]
     Wallet,
@@ -17,7 +18,7 @@ pub enum MediumOptions {
     Email,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub struct MemberItem {
     pub medium: MediumOptions,
     pub account: String,
@@ -25,13 +26,13 @@ pub struct MemberItem {
 
 pub type Members = Vec<MemberItem>;
 
-#[derive(Clone, Default, Debug)]
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub struct Treasury {
     pub amount: u128,
     pub dest: String,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
 pub struct AddMembersAction {
     pub members: Members,
 }
@@ -58,53 +59,10 @@ impl AddMembersAction {
     }
 }
 
-#[derive(Clone, Debug, Default)]
-pub struct RemoveMembersAction {
-    pub members: Members,
-}
-
-impl RemoveMembersAction {
-    pub fn add_member(&mut self, member: MemberItem) {
-        self.members.push(member);
-    }
-
-    pub fn update_member(&mut self, index: usize, member: MemberItem) {
-        if index < self.members.len() {
-            self.members[index] = member;
-        } else {
-            println!("Index out of bounds.");
-        }
-    }
-
-    pub fn remove_member(&mut self, index: usize) {
-        if index < self.members.len() {
-            self.members.remove(index);
-        } else {
-            println!("Index out of bounds.");
-        }
-    }
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct TreasuryAction {
-    pub treasury: Treasury,
-}
-
-impl TreasuryAction {
-    pub fn update_amount(&mut self, amount: u128) {
-        self.treasury.amount = amount;
-    }
-
-    pub fn update_dest(&mut self, dest: String) {
-        self.treasury.dest = dest;
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
+#[serde(tag = "action_type")]
 pub enum ActionItem {
     AddMembers(AddMembersAction),
-    RemoveMembers(RemoveMembersAction),
-    Treasury(TreasuryAction),
 }
 
 impl ActionItem {
@@ -114,22 +72,12 @@ impl ActionItem {
                 key: "AddMembers".to_string(),
                 value: "Add Members".to_string(),
             },
-            ActionItem::RemoveMembers(_) => DropdownItem {
-                key: "RemoveMembers".to_string(),
-                value: "Remove Members".to_string(),
-            },
-            ActionItem::Treasury(_) => DropdownItem {
-                key: "Treasury".to_string(),
-                value: "Treasury".to_string(),
-            },
         }
     }
 
     fn to_option(option: String) -> ActionItem {
         match &*option {
             "AddMembers" => ActionItem::AddMembers(AddMembersAction::default()),
-            "RemoveMembers" => ActionItem::RemoveMembers(RemoveMembersAction::default()),
-            "Treasury" => ActionItem::Treasury(TreasuryAction::default()),
             _ => todo!(),
         }
     }
@@ -137,8 +85,6 @@ impl ActionItem {
     fn get_options() -> Vec<DropdownItem> {
         vec![
             ActionItem::AddMembers(AddMembersAction::default()).option(),
-            ActionItem::RemoveMembers(RemoveMembersAction::default()).option(),
-            ActionItem::Treasury(TreasuryAction::default()).option(),
         ]
     }
 }
@@ -153,6 +99,63 @@ pub struct SettingsForm {}
 
 #[derive(Clone, Default, Debug)]
 pub struct ConfirmationForm {}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct InitiativeInitContent {
+    pub sender: String,
+    pub is_admin: bool,
+}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct InitiativeInfoContent {
+    pub name: String,
+    pub description: String,
+    pub tags: Vec<String>,
+    pub actions: Vec<ActionItem>,
+}
+
+#[derive(PartialEq, Deserialize, Serialize, Debug)]
+pub struct InitiativeData {
+    pub init: InitiativeInitContent,
+    pub info: InitiativeInfoContent,
+}
+
+#[derive(PartialEq, Deserialize, Serialize, Clone, Debug)]
+
+pub enum VoteOf {
+    Yes,
+    No,
+}
+
+#[derive(PartialEq, Deserialize, Serialize, Clone, Debug)]
+pub enum Vote {
+    Standard(VoteOf),
+}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize)]
+pub struct InitiativeVoteContent {
+    pub user: String,
+    pub vote: Vote,
+}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize)]
+pub struct InitiativeVoteData {
+    pub user: String,
+    pub room: String,
+    pub vote: Vote,
+}
+
+#[derive(PartialEq, Deserialize, Serialize, Debug, Default)]
+pub struct InitiativeHistory {
+    pub init: InitiativeInitContent,
+    pub info: InitiativeInfoContent,
+    pub votes: Vec<InitiativeVoteContent>,
+}
+
+#[derive(PartialEq, Deserialize, Serialize, Debug, Default)]
+pub struct CommunityInitiative {
+    id: Option<u32>,
+}
 
 pub fn use_initiative() -> UseInitiativeState {
     let info = consume_context::<Signal<InfoForm>>();

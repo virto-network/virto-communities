@@ -1,3 +1,5 @@
+use crate::hooks::use_initiative::{InitiativeData, InitiativeHistory, InitiativeVoteData};
+
 use super::types::{CommunityMatrixId, CommunitySpace, Uri};
 
 #[derive(Clone)]
@@ -78,5 +80,50 @@ impl SpacesClient {
             .await?;
 
         Ok(response.get())
+    }
+
+    pub async fn create_initiative(
+        &self,
+        initiative: InitiativeData,
+    ) -> Result<CommunityMatrixId, reqwest::Error> {
+        let path = format!("{}/initiative/create", self.base_path);
+        let response = self
+            .client
+            .post(path)
+            .json(&initiative)
+            .send()
+            .await?
+            .json::<CommunityMatrixId>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn vote_initiative(
+        &self,
+        vote: InitiativeVoteData,
+    ) -> Result<(), reqwest::Error> {
+        let path = format!("{}/initiative/vote", self.base_path);
+        let response = self
+            .client
+            .post(path)
+            .json(&vote)
+            .send()
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn get_initiative_by_id(&self, id: &str) -> Result<InitiativeHistory, reqwest::Error> {
+        let path = format!("{}/initiative/{}", self.base_path, id);
+        let response = self
+            .client
+            .get(path)
+            .send()
+            .await?
+            .json::<InitiativeHistory>()
+            .await?;
+
+        Ok(response)
     }
 }

@@ -7,9 +7,7 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Compass, Icon,
-            IconButton, SearchInput, Suitcase, Tab, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Compass, Icon, IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup
         },
         molecules::tabs::TabItem,
     },
@@ -29,7 +27,7 @@ pub enum CommunityTag {
     SocialImpact,
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub struct Community {
     pub id: u16,
     pub icon: Option<String>,
@@ -64,16 +62,6 @@ pub fn Dashboard() -> Element {
 
     let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
-
-    // let mut items = vec![];
-    // for item in tab_items.into_iter() {
-    //     items.push(rsx!(Tab {
-    //         text: item.value,
-    //         on_click: move |_| {
-    //             // tab_value.set(item.k);
-    //         },
-    //     }))
-    // }
 
     let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
         while let Some(_) = rx.next().await {
@@ -198,19 +186,19 @@ pub fn Dashboard() -> Element {
 
                                 span { class: "card__metric",
                                     Icon {
-                                        icon: UserGroup,
+                                        icon: UserAdd,
                                         height: 16,
                                         width: 16,
-                                        stroke_width: 1,
-                                        fill: "var(--text-primary)"
+                                        stroke_width: 2,
+                                        stroke: "var(--text-primary)"
                                     }
                                     small {
-                                        "{community.memberships} Memberships"
+                                        "{community.memberships} Free Memberships"
                                     }
                                 }
                                 span { class: "card__metric",
                                     Icon {
-                                        icon: Suitcase,
+                                        icon: UserGroup,
                                         height: 16,
                                         width: 16,
                                         stroke_width: 1,
@@ -248,7 +236,7 @@ pub fn Dashboard() -> Element {
                                     }
                                 ),
                                 on_click: move |_| {
-                                    let path = format!("/dao/{}", community.id);
+                                    let path = format!("/dao/{}/initiatives", community.id);
                                     nav.push(vec![], &path);
                                 }
                             }
@@ -372,24 +360,6 @@ pub fn Dashboard() -> Element {
                             }
                         }
                     }
-                }
-            }
-        }
-        div { class: "dashboard__floating",
-            IconButton {
-                variant: Variant::SemiRound,
-                size: ElementSize::Big,
-                class: "button--avatar",
-                body: rsx!(
-                    Icon {
-                        icon: Chat,
-                        height: 32,
-                        width: 32,
-                        fill: "var(--fill-00)"
-                    }
-                ),
-                on_click: move |_| {
-                    // nav.push()
                 }
             }
         }

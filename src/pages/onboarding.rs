@@ -77,7 +77,7 @@ struct CommunityData {
     identity: Identity,
 }
 
-fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
+pub fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
     to_value(value)
         .map(|t: serde_json::Value| JsValue::from_serde(&t))
         .unwrap_or_else(|e| Ok(JsValue::from_str("Error creating JsValue")))

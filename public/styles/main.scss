@@ -825,6 +825,10 @@ $fw-bold: 700;
     flex-grow: 2;
 }
 
+.details__tags {
+    padding: 12px 0;
+}
+
 .details__proposal,
 .details__voting {
     display: flex;
@@ -852,6 +856,22 @@ $fw-bold: 700;
     height: 12px;
     width: 100%;
     border-radius: 16px;
+    display: flex;
+}
+
+.statistics__bar__content {
+    height: 100%;
+    border-radius: 16px;
+    display: inline-block;
+}
+
+.statistics__bar--aye,
+.statistics__bar__content--aye {
+    background: var(--state-primary-active);
+}
+
+.statistics__bar--nay,
+.statistics__bar__content--nay {
     background: var(--state-destructive-active);
 }
 

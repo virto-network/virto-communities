@@ -5,9 +5,7 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon,
-            IconButton, SearchInput, Suitcase, Tab, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon, IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup
         },
         molecules::tabs::TabItem,
     },
@@ -19,7 +17,7 @@ use crate::{
     middlewares::is_dao_owner::is_dao_owner,
     pages::dashboard::Community,
     services::kreivo::{
-        community_memberships::{collection, item},
+        community_memberships::{collection, get_owned_memberships, item},
         community_track::{tracks, tracksIds},
     },
 };
@@ -66,6 +64,14 @@ pub fn Explore() -> Element {
                 let response_collection = collection(*track).await;
                 let response_item = item(*track, None).await;
 
+                let collection_items = match response_collection {
+                    Ok(ref collection) => {
+                        let address = format!("0x{}", hex::encode(collection.owner.clone()));
+                        get_owned_memberships(&address).await.unwrap_or(0u16)
+                    }
+                    Err(_) => 0u16,
+                };
+
                 let Ok(track_info) = response_track else {
                     continue;
                 };
@@ -78,11 +84,6 @@ pub fn Explore() -> Element {
                     .collect::<Vec<_>>();
 
                 let filtered_name: &[u8] = &filtered_name;
-
-                let collection_items = match response_collection {
-                    Ok(ref details) => details.items.clone(),
-                    Err(_) => 0u16,
-                };
 
                 let item_details = match response_item {
                     Ok(items) => items,
@@ -222,11 +223,11 @@ pub fn Explore() -> Element {
 
                                 span { class: "card__metric",
                                     Icon {
-                                        icon: UserGroup,
+                                        icon: UserAdd,
                                         height: 16,
                                         width: 16,
-                                        stroke_width: 1,
-                                        fill: "var(--text-primary)"
+                                        stroke_width: 2,
+                                        stroke: "var(--text-primary)"
                                     }
                                     small {
                                         "{community.memberships} Memberships"
@@ -234,7 +235,7 @@ pub fn Explore() -> Element {
                                 }
                                 span { class: "card__metric",
                                     Icon {
-                                        icon: Suitcase,
+                                        icon: UserGroup,
                                         height: 16,
                                         width: 16,
                                         stroke_width: 1,
@@ -272,7 +273,7 @@ pub fn Explore() -> Element {
                                     }
                                 ),
                                 on_click: move |_| {
-                                    let path = format!("/dao/{}", community.id);
+                                    let path = format!("/dao/{}/initiatives", community.id);
                                     nav.push(vec![], &path);
                                 }
                             }
@@ -367,24 +368,6 @@ pub fn Explore() -> Element {
                             }
                         }
                     }
-                }
-            }
-        }
-        div { class: "dashboard__floating",
-            IconButton {
-                variant: Variant::SemiRound,
-                size: ElementSize::Big,
-                class: "button--avatar",
-                body: rsx!(
-                    Icon {
-                        icon: Chat,
-                        height: 32,
-                        width: 32,
-                        fill: "var(--fill-00)"
-                    }
-                ),
-                on_click: move |_| {
-                    // nav.push()
                 }
             }
         }

@@ -10,9 +10,16 @@ use crate::components::atoms::dropdown::ElementSize;
 use crate::components::atoms::Button;
 
 #[derive(PartialEq, Props, Clone)]
+pub struct MarkdownEvent {
+    pub value: String,
+}
+
+#[derive(PartialEq, Props, Clone)]
 pub struct MarkdownProps {
     #[props(default = "".to_string())]
     class: String,
+    content: String,
+    on_input: EventHandler<MarkdownEvent>,
 }
 
 #[wasm_bindgen]
@@ -30,7 +37,15 @@ extern "C" {
 pub fn Markdown(props: MarkdownProps) -> Element {
     let i18 = use_i18();
 
-    let mut content = use_signal(|| translate!(i18, "utils.markdown.value"));
+    let mut is_editor_loaded = use_signal(|| false);
+
+    let mut content = use_signal(|| {
+        if props.content.len() > 0 {
+            props.content
+        } else {
+            translate!(i18, "utils.markdown.value")
+        }
+    });
     let mut is_markdown_visible = use_signal(|| true);
 
     let cont = &*content.read();
@@ -38,20 +53,25 @@ pub fn Markdown(props: MarkdownProps) -> Element {
 
     let mut html_buf = String::new();
     pulldown_cmark::html::push_html(&mut html_buf, parser);
-    
+
     use_effect(move || {
-        init_markdown_editor();
-        set_content_markdown_editor(translate!(i18, "utils.markdown.value"));
+        if !is_editor_loaded() {
+            init_markdown_editor();
+            set_content_markdown_editor(content());
+            
+            let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
+                if let Some(text) = new_content.as_string() {
+                    content.set(text.clone());
+                    props.on_input.call(MarkdownEvent { value: text })
+                }
+            }) as Box<dyn FnMut(JsValue)>);
 
-        let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
-            if let Some(text) = new_content.as_string() {
-                content.set(text);
-            }
-        }) as Box<dyn FnMut(JsValue)>);
+            let function = closure.as_ref().unchecked_ref::<Function>();
+            add_change_listener(function);
+            closure.forget();
 
-        let function = closure.as_ref().unchecked_ref::<Function>();
-        add_change_listener(function);
-        closure.forget();
+            is_editor_loaded.set(true)
+        }
     });
 
     rsx!(

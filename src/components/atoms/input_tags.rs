@@ -6,6 +6,11 @@ use crate::components::atoms::{Icon, IconButton, WarningSign};
 use super::dropdown::ElementSize;
 
 #[derive(PartialEq, Props, Clone)]
+pub struct InputTagsEvent {
+    pub tags: Vec<String>,
+}
+
+#[derive(PartialEq, Props, Clone)]
 pub struct InputTagsProps {
     message: String,
     placeholder: String,
@@ -18,7 +23,7 @@ pub struct InputTagsProps {
     required: bool,
     #[props(default = 5)]
     maxlength: u8,
-    on_input: EventHandler<FormEvent>,
+    on_input: EventHandler<InputTagsEvent>,
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
 }
@@ -143,11 +148,17 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                     oninput: move |event| {
                         if let Some(index) = is_editing_tag() {
                             tags.with_mut(|t|t[index] = event.value());
+                            props.on_input.call(InputTagsEvent {
+                                tags: tags().clone()
+                            });
                             return;
                         }
 
                         if event.value().contains(',') {
                             if tags().len() == (props.maxlength - 1) as usize {
+                                props.on_input.call(InputTagsEvent {
+                                    tags: tags().clone()
+                                });
                                 return;
                             }
                             let e: Vec<String> = event.value().split(',').map(|s| s.to_string()).collect();
@@ -166,11 +177,20 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                             new_value.set(tags().last().unwrap().to_string());
                             tags.with_mut(|t|t.pop());
                         }
-                        // props.on_input.call(event);
+
+                        let val = if temporal_value().len() > 0 {
+                            temporal_value()
+                        } else {
+                            new_value()
+                        };
+
+                        let mut t = tags().clone();
+                        t.push(val.to_string());
+
+                        props.on_input.call(InputTagsEvent {
+                            tags: t
+                        });
                     },
-                    onkeypress: move |event| {
-                        // props.on_keypress.call(event);
-                    }
                 }
             }
             if let Some(error) = props.error {

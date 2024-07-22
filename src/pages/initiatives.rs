@@ -1,34 +1,56 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
+use futures_util::StreamExt;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon,
-            IconButton, SearchInput, Suitcase, Tab, UserGroup,
+            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, CircleCheck,
+            Close, Icon, IconButton, SearchInput, StopSign, Suitcase, Tab, UserGroup,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_accounts::use_accounts, use_notification::use_notification,
-        use_our_navigator::use_our_navigator, use_tooltip::use_tooltip,
+        use_accounts::use_accounts,
+        use_initiative::{use_initiative, InitiativeInfoContent},
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_spaces_client::use_spaces_client,
+        use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::dashboard::Community,
+    services::kreivo::{
+        community_referenda::{
+            get_initiatives_by_community, metadata_of, referendum_count, referendum_info_for,
+            track_queue, Ongoing,
+        },
+        preimage::preimage_for,
+    },
 };
 
 static SKIP: u8 = 6;
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InitiativeWrapper {
+    pub id: u16,
+    pub info: InitiativeInfoContent,
+    pub ongoing: Ongoing,
+}
+
 #[component]
 pub fn Initiatives(id: u16) -> Element {
     let i18 = use_i18();
+    let mut initiative = use_initiative();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
     let mut nav = use_our_navigator();
     let accounts = use_accounts();
+    let spaces_client = use_spaces_client();
 
     let header_handled = consume_context::<Signal<bool>>();
+    let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
 
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -40,9 +62,82 @@ pub fn Initiatives(id: u16) -> Element {
 
     let mut tab_value = use_signal::<String>(|| String::from("all"));
 
-    let mut communities_ids = use_signal::<Vec<u16>>(|| vec![]);
-    let mut communities = use_signal::<Vec<Community>>(|| vec![]);
-    let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
+    let mut initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
+    let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
+    let mut filtered_initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
+
+    let get_initiative_info = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
+        while let Some(f) = rx.next().await {
+            // Temporal value for FIFO ongoing initiative
+            let from = 20;
+
+            let count = referendum_count()
+                .await
+                .expect("Should get referendum count");
+
+            for track in from..count {
+                let Ok(response) = referendum_info_for(track).await else {
+                    continue;
+                };
+
+                if response.ongoing.origin.communities.community_id == id {
+                    let name = format!("Ref: {:?}", track);
+                    let mut init = InitiativeWrapper {
+                        id: track,
+                        info: InitiativeInfoContent {
+                            name,
+                            description: String::new(),
+                            tags: vec![],
+                            actions: vec![],
+                        },
+                        ongoing: response.ongoing,
+                    };
+
+                    let Ok(initiative_metadata) = metadata_of(track).await else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    let initiative_metadata = format!("0x{}", hex::encode(initiative_metadata));
+
+                    log::info!("{}", initiative_metadata);
+
+                    let Ok(room_id_metadata) = preimage_for(&initiative_metadata, 35).await else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    log::info!("{}", room_id_metadata);
+
+                    let Ok(response) = spaces_client
+                        .get()
+                        .get_initiative_by_id(&room_id_metadata)
+                        .await
+                    else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    init.info = response.info;
+
+                    initiatives.with_mut(|c| c.push(init));
+                }
+            }
+
+            tooltip.hide();
+            filtered_initiatives.set(initiatives());
+        }
+    });
+
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        tooltip.handle_tooltip(TooltipItem {
+            title: translate!(i18, "dao.tips.loading.title"),
+            body: translate!(i18, "dao.tips.loading.description"),
+            show: true,
+        });
+
+        get_initiative_info.send(());
+    });
 
     rsx! {
         div {
@@ -65,12 +160,11 @@ pub fn Initiatives(id: u16) -> Element {
                         error: None,
                         on_input: move |event: Event<FormData>| {
                             search_word.set(event.value());
-
                             if search_word().trim().is_empty() {
-                                filtered_communities.set(communities());
+                                filtered_initiatives.set(initiatives());
                             } else {
                                 let pattern = search_word().trim().to_lowercase();
-                                filtered_communities.set(communities().into_iter().filter(|community| community.name.to_lowercase().contains(&pattern)).collect::<Vec<Community>>());
+                                filtered_initiatives.set(initiatives().into_iter().filter(|initiative| initiative.info.name.to_lowercase().contains(&pattern)).collect::<Vec<InitiativeWrapper>>());
                             }
                         },
                         on_keypress: move |_| {},
@@ -90,62 +184,53 @@ pub fn Initiatives(id: u16) -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![], "/initiative");
+                            let path = format!("/dao/{}/initiative", id);
+                            nav.push(vec![], &path);
                         }
                     }
                 }
             }
             div { class: "dashboard__communities",
-                for community in filtered_communities() {
+                for initiative in filtered_initiatives() {
                     section { class: "card",
                         div { class: "card__container",
                             div { class: "card__head",
-                                IconButton {
-                                    body: rsx!(
-                                        Avatar {
-                                            name: "{community.name}",
-                                            size: 48,
-                                            uri: community.icon,
-                                            variant: AvatarVariant::SemiRound
-                                        }
-                                    ),
-                                    on_click: move |_| { }
-                                }
+
                                 h3 { class: "card__title",
-                                    "{community.name}"
+                                    "{initiative.info.name}"
                                 }
                             }
                             p { class: "card__description",
-                                "{community.description}"
+                                ""
                             }
                             div { class: "card__metrics",
                                 span { class: "card__metric",
                                     Icon {
-                                        icon: UserGroup,
+                                        icon: CircleCheck,
                                         height: 16,
                                         width: 16,
-                                        stroke_width: 1,
-                                        fill: "var(--text-primary)"
+                                        stroke_width: 2,
+                                        stroke: "var(--text-primary)"
                                     }
                                     small {
-                                        "{community.memberships} Memberships"
+                                        "{initiative.ongoing.tally.ayes} Aye"
                                     }
                                 }
                                 span { class: "card__metric",
-                                    Icon {
-                                        icon: Suitcase,
-                                        height: 16,
-                                        width: 16,
-                                        stroke_width: 1,
-                                        fill: "var(--text-primary)"
-                                    }
-                                    small {
-                                        "{community.members} Members"
+                                Icon {
+                                    icon: StopSign,
+                                    height: 16,
+                                    width: 16,
+                                    stroke_width: 2,
+                                    stroke: "var(--text-primary)"
+                                }
+                                small {
+                                        "{initiative.ongoing.tally.nays} Nay"
                                     }
                                 }
                             }
                             div { class: "card__tags",
-                                for tag in community.tags {
+                                for tag in initiative.clone().info.tags {
                                     {
                                         rsx!(
                                             Badge {
@@ -170,51 +255,12 @@ pub fn Initiatives(id: u16) -> Element {
                                         fill: "var(--fill-00)"
                                     }
                                 ),
-                                on_click: move |_| { }
-                            }
-                        }
-                    }
-                }
-                section { class: "card ",
-                    div { class: "card__container",
-                        div { class: "card__head",
-                            h3 { class: "card__title",
-                                {translate!(i18, "dao.cta_cards.vote.title")}
-                            }
-                        }
-                        p { class: "card__description",
-                            {translate!(i18, "dao.cta_cards.vote.description")}
-                        }
-                        div { class: "card__head",
-                            a { class: "card__learn",
-                                {translate!(i18, "dao.cta_cards.vote.cta")}
-                            }
-                            Icon {
-                                icon: ArrowRight,
-                                height: 20,
-                                width: 20,
-                                stroke_width: 1,
-                                fill: "var(--text-tertiary)"
-                            }
-                        }
-                    }
-
-                    div { class: "card__cta",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Big,
-                            body: rsx!(
-                                Icon {
-                                    icon: AddPlus,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1.5,
-                                    fill: "var(--fill-00)"
+                                on_click: move |_| {
+                                    tooltip.hide();
+                                    initiative_wrapper.set(Some(initiative.clone()));
+                                    let path = format!("/dao/{}/vote/{}", id, initiative.id);
+                                    nav.push(vec![], &path);
                                 }
-                            ),
-                            on_click: move |_| {
-                                tooltip.hide();
-                                nav.push(vec![], "/vote");
                             }
                         }
                     }
@@ -258,7 +304,8 @@ pub fn Initiatives(id: u16) -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![], "/initiative");
+                                let path = format!("/dao/{}/initiative", id);
+                                nav.push(vec![], &path);
                             }
                         }
                     }
@@ -267,7 +314,7 @@ pub fn Initiatives(id: u16) -> Element {
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
                     span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
+                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((initiatives_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
                     }
                     div { class: "dashboard__footer__paginators",
                         IconButton {
@@ -304,22 +351,6 @@ pub fn Initiatives(id: u16) -> Element {
                         }
                     }
                 }
-            }
-        }
-        div { class: "dashboard__floating",
-            IconButton {
-                variant: Variant::SemiRound,
-                size: ElementSize::Big,
-                class: "button--avatar",
-                body: rsx!(
-                    Icon {
-                        icon: Chat,
-                        height: 32,
-                        width: 32,
-                        fill: "var(--fill-00)"
-                    }
-                ),
-                on_click: move |_| {}
             }
         }
     }

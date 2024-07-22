@@ -57,7 +57,7 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Fetching initiatives",
+                    "title": "Fetching Initiatives",
                     "description": "This may take a moment"
                 }
             },
@@ -119,7 +119,17 @@
                 "cancel": "Cancel",
                 "continue": "Continue"
             },
-            "disclaimer": "Disclaimer: This section is a work in progress. Feel free to interact with it!"
+            "disclaimer": "Disclaimer: This section is a work in progress. Feel free to interact with it!",
+            "tips": {
+                "loading": {
+                    "title": "Create your Initiative",
+                    "description": "This may take a moment"
+                },
+                "created": {
+                    "title": "Everything went well",
+                    "description": "The initiative has been created"
+                }
+            }
         },
         "governance": {
             "title": "Vote an initiative",
@@ -281,6 +291,9 @@
             "communities": {
                 "query_failed": "Failed to fetch communities"
             },
+            "initiatives": {
+                "query_failed": "Failed to fetch initiatives"
+            },
             "attach": {
                 "title": "Failed to upload",
                 "not_found": {
@@ -299,7 +312,8 @@
             "form": {
                 "not_empty": "Cannot be empty.",
                 "upload_fail": "The file could not be uploaded",
-                "community_creation": "The community could not be created"
+                "community_creation": "The community could not be created",
+                "initiative_creation": "The initiative could not be created"
             }
         }
     }

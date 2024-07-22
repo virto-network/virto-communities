@@ -132,11 +132,12 @@ pub fn Header() -> Element {
 
     let mut on_handle_account = move |event: u8| {
         header_handled.set(false);
-        
+
         let account = &accounts.get()[event as usize];
 
         let Ok(serialized_session) = serde_json::to_string(&UserSession {
             name: account.name(),
+            address: account.address(),
             account_id: event,
         }) else {
             return notification.handle_error(&translate!(i18, "errors.session.persist"));

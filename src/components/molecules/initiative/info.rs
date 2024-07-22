@@ -3,7 +3,7 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        button::Variant, dropdown::ElementSize, Button, Input, InputTags, Markdown,
+        button::Variant, dropdown::ElementSize, input_tags::InputTagsEvent, markdown::MarkdownEvent, Button, Input, InputTags, Markdown
     },
     hooks::{
         use_initiative::use_initiative, use_notification::use_notification,
@@ -66,7 +66,12 @@ pub fn InitiativeInfo(error: bool) -> Element {
                         {translate!(i18, "initiative.steps.info.description.description")}
                     }
                 }
-                Markdown {}
+                Markdown {
+                    content: initiative.get_info().description,
+                    on_input: move |event: MarkdownEvent| {
+                        initiative.info_mut().with_mut(|info| info.description = event.value);
+                    },
+                }
             }
             hr { class: "form__divider" }
             div { class: "form__input form__input--initiative",
@@ -79,7 +84,7 @@ pub fn InitiativeInfo(error: bool) -> Element {
                     }
                 }
                 InputTags {
-                    message: initiative.get_info().categories,
+                    message: initiative.get_info().categories.join(","),
                     size: ElementSize::Small,
                     placeholder: {translate!(i18, "initiative.steps.info.categories.placeholder")},
                     error: if error {
@@ -91,8 +96,9 @@ pub fn InitiativeInfo(error: bool) -> Element {
                     } else { None },
                     maxlength: 5,
                     required: true,
-                    on_input: move |event: Event<FormData>| {
-                        initiative.info_mut().with_mut(|info| info.categories = event.value());
+                    on_input: move |event: InputTagsEvent| {
+                        log::info!("tags: {:?}", event.tags);
+                        initiative.info_mut().with_mut(|info| info.categories = event.tags);
                     },
                     on_keypress: move |_| {},
                     on_click: move |_| {},

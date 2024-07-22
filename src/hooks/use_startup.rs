@@ -1,13 +1,13 @@
 use dioxus::{hooks::use_context_provider, signals::Signal};
 use pjs::PjsExtension;
 
-use crate::services::bot::client::SpacesClient;
+use crate::{pages::initiatives::InitiativeWrapper, services::bot::client::SpacesClient};
 
 use super::{
     use_accounts::{Account, IsDaoOwner},
     use_attach::AttachFile,
     use_communities::{Communities, Community},
-    use_initiative::{ActionsForm, ConfirmationForm, InfoForm, SettingsForm},
+    use_initiative::{ActionsForm, CommunityInitiative, ConfirmationForm, InfoForm, SettingsForm},
     use_notification::NotificationItem,
     use_onboard::{BasicsForm, InvitationForm, ManagementForm},
     use_paginator::Paginator,
@@ -16,7 +16,8 @@ use super::{
     use_tooltip::TooltipItem,
 };
 
-const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
+// const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
+const SPACES_CLIENT_URL: &str = "http://localhost:8000";
 
 pub fn use_startup() {
     use_context_provider::<Signal<Theme>>(|| Signal::new(Theme::default()));
@@ -42,6 +43,7 @@ pub fn use_startup() {
     use_context_provider::<Signal<String>>(|| Signal::new(String::new()));
     use_context_provider::<Signal<f64>>(|| Signal::new(0.0));
 
+    use_context_provider::<Signal<Option<InitiativeWrapper>>>(|| Signal::new(None));
     use_context_provider::<Signal<InfoForm>>(|| Signal::new(InfoForm::default()));
     use_context_provider::<Signal<ActionsForm>>(|| Signal::new(ActionsForm::default()));
     use_context_provider::<Signal<SettingsForm>>(|| Signal::new(SettingsForm::default()));

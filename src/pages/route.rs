@@ -21,14 +21,14 @@ pub enum Route {
             Explore {},
             #[nest("/dao")]
                 #[nest("/:id")]
-                    #[route("/")]
+                    #[route("/initiatives")]
                     Initiatives {id: u16},
+                    #[route("/initiative")]
+                    Initiative {id: u16},
+                    #[route("/vote/:initiativeid")]
+                    Vote {id: u16, initiativeid: u16},
                     #[end_nest]
                 #[end_nest]
-            #[route("/initiative")]
-            Initiative {},
-            #[route("/vote")]
-            Vote {},
         #[end_layout]
     #[end_layout]
     #[route("/:..route")]
