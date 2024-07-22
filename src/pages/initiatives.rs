@@ -51,6 +51,7 @@ pub fn Initiatives(id: u16) -> Element {
 
     let header_handled = consume_context::<Signal<bool>>();
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
+    let header_handled = consume_context::<Signal<bool>>();
 
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -68,6 +69,7 @@ pub fn Initiatives(id: u16) -> Element {
 
     let get_initiative_info = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
         while let Some(f) = rx.next().await {
+            initiatives.write().clear();
             // Temporal value for FIFO ongoing initiative
             let from = 20;
 
@@ -128,16 +130,18 @@ pub fn Initiatives(id: u16) -> Element {
             filtered_initiatives.set(initiatives());
         }
     });
-
-    use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        tooltip.handle_tooltip(TooltipItem {
-            title: translate!(i18, "dao.tips.loading.title"),
-            body: translate!(i18, "dao.tips.loading.description"),
-            show: true,
-        });
-
-        get_initiative_info.send(());
-    });
+    
+    use_effect(use_reactive(&header_handled(), move |_| {
+        if header_handled() {
+            tooltip.handle_tooltip(TooltipItem {
+                title: translate!(i18, "dao.tips.loading.title"),
+                body: translate!(i18, "dao.tips.loading.description"),
+                show: true,
+            });
+        
+            get_initiative_info.send(());
+        }
+    }));
 
     rsx! {
         div {
