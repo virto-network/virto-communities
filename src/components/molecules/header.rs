@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
+use futures_util::{StreamExt, TryFutureExt};
 
 use crate::{
     components::atoms::{
@@ -16,6 +16,7 @@ use crate::{
         use_connect_wallet::use_connect_wallet,
         use_notification::use_notification,
         use_session::{use_session, UserSession},
+        use_timestamp::{use_timestamp, IsTimestampHandled},
     },
     services::kreivo::{balances::account, communities::is_admin},
 };
@@ -40,6 +41,8 @@ pub fn Header() -> Element {
     let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
     let mut usdt_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
     let mut header_handled = consume_context::<Signal<bool>>();
+    let is_timestamp_handled = consume_context::<Signal<IsTimestampHandled>>();
+    let timestamp = use_timestamp();
 
     let get_account = move || {
         let Some(user_session) = session.get() else {
@@ -165,32 +168,32 @@ pub fn Header() -> Element {
         get_balance();
     };
 
-    use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if session.is_logged() {
-            match PjsExtension::connect(APP_NAME).await {
-                Ok(mut vault) => {
-                    let Ok(_) = vault.fetch_accounts().await else {
-                        notification
-                            .handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
-                        return;
-                    };
+    let handle_default_account = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
+        while let Some(_) = rx.next().await {
+            if session.is_logged() {
+                match PjsExtension::connect(APP_NAME).await {
+                    Ok(mut vault) => {
+                        let Ok(_) = vault.fetch_accounts().await else {
+                            notification
+                                .handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
+                            return;
+                        };
 
-                    let vault_accounts = vault.accounts();
-                    accounts.set(vault_accounts);
+                        let vault_accounts = vault.accounts();
+                        accounts.set(vault_accounts);
 
-                    if let Some(user_session) = session.get() {
-                        on_handle_account(user_session.account_id);
+                        if let Some(user_session) = session.get() {
+                            on_handle_account(user_session.account_id);
+                        }
                     }
+                    Err(pjs::Error::NoPermission) => {
+                        session.persist_session_file("");
+                    }
+                    Err(_) => todo!(),
                 }
-                Err(pjs::Error::NoPermission) => {
-                    if let Err(e) = session.persist_session_file("") {
-                        log::warn!("Failed to persist session {:?}", e);
-                    };
-                }
-                Err(_) => todo!(),
+            } else {
+                header_handled.set(true);
             }
-        } else {
-            header_handled.set(true);
         }
     });
 
@@ -198,6 +201,12 @@ pub fn Header() -> Element {
     let mut connect_handled = use_signal(|| false);
 
     let active_class = if is_active() { "header--active" } else { "" };
+
+    use_effect(use_reactive(&is_timestamp_handled(), move |_| {
+        if is_timestamp_handled.read().0 {
+            handle_default_account.send(());
+        }
+    }));
 
     rsx!(
         div { class: "dashboard__header",

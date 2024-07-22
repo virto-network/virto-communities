@@ -272,7 +272,8 @@
         "warnings": {
             "title": "Atención",
             "middleware": {
-                "has_dao": "La cuenta no puede crear más DAOs"
+                "has_dao": "La cuenta no puede crear más DAOs",
+                "chain_unavailable": "No podemos hacer esto ahora"
             }
         },
         "errors": {
@@ -289,6 +290,9 @@
             },
             "initiatives": {
                 "query_failed": "No se ha podido traer iniciativas"
+            },
+            "timestamp": {
+                "query_failed": "No se ha podido traer el estado actual"
             },
             "attach": {
                 "title": "Error al subir",

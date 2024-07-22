@@ -34,7 +34,7 @@ mime = "0.3.17"
 futures-util = "0.3.30"
 uuid = { version = "1.8.0", features = ["v4"] }
 
-sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "fix/complex-structures-in-url", default-features = false, features = [
+sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
     "js",
     "wss",
 ] }

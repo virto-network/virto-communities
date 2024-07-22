@@ -263,7 +263,8 @@
         "warnings": {
             "title": "Warning",
             "middleware": {
-                "has_dao": "The account cannot create more DAOs"
+                "has_dao": "The account cannot create more DAOs",
+                "chain_unavailable": "We cannot do this right now"
             }
         },
         "utils": {
@@ -293,6 +294,9 @@
             },
             "initiatives": {
                 "query_failed": "Failed to fetch initiatives"
+            },
+            "timestamp": {
+                "query_failed": "Failed to fetch timestamp"
             },
             "attach": {
                 "title": "Failed to upload",

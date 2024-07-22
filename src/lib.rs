@@ -11,6 +11,7 @@ pub mod pages {
 }
 
 pub mod middlewares {
+    pub mod is_chain_available;
     pub mod is_dao_owner;
 }
 
@@ -34,6 +35,7 @@ pub mod hooks {
     pub mod use_spaces_client;
     pub mod use_startup;
     pub mod use_theme;
+    pub mod use_timestamp;
     pub mod use_tooltip;
 }
 
@@ -55,5 +57,6 @@ pub mod services {
         pub mod community_track;
         pub mod identity;
         pub mod preimage;
+        pub mod timestamp;
     }
 }
