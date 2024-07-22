@@ -9,7 +9,8 @@
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css-out/main.css">
+  <!-- <link rel="stylesheet" href="css-out/main.css"> -->
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.css" />
   <style>
     * {
       box-sizing: border-box;
@@ -44,7 +45,7 @@
       --ratio-ultrawide: 18/5;
       --ratio-golden: 1.618/1;
 
-      /* Vars figma */
+      /* vars figma */
 
       /* Neutral/Solid */
       --neutral-solid-25: #F6F8FA;
@@ -120,6 +121,7 @@
       --fill-50: #C6EBC7;
       --fill-100: #A1DFA4;
       --fill-200: #78D37D;
+      --fill-400: #24AF37;
       --fill-600: #006B0A;
       --fill-00-alt: #141414;
       --fill-100-alt: #171819;
@@ -140,6 +142,7 @@
       --state-destructive-active: #DC2828;
       --state-destructive-hover: #FF6565;
       --state-primary-active: #56C960;
+      --state-primary-selected: #A1DFA4;
     }
 
     :root {
@@ -239,7 +242,26 @@
       }
     );
   </script>
+  <script src="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.js"></script>
+  <script type="text/javascript">
+    function initMarkdownEditor() {
+      let tinyMDE = new TinyMDE.Editor({ element: document.getElementById("editor") });
+      let commandBar = new TinyMDE.CommandBar({
+        element: document.getElementById("toolbar"),
+        editor: tinyMDE,
+      });
 
+      window.initMarkdownEditor = function (callback) {
+        tinyMDE.addEventListener('change', function () {
+          let content = tinyMDE.getContent();
+          callback(content);
+        });
+      };
+
+      window.setContentMarkdownEditor = function (content) {
+        tinyMDE.setContent(content);
+      };
+    }
   </script>
   {script_include}
 </body>

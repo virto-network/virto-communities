@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{components::atoms::{
-    avatar::Variant, ArrowRight, Avatar, Icon, IconButton, Monetization, Suitcase, UserGroup,
+    avatar::Variant, ArrowRight, Avatar, Icon, IconButton, Suitcase, UserGroup,
 }, pages::dashboard::Community};
 
 #[derive(PartialEq, Props, Clone)]
@@ -79,23 +79,3 @@ pub fn Card(props: CardProps) -> Element {
     )
 }
 
-fn nice_money(value: u64) -> String {
-    let units = vec!["", "K", "M", "B"];
-    let mut l = 0;
-    let mut n = value as f64;
-
-    while n >= 1000.0 && l < units.len() - 1 {
-        n /= 1000.0;
-        l += 1;
-    }
-
-    format!(
-        "${:.2}{}",
-        n,
-        if n < 10.0 && l > 0 {
-            units[l]
-        } else {
-            units[l]
-        }
-    )
-}

@@ -34,7 +34,7 @@ mime = "0.3.17"
 futures-util = "0.3.30"
 uuid = { version = "1.8.0", features = ["v4"] }
 
-sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "fix/dependencies", default-features = false, features = [
+sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
     "js",
     "wss",
 ] }
@@ -56,6 +56,8 @@ sp-core = "32.0.0"
 manganis = "0.2.2"
 grass = "0.13.2"
 reqwest = { version = "0.12.4", features = ["multipart", "json"] }
+pulldown-cmark = "0.11.0"
+blake2 = "0.10.6"
 
 [patch.crates-io]
 cookie = { git = "https://github.com/S0c5/cookie-rs.git" }

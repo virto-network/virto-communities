@@ -16,9 +16,11 @@ pub struct UseSessionState {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserSession {
     pub name: String,
+    pub address: String,
     pub account_id: u8,
 }
 
+#[derive(Debug)]
 pub enum SessionError {
     SaveFailed,
     GetFailed,

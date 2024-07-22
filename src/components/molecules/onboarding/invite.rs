@@ -6,9 +6,9 @@ use crate::{
         combo_input::ComboInputValue,
         dropdown::{DropdownItem, ElementSize},
         icon_button::Variant,
-        AddPlus, Attach, ComboInput, Icon, IconButton, Input, MinusCircle, TextareaInput, Title,
+        AddPlus, ComboInput, Icon, IconButton, MinusCircle, Title,
     },
-    hooks::use_onboard::{use_onboard, InvitationItem, Invitations, MediumOptions},
+    hooks::use_onboard::{use_onboard, InvitationItem, MediumOptions},
 };
 
 #[component]
@@ -50,6 +50,7 @@ pub fn OnboardingInvite() -> Element {
                     rsx!(
                         li {
                             ComboInput {
+                                size: ElementSize::Big,
                                 value: ComboInputValue { dropdown: DropdownItem { key: match member.medium {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
                                     MediumOptions::Email => translate!(i18, "onboard.invite.form.email.label"),

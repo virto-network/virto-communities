@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
-use crate::components::atoms::{
-    dropdown::DropdownItem, AccountButton, Dropdown, Icon, IconButton, Input, Search,
-};
+use crate::components::atoms::{dropdown::DropdownItem, Dropdown, Input};
 
 use super::dropdown::ElementSize;
 
@@ -17,6 +15,8 @@ pub struct ComboInputValue {
 pub struct ComboInputProps {
     value: ComboInputValue,
     placeholder: String,
+    #[props(default = ElementSize::Medium)]
+    size: ElementSize,
     on_change: EventHandler<ComboInputValue>,
 }
 
@@ -24,8 +24,10 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
     let i18 = use_i18();
 
     let mut dropdown_value = use_signal::<DropdownItem>(|| props.value.dropdown);
-    let mut input_value = use_signal::<String>(|| props.value.input);
-    let mut soon = use_signal::<bool>(|| dropdown_value().key == "Email" || dropdown_value().key == "Telegram" );
+    let mut input_value = use_signal::<String>(|| props.value.input.clone());
+    let mut soon = use_signal::<bool>(|| {
+        dropdown_value().key == "Email" || dropdown_value().key == "Telegram"
+    });
 
     let mut items = vec![];
     let mut dropdown_options = vec![
@@ -57,7 +59,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                 class: "dropdown--left".to_string(),
                 value: dropdown_value(),
                 placeholder: translate!(i18, "header.cta.account"),
-                size: ElementSize::Big,
+                size: props.size.clone(),
                 default: None,
                 on_change: move |event: usize| {
                     let to_assign = &dropdown_options[event];
@@ -74,8 +76,8 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                 body: items
             }
             Input {
-                message: input_value(),
-                size: ElementSize::Big,
+                message: props.value.input.clone(),
+                size: props.size,
                 placeholder: props.placeholder,
                 error: None,
                 on_input: move |event: Event<FormData>| {

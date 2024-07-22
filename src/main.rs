@@ -30,9 +30,7 @@ fn main() {
 fn App() -> Element {
     use_language();
     use_startup();
-
     let i18 = use_i18();
-    let theme = use_theme();
     let mut notification = use_notification();
     let tooltip = use_tooltip();
     let mut session = use_session();
@@ -66,29 +64,27 @@ fn App() -> Element {
     });
 
     rsx! {
-        div { style: theme.get_style(),
-            if notification.get().show {
-                Notification {
-                    title: "{notification.get().title}",
-                    body: "{notification.get().body}",
-                    variant: notification.get().variant,
-                    on_click: move |_| {
-                        match notification.get().handle.value {
-                            NotificationHandler::Click => {}
-                            NotificationHandler::None => {}
-                        }
+        if notification.get().show {
+            Notification {
+                title: "{notification.get().title}",
+                body: "{notification.get().body}",
+                variant: notification.get().variant,
+                on_click: move |_| {
+                    match notification.get().handle.value {
+                        NotificationHandler::Click => {}
+                        NotificationHandler::None => {}
                     }
                 }
             }
-
-            if tooltip.get().show {
-                Tooltip {
-                    title: "{tooltip.get().title}",
-                    body: "{tooltip.get().body}",
-                }
-            }
-
-            Router::<Route> {}
         }
+
+        if tooltip.get().show {
+            Tooltip {
+                title: "{tooltip.get().title}",
+                body: "{tooltip.get().body}",
+            }
+        }
+
+        Router::<Route> {}
     }
 }

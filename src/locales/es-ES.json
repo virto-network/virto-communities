@@ -50,6 +50,131 @@
                 "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
             }
         },
+        "dao": {
+            "tabs": {
+                "all": "Iniciativas",
+                "owned": "Mis Iniciativas"
+            },
+            "tips": {
+                "loading": {
+                    "title": "Trayendo las Iniciativas",
+                    "description": "Esto puede tomar un momento"
+                }
+            },
+            "cta_header": {
+                "filter": {
+                    "title": "Filtrar",
+                    "options": {}
+                },
+                "search": "Buscar"
+            },
+            "cta_cards": {
+                "create": {
+                    "title": "Crear una Iniciativas",
+                    "description": "Una gobernanza abierta y descentralizada para todas tus ideas",
+                    "cta": "Aprender más"
+                }
+            },
+            "footer": {
+                "paginator": "{from} of {to}"
+            }
+        },
+        "initiative": {
+            "title": "Crear iniciativa",
+            "steps": {
+                "info": {
+                    "label": "Información",
+                    "name": {
+                        "label": "Nombre",
+                        "description": "Lorem Ipsum Dolor",
+                        "placeholder": "Escribe un nombre"
+                    },
+                    "description": {
+                        "label": "Descripción",
+                        "description": "Lorem Ipsum Dolor",
+                        "placeholder": "Escribe una descripción"
+                    },
+                    "categories": {
+                        "label": "Categorías",
+                        "description": "Utiliza palabras para categorizar tu iniciativa basada en su propósito, por ejemplo, 'Impacto Social', 'Finanzas', etc.",
+                        "placeholder": "Escribe categorías separadas por comas"
+                    }
+                },
+                "actions": {
+                    "label": "Acciones"
+                },
+                "settings": {
+                    "label": "Configuraciones"
+                },
+                "confirmation": {
+                    "label": "Confirmación"
+                }
+            },
+            "cta": {
+                "cancel": "Cancelar",
+                "continue": "Continuar"
+            },
+            "disclaimer": "Aviso: Esta sección está en desarrollo. ¡Siéntete libre de interactuar con ella!",
+            "tips": {
+                "loading": {
+                    "title": "Crea tu Iniciativa",
+                    "description": "Esto puede tomar un momento"
+                },
+                "created": {
+                    "title": "Todo ha salido bien",
+                    "description": "La iniciativa ha sido creada"
+                }
+            }
+        },
+        "governance": {
+            "title": "Votar iniciativa",
+            "description": {
+                "details": {
+                    "by": "Propuesto por",
+                    "start-date": "Fecha inicio",
+                    "end-date": "Fecha finalización",
+                    "status": {
+                        "title": "Estado",
+                        "options": {
+                            "voting": "En votación",
+                            "excecuted": "Ejecutada",
+                            "approved": "Aprobada",
+                            "rejected": "Fallida"
+                        }
+                    },
+                    "update": "Modificar",
+                    "cta": "Ver datos avanzados"
+                },
+                "voting": {
+                    "title": "Votación",
+                    "for": "A favor",
+                    "against": "Contra",
+                    "votes": "votos",
+                    "threshold": {
+                        "title": "Umbral superado",
+                        "description": "Es necesario pasar el 50% de los votos para ejecutar la propuesta. "
+                    },
+                    "total": {
+                        "title": "Votos",
+                        "voters": "votantes"
+                    },
+                    "amount": {
+                        "label": "Cuantos {asset} vas a utilizar?",
+                        "placeholder": "1.000"
+                    },
+                    "cta": {
+                        "for": "A favor",
+                        "against": "En contra"
+                    }
+                }
+            },
+            "success": {
+                "title": "Todo ha estado perfecto¡Haz creado un referendo! 🥳",
+                "form": {
+                    "cta_send": "Continuar"
+                }
+            }
+        },
         "onboard": {
             "basics": {
                 "label": "¡Bienvenido! Primero lo primero...",
@@ -131,6 +256,19 @@
                 }
             }
         },
+        "utils": {
+            "markdown": {
+                "cta": {
+                    "edit": "Editor",
+                    "preview": "Ver"
+                },
+                "value": "¡Modifícame!"
+            },
+            "vote_preview": {
+                "title": "Esta es la previsualización de una iniciativa",
+                "description": "Buscamos fondos para crear un sistema de gobernanza descentralizada en nuestra plataforma blockchain. Queremos permitir que nuestra comunidad participe activamente en la toma de decisiones.\n\n**Puntos importantes**\n\n- Desarrollo de herramientas de gobernanza\n- Educación y divulgación sobre gobernanza descentralizada\n- Investigación y desarrollo continuo del sistema de gobernanza\n\n**Uso de fondos**\n\n- Desarrollo de herramientas de gobernanza: 40%.\n- Educación y divulgación: 30%.\n- Investigación y desarrollo: 30%."
+            }
+        },
         "warnings": {
             "title": "Atención",
             "middleware": {
@@ -149,6 +287,9 @@
             },
             "communities": {
                 "query_failed": "No se ha podido traer comunidades"
+            },
+            "initiatives": {
+                "query_failed": "No se ha podido traer iniciativas"
             },
             "timestamp": {
                 "query_failed": "No se ha podido traer el estado actual"
@@ -171,7 +312,8 @@
             "form": {
                 "not_empty": "No puede estar vacío.",
                 "upload_fail": "No se ha podido subir el archivo",
-                "community_creation": "No se ha podido crear la comunidad"
+                "community_creation": "No se ha podido crear la comunidad",
+                "initiative_creation": "No se ha podido crear la iniciativa"
             }
         }
     }

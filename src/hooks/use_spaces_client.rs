@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use dioxus::prelude::*;
 
 use crate::services::bot::client::SpacesClient;
