@@ -9,7 +9,7 @@ use crate::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
             input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Compass, Icon,
-            IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup,
+            IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup, CardSkeleton,
         },
         molecules::tabs::TabItem,
     },
@@ -55,6 +55,7 @@ pub fn Dashboard() -> Element {
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
     let accounts = use_accounts();
+    let mut is_loading = use_signal::<bool>(|| true);
 
     let header_handled = consume_context::<Signal<bool>>();
 
@@ -78,11 +79,13 @@ pub fn Dashboard() -> Element {
                 body: translate!(i18, "dao.tips.loading.description"),
                 show: true,
             });
+            is_loading.set(true);
 
             let Some(account) = accounts.get_account() else {
                 log::info!("error here by account");
                 notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
                 tooltip.hide();
+                is_loading.set(false);
                 return;
             };
 
@@ -90,6 +93,7 @@ pub fn Dashboard() -> Element {
                 log::info!("error here by address");
                 notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
                 tooltip.hide();
+                is_loading.set(false);
                 return;
             };
 
@@ -97,6 +101,7 @@ pub fn Dashboard() -> Element {
                 log::info!("error here by memeber");
                 notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
                 tooltip.hide();
+                is_loading.set(false);
                 return;
             };
 
@@ -104,6 +109,7 @@ pub fn Dashboard() -> Element {
             filtered_communities.set(community_tracks.clone());
 
             tooltip.hide();
+            is_loading.set(false);
         }
     });
 
@@ -168,6 +174,9 @@ pub fn Dashboard() -> Element {
                 }
             }
             div { class: "dashboard__communities",
+            if is_loading() {
+                CardSkeleton {}
+            } else {
                 for community in filtered_communities() {
                     section { class: "card",
                         div { class: "card__container",
@@ -251,6 +260,7 @@ pub fn Dashboard() -> Element {
                         }
                     }
                 }
+            }
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
