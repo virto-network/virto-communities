@@ -12,7 +12,7 @@ pub enum ChainStateError {
     FailedDecode,
 }
 pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
-    let query = format!("wss://kreivo.io/communityTracks/tracksIds");
+    let query = format!("ws://localhost:12281/communityTracks/tracksIds");
     let response = sube!(& query)
         .await
         .map_err(|e| {
@@ -65,7 +65,7 @@ pub struct TrackInfo {
     pub min_support: Curve,
 }
 pub async fn tracks(track: u16) -> Result<TrackInfo, ChainStateError> {
-    let query = format!("wss://kreivo.io/communityTracks/tracks/{}", track);
+    let query = format!("ws://localhost:12281/communityTracks/tracks/{}", track);
     let response = sube!(& query)
         .await
         .map_err(|e| {

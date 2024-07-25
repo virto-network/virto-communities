@@ -1,14 +1,10 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
-use futures_util::StreamExt;
-use serde::{Deserialize, Serialize};
 use crate::{
     components::{
         atoms::{
-            dropdown::ElementSize, AddPlus, ArrowLeft, ArrowRight, Badge, CircleCheck,
-            Icon, IconButton, SearchInput, StopSign, Tab,
+            dropdown::ElementSize, AddPlus, ArrowRight, Badge, CircleCheck, Icon, IconButton,
+            SearchInput, StopSign, Tab,
         },
-        molecules::tabs::TabItem,
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
         use_communities::use_communities,
@@ -18,13 +14,15 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     services::kreivo::{
-        community_referenda::{
-            metadata_of, referendum_count, referendum_info_for, Ongoing,
-        },
+        community_referenda::{metadata_of, referendum_count, referendum_info_for, Ongoing},
         preimage::{preimage_for, request_status_for},
     },
 };
-static SKIP: u8 = 6;
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
+use futures_util::StreamExt;
+use serde::{Deserialize, Serialize};
+static SKIP: usize = 6;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InitiativeWrapper {
     pub id: u16,
@@ -40,14 +38,12 @@ pub fn Initiatives(id: u16) -> Element {
     let mut communities = use_communities();
 
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
-    let mut current_page = use_signal::<u8>(|| 1);
+    let mut current_page = use_signal::<usize>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
-    let tab_items = vec![
-        TabItem {
-            k: String::from("all"),
-            value: translate!(i18, "dao.tabs.all"),
-        },
-    ];
+    let tab_items = vec![TabItem {
+        k: String::from("all"),
+        value: translate!(i18, "dao.tabs.all"),
+    }];
     let tab_value = use_signal::<String>(|| String::from("all"));
     let initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
     let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
@@ -69,7 +65,7 @@ pub fn Initiatives(id: u16) -> Element {
         while let Some(id) = rx.next().await {
             initiatives.set(vec![]);
             filtered_initiatives.set(vec![]);
-            
+
             tooltip.handle_tooltip(TooltipItem {
                 title: translate!(i18, "dao.tips.loading.title"),
                 body: translate!(i18, "dao.tips.loading.description"),
@@ -141,9 +137,7 @@ pub fn Initiatives(id: u16) -> Element {
         }
     });
 
-    use_effect(use_reactive(&id, move |_| {
-        handle_initiatives.send(id)
-    }));
+    use_effect(use_reactive(&id, move |_| handle_initiatives.send(id)));
 
     use_drop(move || communities.remove_community());
 
@@ -285,31 +279,10 @@ pub fn Initiatives(id: u16) -> Element {
                 }
             }
             div { class: "dashboard__footer grid-footer",
-                div { class: "dashboard__footer__pagination",
-                    span { class: "dashboard__footer__paginator",
-                        {
-                        translate!(i18, "dashboard.footer.paginator", from : current_page(), to :
-                        (((initiatives_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil()) }
-                    }
-                    div { class: "dashboard__footer__paginators",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(Icon { icon : ArrowLeft, height : 24, width : 24, fill : "var(--white)" }),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current - 1);
-                            }
-                        }
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(Icon { icon : ArrowRight, height : 24, width : 24, fill : "var(--white)" }),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current + 1);
-                            }
-                        }
+                Paginator {
+                    to: (initiatives_ids.len() + SKIP - 1).saturating_div(SKIP).max(1),
+                    on_change: move |event: PaginatorValue| {
+                        current_page.set(event.value());
                     }
                 }
             }

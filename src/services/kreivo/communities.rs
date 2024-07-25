@@ -12,7 +12,7 @@ pub enum ChainStateError {
     FailedDecode,
 }
 pub async fn is_admin(address: &[u8]) -> Result<bool, ChainStateError> {
-    let query = format!("wss://kreivo.io/communities/communityIdFor");
+    let query = format!("ws://localhost:12281/communities/communityIdFor");
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::ValueSet(value) = response else {
         return Err(ChainStateError::InternalError);

@@ -6,11 +6,11 @@ use serde::{Deserialize, Serialize};
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
-            ArrowRight, Avatar, Badge, Compass, DynamicText, Icon, IconButton, SearchInput, Star,
-            Tab, UserAdd, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowRight, Avatar,
+            Badge, Compass, DynamicText, Icon, IconButton, SearchInput, Star, Tab, UserAdd,
+            UserGroup,
         },
-        molecules::tabs::TabItem,
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
         use_accounts::use_accounts, use_communities::use_communities,
@@ -273,31 +273,15 @@ pub fn Dashboard() -> Element {
                 }
             }
             div { class: "dashboard__footer grid-footer",
-                div { class: "dashboard__footer__pagination",
-                    span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities.get_communities().len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
-                    }
-                    div { class: "dashboard__footer__paginators",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(Icon { icon : ArrowLeft, height : 24, width : 24, fill : "var(--white)" }),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current - 1);
-                                on_handle_paginator.send(current_page())
-                            }
-                        }
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(Icon { icon : ArrowRight, height : 24, width : 24, fill : "var(--white)" }),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current + 1);
-                                on_handle_paginator.send(current_page())
-                            }
-                        }
+                Paginator {
+                    to: ((communities.get_communities_by_filters(
+                        Some(()),
+                        filter_name().as_deref(),
+                        filter_paginator(),
+                    ).len() + SKIP - 1).saturating_div(SKIP)).max(1),
+                    on_change: move |event: PaginatorValue| {
+                        current_page.set(event.value());
+                        on_handle_paginator.send(current_page())
                     }
                 }
             }
