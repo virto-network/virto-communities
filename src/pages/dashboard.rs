@@ -74,12 +74,12 @@ pub fn Dashboard() -> Element {
 
     let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
         while let Some(_) = rx.next().await {
+            is_loading.set(true);
             tooltip.handle_tooltip(TooltipItem {
                 title: translate!(i18, "dao.tips.loading.title"),
                 body: translate!(i18, "dao.tips.loading.description"),
                 show: true,
             });
-            is_loading.set(true);
 
             let Some(account) = accounts.get_account() else {
                 log::info!("error here by account");
@@ -259,7 +259,7 @@ pub fn Dashboard() -> Element {
                             }
                         }
                     }
-                }
+            }
             }
                 section { class: "card card--reverse",
                     div { class: "card__container",

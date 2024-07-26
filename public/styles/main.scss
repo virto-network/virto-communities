@@ -2132,6 +2132,22 @@ textarea::placeholder {
     }
 }
 
+@keyframes loadingBackground {
+    0% {
+        background-color: #e0e0e0;
+    }
+    50% {
+        background-color: #c0c0c0;
+    }
+    100% {
+        background-color: #e0e0e0;
+    }
+}
+
+.card--skeleton {
+    animation: loadingBackground 1.5s infinite;
+}
+
 .card--reverse {
     flex-direction: column-reverse;
     background: var(--fill-100);
@@ -2678,22 +2694,5 @@ textarea::placeholder {
     }
 }
 
-// Has to be moved to a more logic place on the file.
-.card--skeleton {
-    animation: loadingBackground 1.5s infinite;
-    // Used before to check if the component was rendering ok. 
-    // height: 300px;
-    // width: 300px;
-}
 
-@keyframes loadingBackground {
-    0% {
-        background-color: #e0e0e0;
-    }
-    50% {
-        background-color: #c0c0c0;
-    }
-    100% {
-        background-color: #e0e0e0;
-    }
-}
+
