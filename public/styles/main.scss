@@ -2563,8 +2563,40 @@ textarea::placeholder {
         display: inline-block;
     }
 
+    .page {
+        grid-template-areas:
+        "header"
+        "main"
+        "footer"
+        "sidebar";
+        grid-template-rows: 80px auto 1fr 80px;
+    }
+
     .dashboard__header__right {
         gap: 8px;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: 80px;
+        position: fixed;
+        bottom: 0;
+    }
+
+    .sidebar__container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .sidebar__list {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .sidebar__divider {
+        display: none;
     }
 
     .dashboard {
