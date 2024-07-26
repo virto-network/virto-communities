@@ -5,7 +5,7 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon, IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon, IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup, CardSkeleton
         },
         molecules::tabs::TabItem,
     },
@@ -30,6 +30,7 @@ pub fn Explore() -> Element {
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
     let mut nav = use_our_navigator();
+    let mut is_loading = use_signal::<bool>(|| true);
 
     let header_handled = consume_context::<Signal<bool>>();
 
@@ -49,6 +50,7 @@ pub fn Explore() -> Element {
 
     let get_community_track = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
         while let Some(f) = rx.next().await {
+            is_loading.set(true);
             communities.clear();
 
             let from = if f - 1 > 0 { (f - 1) * SKIP } else { 0 };
@@ -103,6 +105,7 @@ pub fn Explore() -> Element {
                 communities.with_mut(|c| c.push(community))
             }
             tooltip.hide();
+            is_loading.set(false);
             filtered_communities.set(communities())
         }
     });
@@ -119,6 +122,7 @@ pub fn Explore() -> Element {
 
     let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
         while let Some(_) = rx.next().await {
+            is_loading.set(true);
             tooltip.handle_tooltip(TooltipItem {
                 title: translate!(i18, "dashboard.tips.loading.title"),
                 body: translate!(i18, "dashboard.tips.loading.description"),
@@ -128,6 +132,7 @@ pub fn Explore() -> Element {
             let Ok(community_tracks) = tracksIds().await else {
                 notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
                 tooltip.hide();
+                is_loading.set(false);
                 return;
             };
 
@@ -197,6 +202,9 @@ pub fn Explore() -> Element {
                 }
             }
             div { class: "dashboard__communities",
+            if is_loading() {
+                CardSkeleton {}
+            } else {
                 for community in filtered_communities() {
                     section { class: "card",
                         div { class: "card__container",
@@ -280,6 +288,7 @@ pub fn Explore() -> Element {
                         }
                     }
                 }
+            }
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
