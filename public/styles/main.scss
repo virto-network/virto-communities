@@ -2553,7 +2553,7 @@ textarea::placeholder {
         "main"
         "footer"
         "sidebar";
-        grid-template-rows: 90px auto 1fr 90px;
+        grid-template-rows: 80px auto 1fr 80px;
     }
 
     .dashboard__header__right {
@@ -2562,7 +2562,7 @@ textarea::placeholder {
 
     .sidebar {
         width: 100%;
-        height: 90px;
+        height: 80px;
         position: fixed;
         bottom: 0;
     }
