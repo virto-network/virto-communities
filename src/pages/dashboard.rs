@@ -17,16 +17,11 @@ use crate::{
         use_accounts::use_accounts,
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
-        use_tooltip::{use_tooltip, TooltipItem},
+        use_tooltip::use_tooltip,
     },
     middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
     pages::route::Route,
-    services::kreivo::community_memberships::get_communities_by_member,
-    services::kreivo::{
-        community_memberships::{collection, item},
-        community_track::{tracks, tracksIds},
-        identity::{identityOf, superOf},
-    },
+    services::kreivo::check_name::{fetch_communities, Community},
 };
 
 #[derive(PartialEq, Clone)]
@@ -35,16 +30,16 @@ pub enum CommunityTag {
     SocialImpact,
 }
 
-#[derive(PartialEq, Clone, Debug)]
-pub struct Community {
-    pub id: u16,
-    pub icon: Option<String>,
-    pub name: String,
-    pub description: String,
-    pub memberships: u16,
-    pub tags: Vec<String>,
-    pub members: u16,
-}
+// #[derive(PartialEq, Clone, Debug)]
+// pub struct Community {
+//     pub id: u16,
+//     pub icon: Option<String>,
+//     pub name: String,
+//     pub description: String,
+//     pub memberships: u16,
+//     pub tags: Vec<String>,
+//     pub members: u16,
+// }
 
 static SKIP: u8 = 6;
 
@@ -72,50 +67,29 @@ pub fn Dashboard() -> Element {
     let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
 
-    let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
-            is_loading.set(true);
-            tooltip.handle_tooltip(TooltipItem {
-                title: translate!(i18, "dao.tips.loading.title"),
-                body: translate!(i18, "dao.tips.loading.description"),
-                show: true,
-            });
-
-            let Some(account) = accounts.get_account() else {
-                log::info!("error here by account");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            };
-
-            let Ok(address) = sp_core::sr25519::Public::from_str(&account.address()) else {
-                log::info!("error here by address");
-                notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            };
-
-            let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
-                log::info!("error here by memeber");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            };
-
-            communities_by_address.set(community_tracks.clone());
-            filtered_communities.set(community_tracks.clone());
-
-            tooltip.hide();
-            is_loading.set(false);
+    let get_communities_coroutine = use_coroutine({
+        let accounts = accounts.clone();
+        let mut notification = notification.clone();
+        let mut tooltip = use_tooltip();
+        let mut is_loading = use_signal::<bool>(|| true);
+       
+        move |mut rx: UnboundedReceiver<()>| async move {
+            while let Some(_) = rx.next().await {
+                match fetch_communities(&accounts, &notification, &mut tooltip, &mut is_loading).await {
+                    Ok(community_tracks) => {
+                        communities_by_address.set(community_tracks.clone());
+                        filtered_communities.set(community_tracks);
+                    }
+                    Err(_) => {
+                        notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+                    }
+                }
+            }
         }
     });
-
     use_effect(use_reactive(&header_handled(), move |_| {
         if header_handled() {
-            get_communities.send(());
+            get_communities_coroutine.send(())
         }
     }));
 

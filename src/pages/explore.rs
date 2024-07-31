@@ -15,10 +15,10 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::dashboard::Community,
     services::kreivo::{
         community_memberships::{collection, get_owned_memberships, item},
         community_track::{tracks, tracksIds},
+        check_name::{fetch_community_ids, Community},
     },
 };
 
@@ -120,30 +120,30 @@ pub fn Explore() -> Element {
     //     }))
     // }
 
-    let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
-            is_loading.set(true);
-            tooltip.handle_tooltip(TooltipItem {
-                title: translate!(i18, "dashboard.tips.loading.title"),
-                body: translate!(i18, "dashboard.tips.loading.description"),
-                show: true,
-            });
-
-            let Ok(community_tracks) = tracksIds().await else {
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            };
-
-            communities_ids.set(community_tracks.communities);
-            get_community_track.send(current_page());
+    let get_communities_coroutine = use_coroutine({
+        let mut notification = notification.clone();
+        let mut tooltip = use_tooltip();
+        let mut is_loading = use_signal::<bool>(|| true);
+        let mut communities_ids = communities_ids.clone();
+        let mut communities = communities.clone();
+        move |mut rx: UnboundedReceiver<()>| async move {
+            while let Some(_) = rx.next().await {
+                match fetch_community_ids(&notification, &mut tooltip, &mut is_loading).await {
+                    Ok(community_ids) => {
+                        communities_ids.set(community_ids);
+                        is_loading.set(false)
+                    }
+                    Err(_) => {
+                        notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+                    }
+                }
+            }
         }
     });
 
     use_effect(use_reactive(&header_handled(), move |_| {
         if header_handled() {
-            get_communities.send(())
+            get_communities_coroutine.send(())
         }
     }));
 
