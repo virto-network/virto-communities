@@ -2,7 +2,9 @@ use dioxus::prelude::*;
 
 use crate::{components::atoms::{
     avatar::Variant, ArrowRight, Avatar, Icon, IconButton, Suitcase, UserGroup,
-}, pages::dashboard::Community};
+    }, 
+    services::kreivo::check_name::Community,
+};
 
 #[derive(PartialEq, Props, Clone)]
 pub struct CardProps {

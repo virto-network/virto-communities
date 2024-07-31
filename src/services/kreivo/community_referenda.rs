@@ -4,7 +4,12 @@ use serde_json::{from_str, from_value, to_string, Value};
 use std::str::FromStr;
 use sube::{sube, Response};
 
-use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
+use crate::services::kreivo::
+    {
+        check_name::Community,
+        community_track::ChainStateError,
+    };
+
 
 #[derive(Debug, Deserialize)]
 pub struct TrackInfo {
