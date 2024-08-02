@@ -106,7 +106,15 @@
                     }
                 },
                 "actions": {
-                    "label": "Actions"
+                    "label": "Actions",
+                    "kusama_treasury": {
+                        "disclaimer": {
+                            "period_1": "The delivery of resources from the treasury will be made instantly once the proposal is approved.",
+                            "period_n": "\nImportant: The resources for the other periods will be delivered on the dates established for each one."
+                        },
+                        "error": "Must be greater than 0",
+                        "placeholder": "Delivery date"
+                    }
                 },
                 "settings": {
                     "label": "Settings"

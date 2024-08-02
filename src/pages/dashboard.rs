@@ -17,15 +17,14 @@ use crate::{
         use_accounts::use_accounts,
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
+        use_session::use_session,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
-    pages::route::Route,
-    services::kreivo::community_memberships::get_communities_by_member,
+    pages::{onboarding::convert_to_jsvalue, route::Route},
     services::kreivo::{
-        community_memberships::{collection, item},
+        community_memberships::{collection, get_communities_by_member, item},
         community_track::{tracks, tracksIds},
-        identity::{identityOf, superOf},
     },
 };
 
@@ -54,9 +53,7 @@ pub fn Dashboard() -> Element {
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
-    let accounts = use_accounts();
-
-    let header_handled = consume_context::<Signal<bool>>();
+    let session = use_session();
 
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -71,47 +68,39 @@ pub fn Dashboard() -> Element {
     let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
 
-    let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
-            tooltip.handle_tooltip(TooltipItem {
-                title: translate!(i18, "dao.tips.loading.title"),
-                body: translate!(i18, "dao.tips.loading.description"),
-                show: true,
-            });
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        tooltip.handle_tooltip(TooltipItem {
+            title: translate!(i18, "dao.tips.loading.title"),
+            body: translate!(i18, "dao.tips.loading.description"),
+            show: true,
+        });
 
-            let Some(account) = accounts.get_account() else {
-                log::info!("error here by account");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                return;
-            };
-
-            let Ok(address) = sp_core::sr25519::Public::from_str(&account.address()) else {
-                log::info!("error here by address");
-                notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
-                tooltip.hide();
-                return;
-            };
-
-            let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
-                log::info!("error here by memeber");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                return;
-            };
-
-            communities_by_address.set(community_tracks.clone());
-            filtered_communities.set(community_tracks.clone());
-
+        let Some(session) = session.get() else {
+            log::info!("error here by account");
+            notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
             tooltip.hide();
-        }
-    });
+            return;
+        };
 
-    use_effect(use_reactive(&header_handled(), move |_| {
-        if header_handled() {
-            get_communities.send(());
-        }
-    }));
+        let Ok(address) = sp_core::sr25519::Public::from_str(&session.address) else {
+            log::info!("error here by address");
+            notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
+            tooltip.hide();
+            return;
+        };
+
+        let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
+            log::info!("error here by memeber");
+            notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+            tooltip.hide();
+            return;
+        };
+
+        communities_by_address.set(community_tracks.clone());
+        filtered_communities.set(community_tracks.clone());
+
+        tooltip.hide();
+    });
 
     rsx! {
         div {
@@ -132,7 +121,6 @@ pub fn Dashboard() -> Element {
                 div { class: "head__actions",
                     SearchInput {
                         message: search_word(),
-                        itype: InputType::Search,
                         placeholder: translate!(i18, "dashboard.cta_header.search"),
                         error: None,
                         on_input: move |event: Event<FormData>| {

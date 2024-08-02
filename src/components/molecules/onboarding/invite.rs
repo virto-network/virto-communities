@@ -3,7 +3,7 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        combo_input::ComboInputValue,
+        combo_input::{ComboInputOption, ComboInputValue},
         dropdown::{DropdownItem, ElementSize},
         icon_button::Variant,
         AddPlus, ComboInput, Icon, IconButton, MinusCircle, Title,
@@ -47,30 +47,31 @@ pub fn OnboardingInvite() -> Element {
         ul { class: "form__inputs",
             {
                 members_lock.iter().enumerate().map(|(index, member)| {
+                    let x  = DropdownItem { key: match member.medium {
+                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                    }, value: match member.medium.clone() {
+                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                    } };
+
                     rsx!(
                         li {
                             ComboInput {
                                 size: ElementSize::Big,
-                                value: ComboInputValue { dropdown: DropdownItem { key: match member.medium {
-                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
-                                    MediumOptions::Email => translate!(i18, "onboard.invite.form.email.label"),
-                                    MediumOptions::Telegram => translate!(i18, "onboard.invite.form.phone.label"),
-                                }, value: match member.medium.clone() {
-                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
-                                    MediumOptions::Email => translate!(i18, "onboard.invite.form.email.label"),
-                                    MediumOptions::Telegram => translate!(i18, "onboard.invite.form.phone.label"),
-                                } }, input: member.account.clone() },
+                                value: ComboInputValue {
+                                    option: ComboInputOption::Dropdown(x),
+                                    input: member.account.clone()
+                                },
                                 placeholder: match member.medium {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
-                                    MediumOptions::Email => translate!(i18, "onboard.invite.form.email.placeholder"),
-                                    MediumOptions::Telegram => translate!(i18, "onboard.invite.form.phone.placeholder"),
                                 },
                                 on_change: move |event: ComboInputValue| {
-                                    log::info!("{:?}", event.dropdown.key);
-                                    let medium = match event.dropdown.key.as_str() {
-                                        "Wallet" => MediumOptions::Wallet,
-                                        "Email" => MediumOptions::Email,
-                                        "Telegram" => MediumOptions::Telegram,
+                                    let medium = match event.option {
+                                        ComboInputOption::Dropdown(value) => {
+                                            match value.key.as_str() {
+                                                "Wallet" => MediumOptions::Wallet,
+                                                _ => todo!()
+                                            }
+                                        },
                                         _ => todo!()
                                     };
 

@@ -1,4 +1,6 @@
 use dioxus::prelude::*;
+use wasm_bindgen::JsCast;
+use web_sys::HtmlInputElement;
 
 use crate::components::atoms::{Icon, IconButton, Search, WarningSign};
 
@@ -10,6 +12,7 @@ pub enum InputType {
     Message,
     Search,
     Password,
+    Date,
 }
 
 #[derive(PartialEq, Props, Clone)]
@@ -20,6 +23,7 @@ pub struct InputProps {
     placeholder: String,
     #[props(!optional)]
     error: Option<String>,
+    help: Option<String>,
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
     label: Option<String>,
@@ -33,6 +37,8 @@ pub struct InputProps {
 }
 
 pub fn Input(props: InputProps) -> Element {
+    let mut input_ref = use_signal::<Option<Box<HtmlInputElement>>>(|| None);
+
     let input_error_container = if let Some(_) = props.error {
         "input--error-container"
     } else {
@@ -43,6 +49,7 @@ pub fn Input(props: InputProps) -> Element {
         InputType::Text => "text",
         InputType::Search => "text",
         InputType::Message => "text",
+        InputType::Date => "date",
         InputType::Password => "password",
     };
 
@@ -72,6 +79,27 @@ pub fn Input(props: InputProps) -> Element {
                 input {
                     r#type: "{input_type}",
                     class: "input",
+                    onmounted: move |event| {
+                        event.data.downcast::<web_sys::Element>()
+                        .and_then(|element| element.clone().dyn_into::<HtmlInputElement>().ok())
+                        .map(|html_element| input_ref.set(Some(Box::new(html_element.clone()))));
+
+                        if input_type == "date" {
+                            if let Some(input_element) = input_ref() {
+                                input_element.set_type("text")
+                            }
+                        }
+                    },
+                    onfocus: move |_| {
+                        if let Some(input_element) = input_ref() {
+                            input_element.set_type(input_type)
+                        }
+                    },
+                    onblur: move |_| {
+                        if let Some(input_element) = input_ref() {
+                            input_element.set_type("text")
+                        }
+                    },
                     value: props.message,
                     required: props.required,
                     maxlength: i64::from(props.maxlength),
@@ -98,6 +126,15 @@ pub fn Input(props: InputProps) -> Element {
                     }
                 }
             }
+            if props.error.is_none() {
+                if let Some(help) = props.help {
+                    div {
+                        class: "input--help",
+                        "{help}"
+                    }
+                }
+            }
+
             if let Some(error) = props.error {
                 div {
                     class: "input--error",

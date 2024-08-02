@@ -1,10 +1,9 @@
-use std::{ops::Deref, vec};
+use std::str::FromStr;
 
-use blake2::{digest::consts::U32, Blake2b, Blake2s256, Digest};
+use chrono::{DateTime, Duration, NaiveDate, Utc};
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::{StreamExt, TryFutureExt};
-use serde::Serialize;
+use futures_util::TryFutureExt;
 use wasm_bindgen::prelude::*;
 
 use crate::{
@@ -13,15 +12,12 @@ use crate::{
             button::Variant, dropdown::ElementSize, icon_button::Variant as IconButtonVariant,
             Arrow, Button, Icon, IconButton, Step, StepCard,
         },
-        molecules::{
-            InitiativeActions, InitiativeConfirmation, InitiativeInfo, InitiativeSettings,
-        },
+        molecules::{InitiativeActions, InitiativeInfo},
     },
     hooks::{
-        use_accounts::use_accounts,
         use_initiative::{
             use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
-            InitiativeInitContent,
+            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod,
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -30,7 +26,10 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     pages::onboarding::convert_to_jsvalue,
-    services::kreivo::community_referenda::referendum_count,
+    services::{
+        kreivo::{community_referenda::referendum_count, timestamp::now},
+        kusama::system::number,
+    },
 };
 
 #[derive(Clone, Debug)]
@@ -42,56 +41,34 @@ pub enum InitiativeStep {
     None,
 }
 
-#[derive(Serialize)]
-struct AccountMembership {
-    id: String,
-    membership_id: u32,
-}
-
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenInitiativeAddMembers)]
-    async fn topup_then_initiative_add_members(
+    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenInitiativeSetup)]
+    pub async fn topup_then_initiative_setup(
         community_id: u16,
         initiative_id: u16,
-        membership_accounts_add: JsValue,
-        membership_accounts_remove: JsValue,
         room_id: JsValue,
         remark: JsValue,
+        membership_accounts_add: JsValue,
+        membership_accounts_remove: JsValue,
+        periods_treasury_request: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
+
+const BLOCK_TIME_IN_SECONDS: i64 = 6;
 
 #[component]
 pub fn Initiative(id: u16) -> Element {
     let i18 = use_i18();
     let mut initiative = use_initiative();
-    let mut accounts = use_accounts();
-    let mut session = use_session();
-    let mut nav = use_our_navigator();
+    let session = use_session();
+    let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
     let spaces_client = use_spaces_client();
 
     let mut onboarding_step = use_signal::<InitiativeStep>(|| InitiativeStep::Info);
-    let mut onboarding_steps = use_signal::<Vec<InitiativeStep>>(|| {
-        vec![
-            InitiativeStep::Info,
-            InitiativeStep::Actions,
-            InitiativeStep::Settings,
-            InitiativeStep::Confirmation,
-            InitiativeStep::None,
-        ]
-    });
-
     let mut handle_required_inputs = use_signal::<bool>(|| false);
-
-    let get_account = move || {
-        let Some(user_session) = session.get() else {
-            return None;
-        };
-
-        accounts.get_one(user_session.account_id)
-    };
 
     use_before_render(move || {
         initiative.default();
@@ -133,7 +110,7 @@ pub fn Initiative(id: u16) -> Element {
                     }
                     div { class: "steps__wrapper",
                         StepCard {
-                            name: {translate!(i18, "initiative.steps.info.label")},
+                            name: translate!(i18, "initiative.steps.info.label"),
                             checked: matches!(*onboarding_step.read(), InitiativeStep::Info ),
                             body: rsx!(
                                 div { class: "step-card__info",
@@ -176,7 +153,7 @@ pub fn Initiative(id: u16) -> Element {
                             },
                         }
                         StepCard {
-                            name: {translate!(i18, "initiative.steps.actions.label")},
+                            name: translate!(i18, "initiative.steps.actions.label"),
                             checked: matches!(*onboarding_step.read(), InitiativeStep::Actions ),
                             body: rsx!(
                                 div { class: "step-card__info",
@@ -273,13 +250,6 @@ pub fn Initiative(id: u16) -> Element {
 
                                 let room_id = response_bot.get_id();
 
-                                let mut hasher = Blake2b::<U32>::new();
-                                hasher.update(room_id.clone());
-                                let res = hasher.finalize();
-                                let res = res.deref();
-
-                                let room_to_blake = format!("0x{}", hex::encode(res));
-
                                 let add_members_action = initiative.get_actions().into_iter().filter_map(|action| {
                                     match action {
                                         ActionItem::AddMembers(add_members_action) => {
@@ -295,6 +265,48 @@ pub fn Initiative(id: u16) -> Element {
                                 }).collect::<Vec<Vec<String>>>();
 
                                 let add_members_action = add_members_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<String>>();
+
+                                log::info!("add_members_action: {:?}", add_members_action);
+
+                                let current_block = number().await.map_err(|_| {
+                                    log::warn!("Failed to get last block kusama");
+                                    translate!(i18, "errors.form.initiative_creation")
+                                })?;
+
+                                let now_kusama = now().await.map_err(|_| {
+                                    log::warn!("Failed to get timestamp kusama");
+                                    translate!(i18, "errors.form.initiative_creation")
+                                })?;
+
+                                log::info!("{} {}", current_block, now_kusama);
+
+                                let treasury_action = initiative.get_actions().into_iter().filter_map(|action| {
+                                    match action {
+                                        ActionItem::KusamaTreasury(treasury_action) => {
+                                            Some(treasury_action.periods.clone()
+                                            .into_iter()
+                                            .filter_map(|period|{
+                                                if period.amount > 0 {
+                                                    Some(convert_treasury_to_period(period, current_block, now_kusama))
+                                                } else {
+                                                    None
+                                                }
+                                            })
+                                            .collect::<Vec<KusamaTreasuryPeriod>>())
+                                        },
+                                        _ => None
+                                    }
+                                }).collect::<Vec<Vec<KusamaTreasuryPeriod>>>();
+
+                                let treasury_action = treasury_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<KusamaTreasuryPeriod>>();
+
+                                log::info!("treasury {:?}", treasury_action);
+
+                                let treasury_action = convert_to_jsvalue(&treasury_action)
+                                .map_err(|_| {
+                                    log::warn!("Malformed membership accounts add");
+                                    translate!(i18, "errors.form.initiative_creation")
+                                })?;
 
                                 let membership_accounts_add = convert_to_jsvalue(&add_members_action)
                                 .map_err(|_| {
@@ -315,23 +327,24 @@ pub fn Initiative(id: u16) -> Element {
                                     })?;
 
                                 let remark =
-                                    convert_to_jsvalue(&room_to_blake).map_err(|_| {
+                                    convert_to_jsvalue(&initiative.get_info().name).map_err(|_| {
                                         log::warn!("Malformed remark");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
 
-                                let response = topup_then_initiative_add_members(
+                                let response = topup_then_initiative_setup(
                                     id,
                                     last_initiative,
-                                    membership_accounts_add,
-                                    membership_accounts_remove,
                                     room_id,
                                     remark,
+                                    membership_accounts_add,
+                                    membership_accounts_remove,
+                                    treasury_action,
                                 )
                                 .await;
 
-                                log::info!("response initiative: {:?}", response);
-                                tooltip.hide();
+                                // log::info!("response initiative: {:?}", response);
+                                // tooltip.hide();
 
                                 let path = format!("/dao/{id}/initiatives");
                                 nav.push(vec![], &path);
@@ -350,3 +363,63 @@ pub fn Initiative(id: u16) -> Element {
         }
     }
 }
+
+fn calculate_future_block(
+    current_block: u32,
+    current_date_millis: u64,
+    future_date_str: &str,
+) -> u32 {
+    let future_date_naive = NaiveDate::from_str(future_date_str).expect("Fecha futura no válida");
+    let future_date = DateTime::<Utc>::from_utc(future_date_naive.and_hms(0, 0, 0), Utc);
+
+    let current_date = DateTime::<Utc>::from_utc(
+        chrono::NaiveDateTime::from_timestamp(
+            (current_date_millis / 1000).try_into().unwrap(),
+            ((current_date_millis % 1000) * 1_000_000) as u32,
+        ),
+        Utc,
+    );
+
+    let elapsed_time_in_seconds = (future_date - current_date).num_seconds();
+    let blocks_to_add = elapsed_time_in_seconds / BLOCK_TIME_IN_SECONDS;
+    (current_block + blocks_to_add as u32).into()
+}
+
+fn calculate_date_from_block(
+    current_block: u32,
+    current_date_millis: u64,
+    target_block: u32,
+) -> DateTime<Utc> {
+    let current_date = DateTime::<Utc>::from_utc(
+        chrono::NaiveDateTime::from_timestamp(
+            (current_date_millis / 1000).try_into().unwrap(),
+            ((current_date_millis % 1000) * 1_000_000) as u32,
+        ),
+        Utc,
+    );
+
+    let blocks_to_add = target_block as i64 - current_block as i64;
+    let elapsed_time_in_seconds = blocks_to_add * BLOCK_TIME_IN_SECONDS;
+    current_date + Duration::seconds(elapsed_time_in_seconds)
+}
+
+fn convert_treasury_to_period(
+    treasury: KusamaTreasury,
+    current_block: u32,
+    current_date_millis: u64,
+) -> KusamaTreasuryPeriod {
+    if treasury.date != "" {
+        let future_block =
+            calculate_future_block(current_block, current_date_millis, &treasury.date);
+        KusamaTreasuryPeriod {
+            blocks: Some(future_block as u64),
+            amount: treasury.amount,
+        }
+    } else {
+        KusamaTreasuryPeriod {
+            blocks: None,
+            amount: treasury.amount,
+        }
+    }
+}
+

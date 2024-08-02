@@ -29,9 +29,7 @@ pub fn Explore() -> Element {
     let i18 = use_i18();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let mut nav = use_our_navigator();
-
-    let header_handled = consume_context::<Signal<bool>>();
+    let nav = use_our_navigator();
 
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -41,7 +39,7 @@ pub fn Explore() -> Element {
         value: translate!(i18, "dashboard.tabs.all"),
     }];
 
-    let mut tab_value = use_signal::<String>(|| String::from("all"));
+    let tab_value = use_signal::<String>(|| String::from("all"));
 
     let mut communities_ids = use_signal::<Vec<u16>>(|| vec![]);
     let mut communities = use_signal::<Vec<Community>>(|| vec![]);
@@ -90,7 +88,7 @@ pub fn Explore() -> Element {
                     Err(_) => 0u16,
                 };
 
-                let mut community = Community {
+                let community = Community {
                     id: *track,
                     icon: None,
                     name: String::from_utf8_lossy(filtered_name).to_string(),
@@ -107,18 +105,7 @@ pub fn Explore() -> Element {
         }
     });
 
-    // let mut items = vec![];
-    // for item in tab_items.into_iter() {
-    //     items.push(rsx!(Tab {
-    //         text: item.value,
-    //         on_click: move |_| {
-    //             // tab_value.set(item.k);
-    //         },
-    //     }))
-    // }
-
-    let get_communities = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
             tooltip.handle_tooltip(TooltipItem {
                 title: translate!(i18, "dashboard.tips.loading.title"),
                 body: translate!(i18, "dashboard.tips.loading.description"),
@@ -133,14 +120,7 @@ pub fn Explore() -> Element {
 
             communities_ids.set(community_tracks.communities);
             get_community_track.send(current_page());
-        }
     });
-
-    use_effect(use_reactive(&header_handled(), move |_| {
-        if header_handled() {
-            get_communities.send(())
-        }
-    }));
 
     rsx! {
         div {
@@ -161,7 +141,6 @@ pub fn Explore() -> Element {
                 div { class: "head__actions",
                     SearchInput {
                         message: search_word(),
-                        itype: InputType::Search,
                         placeholder: translate!(i18, "dashboard.cta_header.search"),
                         error: None,
                         on_input: move |event: Event<FormData>| {

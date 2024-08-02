@@ -24,8 +24,6 @@ pub struct ManagementForm {
 pub enum MediumOptions {
     #[default]
     Wallet,
-    Telegram,
-    Email,
 }
 
 #[derive(Clone, Default, Debug)]
@@ -45,7 +43,6 @@ pub fn use_onboard() -> UseOnboardState {
     let basics = consume_context::<Signal<BasicsForm>>();
     let management = consume_context::<Signal<ManagementForm>>();
     let invitations = consume_context::<Signal<InvitationForm>>();
-    let name = consume_context::<Signal<String>>();
 
     use_hook(|| UseOnboardState {
         inner: UseOnboardInner {

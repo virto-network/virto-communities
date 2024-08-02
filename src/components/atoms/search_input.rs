@@ -2,12 +2,10 @@ use dioxus::prelude::*;
 
 use crate::components::atoms::{Icon, IconButton, Search};
 
-use super::{dropdown::ElementSize, input::InputType};
+use super::dropdown::ElementSize;
 
 #[derive(PartialEq, Props, Clone)]
 pub struct SearchInputProps {
-    #[props(default = InputType::Text)]
-    itype: InputType,
     message: String,
     placeholder: String,
     #[props(!optional)]
@@ -27,30 +25,17 @@ pub fn SearchInput(props: SearchInputProps) -> Element {
         ""
     };
 
-    let input_type = match props.itype {
-        InputType::Text => "text",
-        InputType::Search => "text",
-        InputType::Message => "text",
-        InputType::Password => "password",
-    };
-
     let size = match props.size {
         ElementSize::Big => "input-wrapper__container--big",
         ElementSize::Medium => "input-wrapper__container--medium",
         ElementSize::Small => "input-wrapper__container--small",
     };
 
-    let is_search = if matches!(props.itype, InputType::Search) {
-        "input__wrapper--search"
-    } else {
-        ""
-    };
-
     let mut is_active = use_signal::<bool>(|| false);
 
     rsx!(
         section {
-            class: "input__wrapper {is_search}",
+            class: "input__wrapper input__wrapper--search",
             class: if is_active() {"input__wrapper--active"},
             if let Some(value) = props.label {
                 label { class: "input__label", "{value}" }
@@ -58,29 +43,27 @@ pub fn SearchInput(props: SearchInputProps) -> Element {
             div {
                 class: "input-wrapper {size} {input_error_container}",
                 input {
-                    r#type: "{input_type}",
+                    r#type: "text",
                     class: "input",
                     value: props.message,
                     placeholder: "{props.placeholder}",
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)
                 }
-                if matches!(props.itype, InputType::Search) {
-                    IconButton {
-                        class: "button--avatar bg--transparent",
-                        size: props.size,
-                        body: rsx!(
-                            Icon {
-                                icon: Search,
-                                height: 26,
-                                width: 26,
-                                stroke_width: 1.5,
-                                fill: "var(--text-secondary)"
-                            }
-                        ),
-                        on_click: move |_| {
-                            is_active.toggle();
+                IconButton {
+                    class: "button--avatar bg--transparent",
+                    size: props.size,
+                    body: rsx!(
+                        Icon {
+                            icon: Search,
+                            height: 26,
+                            width: 26,
+                            stroke_width: 1.5,
+                            fill: "var(--text-secondary)"
                         }
+                    ),
+                    on_click: move |_| {
+                        is_active.toggle();
                     }
                 }
             }
