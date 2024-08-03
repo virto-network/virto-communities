@@ -7,9 +7,9 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize,
-            input::InputType, AddPlus, ArrowRight, Avatar, Badge, Compass, Icon,
-            IconButton, SearchInput, Tab, UserAdd, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, input::InputType, AddPlus,
+            ArrowRight, Avatar, Badge, Compass, Icon, IconButton, SearchInput, Tab, UserAdd,
+            UserGroup,
         },
         molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
@@ -40,7 +40,7 @@ pub struct Community {
     pub members: u16,
 }
 
-static SKIP: u8 = 6;
+static SKIP: usize = 6;
 
 #[component]
 pub fn Dashboard() -> Element {
@@ -320,7 +320,15 @@ pub fn Dashboard() -> Element {
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
-                    to: (((communities_by_address.len() as f64 + 1f64) / SKIP as f64) as f64).ceil() as u8,
+                    to: {
+                        let mut div: u8 = (communities_by_address.len() + 1).saturating_div(SKIP).try_into().expect("Failed to convert paginator");
+
+                        if div == 0 {
+                            div += 1
+                        }
+
+                        div
+                    },
                     on_change: move |_: PaginatorValue| {}
                 }
             }

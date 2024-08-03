@@ -6,9 +6,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     components::{
         atoms::{
-            dropdown::ElementSize,
-            input::InputType, AddPlus, ArrowRight, Badge, CircleCheck,
-            Icon, IconButton, SearchInput, StopSign, Tab
+            dropdown::ElementSize, input::InputType, AddPlus, ArrowRight, Badge, CircleCheck, Icon,
+            IconButton, SearchInput, StopSign, Tab,
         },
         molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
@@ -30,7 +29,7 @@ use crate::{
     },
 };
 
-static SKIP: u8 = 6;
+static SKIP: usize = 6;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InitiativeWrapper {
@@ -312,7 +311,15 @@ pub fn Initiatives(id: u16) -> Element {
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
-                    to: (((initiatives_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil() as u8,
+                    to: {
+                        let mut div: u8 = (initiatives_ids.len() + 1).saturating_div(SKIP).try_into().expect("Failed to convert paginator");
+
+                        if div == 0 {
+                            div += 1
+                        }
+
+                        div
+                    },
                     on_change: move |event: PaginatorValue| {}
                 }
             }
