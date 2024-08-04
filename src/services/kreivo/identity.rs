@@ -36,7 +36,7 @@ pub async fn superOf(account: &str) -> Result<Invitation, ChainStateError> {
 }
 
 pub async fn identityOf(account: &str) -> Result<String, ChainStateError> {
-    let query = format!("ws://127.0.0.1:11004/identity/identityOf/{}", account);
+    let query = format!("wss://people-kusama-rpc.dwellir.com/identity/identityOf/{}", account);
 
     let response = sube!(&query)
         .await
