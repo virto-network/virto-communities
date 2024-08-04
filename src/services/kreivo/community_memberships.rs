@@ -2,7 +2,10 @@ use codec::Decode;
 use serde::Deserialize;
 use sube::{sube, Response};
 
-use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
+use crate::services::kreivo::{
+    community_track::ChainStateError,
+    check_name::Community,
+};
 
 use super::community_track::{tracks, tracksIds};
 

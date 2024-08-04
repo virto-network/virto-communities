@@ -15,8 +15,10 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::is_dao_owner::is_dao_owner,
-    pages::dashboard::Community,
-    services::kreivo::community_memberships::get_communities_by_member,
+    services::kreivo::{
+        community_memberships::get_communities_by_member,
+        check_name::Community
+    }
 };
 
 #[component]

@@ -2132,6 +2132,22 @@ textarea::placeholder {
     }
 }
 
+@keyframes loadingBackground {
+    0% {
+        background-color: #e0e0e0;
+    }
+    50% {
+        background-color: #c0c0c0;
+    }
+    100% {
+        background-color: #e0e0e0;
+    }
+}
+
+.card--skeleton {
+    animation: loadingBackground 1.5s infinite;
+}
+
 .card--reverse {
     flex-direction: column-reverse;
     background: var(--fill-100);
@@ -2709,3 +2725,6 @@ textarea::placeholder {
         gap: 10px;
     }
 }
+
+
+
