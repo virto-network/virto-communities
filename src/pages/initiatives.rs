@@ -6,11 +6,10 @@ use serde::{Deserialize, Serialize};
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, CircleCheck,
-            Close, Icon, IconButton, SearchInput, StopSign, Suitcase, Tab, UserGroup,
+            dropdown::ElementSize, input::InputType, AddPlus, ArrowRight, Badge, CircleCheck, Icon,
+            IconButton, SearchInput, StopSign, Tab,
         },
-        molecules::tabs::TabItem,
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
         use_accounts::use_accounts,
@@ -30,7 +29,7 @@ use crate::{
     },
 };
 
-static SKIP: u8 = 6;
+static SKIP: usize = 6;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InitiativeWrapper {
@@ -52,7 +51,6 @@ pub fn Initiatives(id: u16) -> Element {
     let header_handled = consume_context::<Signal<bool>>();
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
 
-    let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
 
     let tab_items = vec![TabItem {
@@ -312,44 +310,17 @@ pub fn Initiatives(id: u16) -> Element {
                 }
             }
             div { class: "dashboard__footer grid-footer",
-                div { class: "dashboard__footer__pagination",
-                    span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((initiatives_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
-                    }
-                    div { class: "dashboard__footer__paginators",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowLeft,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current - 1);
-                            }
+                Paginator {
+                    to: {
+                        let mut div: u8 = (initiatives_ids.len() + 1).saturating_div(SKIP).try_into().expect("Failed to convert paginator");
+
+                        if div == 0 {
+                            div += 1
                         }
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowRight,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current + 1);
-                            }
-                        }
-                    }
+
+                        div
+                    },
+                    on_change: move |event: PaginatorValue| {}
                 }
             }
         }

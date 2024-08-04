@@ -1,11 +1,13 @@
 pub mod header;
 pub mod initiative;
 pub mod onboarding;
+pub mod paginator;
 pub mod sidebar;
 pub mod tabs;
 
 pub use header::Header;
 pub use initiative::*;
 pub use onboarding::*;
+pub use paginator::Paginator;
 pub use sidebar::Sidebar;
 pub use tabs::Tabs;

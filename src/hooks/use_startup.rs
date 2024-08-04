@@ -10,7 +10,6 @@ use super::{
     use_initiative::{ActionsForm, CommunityInitiative, ConfirmationForm, InfoForm, SettingsForm},
     use_notification::NotificationItem,
     use_onboard::{BasicsForm, InvitationForm, ManagementForm},
-    use_paginator::Paginator,
     use_session::UserSession,
     use_theme::Theme,
     use_timestamp::{IsTimestampHandled, TimestampValue},
@@ -31,7 +30,6 @@ pub fn use_startup() {
     use_context_provider::<Signal<Option<AttachFile>>>(|| Signal::new(None));
     use_context_provider::<Signal<NotificationItem>>(|| Signal::new(NotificationItem::default()));
     use_context_provider::<Signal<TooltipItem>>(|| Signal::new(TooltipItem::default()));
-    use_context_provider::<Signal<Paginator>>(|| Signal::new(Paginator::default()));
 
     use_context_provider::<Signal<Option<UserSession>>>(|| Signal::new(None));
     use_context_provider::<Signal<Vec<Account>>>(|| Signal::new(vec![]));

@@ -7,11 +7,11 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Compass, Icon,
-            IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, input::InputType, AddPlus,
+            ArrowRight, Avatar, Badge, Compass, Icon, IconButton, SearchInput, Tab, UserAdd,
+            UserGroup,
         },
-        molecules::tabs::TabItem,
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
         use_accounts::use_accounts,
@@ -20,13 +20,7 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
-    pages::route::Route,
     services::kreivo::community_memberships::get_communities_by_member,
-    services::kreivo::{
-        community_memberships::{collection, item},
-        community_track::{tracks, tracksIds},
-        identity::{identityOf, superOf},
-    },
 };
 
 #[derive(PartialEq, Clone)]
@@ -46,7 +40,7 @@ pub struct Community {
     pub members: u16,
 }
 
-static SKIP: u8 = 6;
+static SKIP: usize = 6;
 
 #[component]
 pub fn Dashboard() -> Element {
@@ -58,7 +52,6 @@ pub fn Dashboard() -> Element {
 
     let header_handled = consume_context::<Signal<bool>>();
 
-    let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
 
     let tab_items = vec![TabItem {
@@ -326,48 +319,17 @@ pub fn Dashboard() -> Element {
                 }
             }
             div { class: "dashboard__footer grid-footer",
-                div { class: "dashboard__footer__pagination",
-                    span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_by_address.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
-                    }
-                    div { class: "dashboard__footer__paginators",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowLeft,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current - 1);
+                Paginator {
+                    to: {
+                        let mut div: u8 = (communities_by_address.len() + 1).saturating_div(SKIP).try_into().expect("Failed to convert paginator");
 
-                                // get_community_track.send(current_page())
-                            }
+                        if div == 0 {
+                            div += 1
                         }
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowRight,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current + 1);
 
-                                // get_community_track.send(current_page())
-                            }
-                        }
-                    }
+                        div
+                    },
+                    on_change: move |_: PaginatorValue| {}
                 }
             }
         }

@@ -5,9 +5,10 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon, IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, input::InputType, AddPlus,
+            ArrowRight, Avatar, Badge, Icon, IconButton, SearchInput, Tab, UserAdd, UserGroup,
         },
-        molecules::tabs::TabItem,
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
         use_notification::use_notification,
@@ -22,14 +23,14 @@ use crate::{
     },
 };
 
-static SKIP: u8 = 7;
+static SKIP: usize = 7;
 
 #[component]
 pub fn Explore() -> Element {
     let i18 = use_i18();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let mut nav = use_our_navigator();
+    let nav = use_our_navigator();
 
     let header_handled = consume_context::<Signal<bool>>();
 
@@ -47,17 +48,17 @@ pub fn Explore() -> Element {
     let mut communities = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
 
-    let get_community_track = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
+    let get_community_track = use_coroutine(move |mut rx: UnboundedReceiver<usize>| async move {
         while let Some(f) = rx.next().await {
             communities.clear();
 
             let from = if f - 1 > 0 { (f - 1) * SKIP } else { 0 };
             let to = if usize::from(f * SKIP) >= communities_ids.len() {
-                communities_ids.len() as u8
+                communities_ids.len()
             } else {
                 f * SKIP
             };
-            let range = &communities_ids()[from as usize..to as usize];
+            let range = &communities_ids()[from as usize..to];
 
             for track in range {
                 let response_track = tracks(*track).await;
@@ -90,7 +91,7 @@ pub fn Explore() -> Element {
                     Err(_) => 0u16,
                 };
 
-                let mut community = Community {
+                let community = Community {
                     id: *track,
                     icon: None,
                     name: String::from_utf8_lossy(filtered_name).to_string(),
@@ -132,7 +133,11 @@ pub fn Explore() -> Element {
             };
 
             communities_ids.set(community_tracks.communities);
-            get_community_track.send(current_page());
+            get_community_track.send(
+                current_page()
+                    .try_into()
+                    .expect("Failed to convert current page"),
+            );
         }
     });
 
@@ -326,47 +331,19 @@ pub fn Explore() -> Element {
                 }
             }
             div { class: "dashboard__footer grid-footer",
-                div { class: "dashboard__footer__pagination",
-                    span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_ids.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
-                    }
-                    div { class: "dashboard__footer__paginators",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowLeft,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current - 1);
+                Paginator {
+                    to: {
+                        let mut div: u8 = (communities_ids.len() + 1).saturating_div(SKIP).try_into().expect("Failed to convert paginator");
 
-                                get_community_track.send(current_page())
-                            }
+                        if div == 0 {
+                            div += 1
                         }
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowRight,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current + 1);
 
-                                get_community_track.send(current_page())
-                            }
-                        }
+                        div
+                    },
+                    on_change: move |event: PaginatorValue| {
+                        current_page.set(event.value());
+                        get_community_track.send(event.value().try_into().expect("Failed to convert current page"))
                     }
                 }
             }
