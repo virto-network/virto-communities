@@ -108,7 +108,7 @@ impl ActionItem {
             },
             ActionItem::KusamaTreasury(_) => DropdownItem {
                 key: "KusamaTreasury".to_string(),
-                value: "Kusama Treasury".to_string(),
+                value: "Kusama - Request treasury spend".to_string(),
             },
         }
     }
