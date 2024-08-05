@@ -188,7 +188,11 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                 }))
             };
 
-            log::info!("here vote");
+            if let Some(mut wrapper) = initiative_wrapper() {
+                votes_statistics.set(VoteDigest::default());
+                votes_statistics.with_mut(|votes| votes.aye = wrapper.ongoing.tally.ayes);
+                votes_statistics.with_mut(|votes| votes.nay = wrapper.ongoing.tally.nays);
+            }
 
             if let Some(mut wrapper) = initiative_wrapper() {
                 let Ok(initiative_metadata) = metadata_of(initiativeid).await else {
@@ -223,13 +227,6 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                 wrapper.info = response.info.clone();
 
                 initiative_wrapper.set(Some(wrapper.clone()));
-            }
-
-            if let Some(mut wrapper) = initiative_wrapper() {
-                log::info!("here wrapper");
-                votes_statistics.set(VoteDigest::default());
-                votes_statistics.with_mut(|votes| votes.aye = wrapper.ongoing.tally.ayes);
-                votes_statistics.with_mut(|votes| votes.nay = wrapper.ongoing.tally.nays);
             }
         }
     });

@@ -31,6 +31,8 @@ pub struct InputProps {
     required: bool,
     #[props(default = 100)]
     maxlength: u8,
+    left_text: Option<Element>,
+    right_text: Option<Element>,
     on_input: EventHandler<FormEvent>,
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
@@ -76,6 +78,7 @@ pub fn Input(props: InputProps) -> Element {
             }
             div {
                 class: "input-wrapper {size} {input_error_container}",
+                {props.left_text}
                 input {
                     r#type: "{input_type}",
                     class: "input",
@@ -107,6 +110,7 @@ pub fn Input(props: InputProps) -> Element {
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)
                 }
+                {props.right_text}
                 if matches!(props.itype, InputType::Search) {
                     IconButton {
                         class: "button--avatar bg--transparent",
