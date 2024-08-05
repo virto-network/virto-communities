@@ -225,30 +225,32 @@ pub fn Initiative(id: u16) -> Element {
                                     translate!(i18, "errors.form.initiative_creation")
                                 })?;
 
-                                let response_bot = spaces_client
-                                    .get()
-                                    .create_initiative(InitiativeData {
-                                        init: InitiativeInitContent {
-                                            sender: session
-                                                .get()
-                                                .expect("should get a signer for the session")
-                                                .address,
-                                            is_admin: false,
-                                        },
-                                        info: InitiativeInfoContent {
-                                            name: initiative.get_info().name,
-                                            description: initiative.get_info().description,
-                                            tags: initiative.get_info().categories,
-                                            actions: initiative.get_actions(),
-                                        },
-                                    })
-                                    .await
-                                    .map_err(|_| {
-                                        log::warn!("Failed to create off-chain");
-                                        translate!(i18, "errors.form.initiative_creation")
-                                    })?;
+                                // let response_bot = spaces_client
+                                //     .get()
+                                //     .create_initiative(InitiativeData {
+                                //         init: InitiativeInitContent {
+                                //             sender: session
+                                //                 .get()
+                                //                 .expect("should get a signer for the session")
+                                //                 .address,
+                                //             is_admin: false,
+                                //         },
+                                //         info: InitiativeInfoContent {
+                                //             name: initiative.get_info().name,
+                                //             description: initiative.get_info().description,
+                                //             tags: initiative.get_info().categories,
+                                //             actions: initiative.get_actions(),
+                                //         },
+                                //     })
+                                //     .await
+                                //     .map_err(|_| {
+                                //         log::warn!("Failed to create off-chain");
+                                //         translate!(i18, "errors.form.initiative_creation")
+                                //     })?;
 
-                                let room_id = response_bot.get_id();
+                                // let room_id = response_bot.get_id();
+
+                                let room_id = "matrix.org";
 
                                 let add_members_action = initiative.get_actions().into_iter().filter_map(|action| {
                                     match action {
@@ -343,11 +345,10 @@ pub fn Initiative(id: u16) -> Element {
                                 )
                                 .await;
 
-                                // log::info!("response initiative: {:?}", response);
-                                // tooltip.hide();
+                                tooltip.hide();
 
-                                let path = format!("/dao/{id}/initiatives");
-                                nav.push(vec![], &path);
+                                // let path = format!("/dao/{id}/initiatives");
+                                // nav.push(vec![], &path);
 
                                 Ok::<(), String>(())
                             }
@@ -422,4 +423,3 @@ fn convert_treasury_to_period(
         }
     }
 }
-

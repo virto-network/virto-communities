@@ -3,7 +3,7 @@ use sube::{sube, Response};
 use crate::services::kreivo::communities::ChainStateError;
 
 pub async fn now() -> Result<u64, ChainStateError> {
-    let query = format!("wss://kusama-rpc.dwellir.com/timestamp/now");
+    let query = format!("ws://localhost:10000/timestamp/now");
 
     let response = sube!(&query)
         .await

@@ -2,11 +2,14 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
-    components::atoms::{
-        combo_input::{ComboInputOption, ComboInputValue},
-        dropdown::{DropdownItem, ElementSize},
-        icon_button::Variant,
-        AddPlus, ComboInput, Dropdown, Icon, IconButton, MinusCircle, SubstractLine,
+    components::{
+        atoms::{
+            combo_input::{ComboInputOption, ComboInputValue},
+            dropdown::{DropdownItem, ElementSize},
+            icon_button::Variant,
+            AddPlus, ComboInput, Dropdown, Icon, IconButton, Input, MinusCircle, SubstractLine,
+        },
+        molecules::Voting,
     },
     hooks::{
         use_initiative::{
@@ -262,8 +265,14 @@ pub fn InitiativeActions() -> Element {
                                         }
                                     )
                                 }
+                                ActionItem::VotingOpenGov(meta) =>  {
+                                    rsx!(
+                                        Voting {
+                                            meta: meta.clone()
+                                        }
+                                    )
+                                }
                             }
-
                         }
                     )
                 })
