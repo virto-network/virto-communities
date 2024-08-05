@@ -20,11 +20,15 @@ pub struct ComboInputValue {
 
 #[derive(PartialEq, Props, Clone)]
 pub struct ComboInputProps {
+    #[props(default = "".to_string())]
+    class: String,
     value: ComboInputValue,
     placeholder: String,
     error: Option<String>,
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
+    left_text: Option<Element>,
+    right_text: Option<Element>,
     on_change: EventHandler<ComboInputValue>,
 }
 
@@ -48,7 +52,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
 
     rsx!(
         div {
-            class: "combo-input",
+            class: "combo-input {props.class}",
             match option_value() {
                 ComboInputOption::Date(value) => rsx!(
                     Input {
@@ -88,7 +92,8 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                 message: props.value.input.clone(),
                 size: props.size,
                 placeholder: props.placeholder,
-                error: props.error,
+                error: None,
+                right_text: props.right_text,
                 on_input: move |event: Event<FormData>| {
                     input_value.set(event.value().clone());
                     props.on_change.call(ComboInputValue { option: option_value(), input: input_value().clone() })

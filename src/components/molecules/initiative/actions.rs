@@ -179,6 +179,7 @@ pub fn InitiativeActions() -> Element {
                                                     rsx!(
                                                         li {
                                                             ComboInput {
+                                                                class: "combo-input--reverse",
                                                                 size: ElementSize::Small,
                                                                 value: ComboInputValue {
                                                                     option,
@@ -190,6 +191,13 @@ pub fn InitiativeActions() -> Element {
                                                                     None
                                                                 },
                                                                 placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
+                                                                right_text: {
+                                                                    rsx!(
+                                                                        span { class: "input--right__text",
+                                                                            "KSM"
+                                                                        }
+                                                                    )
+                                                                },
                                                                 on_change: move |event: ComboInputValue| {
                                                                     let date = match event.option {
                                                                         ComboInputOption::Date(value) => {

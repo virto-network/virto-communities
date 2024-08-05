@@ -1353,6 +1353,11 @@ textarea::placeholder {
     text-wrap: balance;
 }
 
+.input--right__text {
+    @extend %text-sm-font-medium;
+    color: var(--text-secondary);
+}
+
 .input-wrapper {
     width: 100%;
     min-width: 220px;
@@ -1390,7 +1395,7 @@ textarea::placeholder {
 }
 
 .input--error-container {
-    border: 2px solid var(--state-destructive-active);
+    // border: 2px solid var(--state-destructive-active);
 }
 
 .input--error {
@@ -1801,11 +1806,28 @@ textarea::placeholder {
     background: var(--fill-50);
 }
 
+.combo-input .dropdown__container {
+    border-radius: 0;
+    background: var(--fill-200);
+}
+
+.combo-input .input-wrapper {
+    background: var(--fill-00);
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
 .combo-input {
     display: flex;
     border-radius: 12px;
     width: 100%;
     border: none;
+    overflow: hidden;
+}
+
+.combo-input--reverse {
+    flex-direction: row-reverse;
 }
 
 .combo-input--comming-soon {
@@ -1828,10 +1850,7 @@ textarea::placeholder {
     width: 40%;
 }
 
-.combo-input .dropdown__container {
-    border-radius: 12px 0 0 12px;
-    background: var(--fill-200);
-}
+
 
 .combo-input .dropdown__list {
     min-width: 100%;
@@ -1852,12 +1871,7 @@ textarea::placeholder {
     display: inline-flex;
 }
 
-.combo-input .input-wrapper {
-    background: var(--fill-00);
-    border-radius: 0 12px 12px 0;
-    margin: 0;
-    box-shadow: none;
-}
+
 
 .subtitle {
     color: var(--text-primary);
