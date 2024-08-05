@@ -92,11 +92,86 @@ impl KusamaTreasuryAction {
     }
 }
 
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
+pub enum ConvictionVote {
+    #[default]
+    None,
+    Locked1x,
+    Locked2x,
+    Locked3x,
+    Locked4x,
+    Locked5x,
+    Locked6x,
+}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct StandardVote {
+    pub aye: bool,
+    pub conviction: ConvictionVote,
+    pub balance: u64,
+}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct SplitVote {
+    pub aye: u64,
+    pub nay: u64,
+}
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct SplitAbstainVote {
+    pub aye: u64,
+    pub nay: u64,
+    pub abstain: u64,
+}
+
+#[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
+pub enum VoteType {
+    Standard(StandardVote),
+    Split(SplitVote),
+    SplitAbstain(SplitAbstainVote),
+}
+
+#[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
+pub struct VotingOpenGov {
+    pub poll_index: u64,
+    pub vote: VoteType,
+}
+
+pub type VotingOpenGovActionProposals = Vec<VotingOpenGov>;
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct VotingOpenGovAction {
+    pub proposals: VotingOpenGovActionProposals,
+}
+
+impl VotingOpenGovAction {
+    pub fn add_proposal(&mut self, proposal: VotingOpenGov) {
+        self.proposals.push(proposal);
+    }
+
+    pub fn update_proposal(&mut self, index: usize, proposal: VotingOpenGov) {
+        if index < self.proposals.len() {
+            self.proposals[index] = proposal;
+        } else {
+            println!("Index out of bounds.");
+        }
+    }
+
+    pub fn remove_proposal(&mut self, index: usize) {
+        if index < self.proposals.len() {
+            self.proposals.remove(index);
+        } else {
+            println!("Index out of bounds.");
+        }
+    }
+}
+
 #[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
 #[serde(tag = "action_type")]
 pub enum ActionItem {
     AddMembers(AddMembersAction),
     KusamaTreasury(KusamaTreasuryAction),
+    VotingOpenGov(VotingOpenGovAction),
 }
 
 impl ActionItem {
@@ -108,7 +183,11 @@ impl ActionItem {
             },
             ActionItem::KusamaTreasury(_) => DropdownItem {
                 key: "KusamaTreasury".to_string(),
-                value: "Kusama Treasury".to_string(),
+                value: "Kusama - Request treasury spend".to_string(),
+            },
+            ActionItem::VotingOpenGov(_) => DropdownItem {
+                key: "VotingOpenGov".to_string(),
+                value: "Kusama - Vote in OpenGov".to_string(),
             },
         }
     }
@@ -117,6 +196,7 @@ impl ActionItem {
         match &*option {
             "AddMembers" => ActionItem::AddMembers(AddMembersAction::default()),
             "KusamaTreasury" => ActionItem::KusamaTreasury(KusamaTreasuryAction::default()),
+            "VotingOpenGov" => ActionItem::VotingOpenGov(VotingOpenGovAction::default()),
             _ => todo!(),
         }
     }
@@ -125,6 +205,7 @@ impl ActionItem {
         vec![
             ActionItem::AddMembers(AddMembersAction::default()).option(),
             ActionItem::KusamaTreasury(KusamaTreasuryAction::default()).option(),
+            ActionItem::VotingOpenGov(VotingOpenGovAction::default()).option(),
         ]
     }
 }

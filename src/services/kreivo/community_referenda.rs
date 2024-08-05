@@ -14,7 +14,7 @@ pub struct TrackInfo {
 
 pub async fn track_queue(item: u16) -> Result<Vec<TrackInfo>, ChainStateError> {
     let query = format!(
-        "wss://kreivo.io/communityReferenda/trackQueue/{}",
+        "ws://localhost:12281/communityReferenda/trackQueue/{}",
         item
     );
     let response = sube!(&query)
@@ -42,7 +42,7 @@ pub async fn track_queue(item: u16) -> Result<Vec<TrackInfo>, ChainStateError> {
 }
 
 pub async fn referendum_count() -> Result<u16, ChainStateError> {
-    let query = format!("wss://kreivo.io/communityReferenda/referendumCount");
+    let query = format!("ws://localhost:12281/communityReferenda/referendumCount");
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;
@@ -103,7 +103,7 @@ pub struct OngoingWrapper {
 
 pub async fn referendum_info_for(id: u16) -> Result<OngoingWrapper, ChainStateError> {
     let query = format!(
-        "wss://kreivo.io/communityReferenda/referendumInfoFor/{}",
+        "ws://localhost:12281/communityReferenda/referendumInfoFor/{}",
         id
     );
     let response = sube!(&query)
@@ -125,7 +125,7 @@ pub async fn referendum_info_for(id: u16) -> Result<OngoingWrapper, ChainStateEr
 }
 
 pub async fn metadata_of(id: u16) -> Result<Vec<u8>, ChainStateError> {
-    let query = format!("wss://kreivo.io/communityReferenda/metadataOf/{}", id);
+    let query = format!("ws://localhost:12281/communityReferenda/metadataOf/{}", id);
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;
