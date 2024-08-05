@@ -18,7 +18,6 @@ struct Raw {
 pub async fn superOf(account: &str) -> Result<Invitation, ChainStateError> {
     let query = format!("wss://people-kusama-rpc.dwellir.com/identity/superOf/0x6d6f646c6b762f636d7479730200000000000000000000000000000000000000");
 
-    // log::info!("query: {:#?}", query);
     let response = sube!(&query).await.map_err(|e| {
         log::info!("{:?}", e);
         ChainStateError::FailedQuery
@@ -37,9 +36,8 @@ pub async fn superOf(account: &str) -> Result<Invitation, ChainStateError> {
 }
 
 pub async fn identityOf(account: &str) -> Result<String, ChainStateError> {
-    let query = format!("ws://127.0.0.1:11004/identity/identityOf/{}", account);
+    let query = format!("wss://people-kusama-rpc.dwellir.com/identity/identityOf/{}", account);
 
-    log::info!("query: {:#?}", query);
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;

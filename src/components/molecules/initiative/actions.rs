@@ -3,17 +3,21 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        combo_input::ComboInputValue,
+        combo_input::{ComboInputOption, ComboInputValue},
         dropdown::{DropdownItem, ElementSize},
         icon_button::Variant,
         AddPlus, ComboInput, Dropdown, Icon, IconButton, MinusCircle, SubstractLine,
     },
     hooks::{
-        use_initiative::{use_initiative, ActionItem, AddMembersAction, MediumOptions, MemberItem},
+        use_initiative::{
+            use_initiative, ActionItem, AddMembersAction, KusamaTreasury, MediumOptions, MemberItem,
+        },
         use_notification::use_notification,
         use_spaces_client::use_spaces_client,
     },
 };
+
+const KUSAMA_PRECISION_DECIMALS: u64 = 1_000_000_000_000;
 
 #[component]
 pub fn InitiativeActions() -> Element {
@@ -21,8 +25,6 @@ pub fn InitiativeActions() -> Element {
     let mut initiative = use_initiative();
     let mut notification = use_notification();
     let spaces_client = use_spaces_client();
-
-    let mut name_maxlength = use_signal(|| 24);
 
     let actions_lock = initiative.get_actions();
 
@@ -79,30 +81,31 @@ pub fn InitiativeActions() -> Element {
                                         ul { class: "form__inputs form__inputs--combo",
                                             {
                                                 meta.members.iter().enumerate().map(|(index_meta, member)| {
+                                                    let dropdown_item = DropdownItem { key: match member.medium {
+                                                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                                                    }, value: match member.medium.clone() {
+                                                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                                                    } };
+
                                                     rsx!(
                                                         li {
                                                             ComboInput {
                                                                 size: ElementSize::Small,
-                                                                value: ComboInputValue { dropdown: DropdownItem { key: match member.medium {
-                                                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
-                                                                    MediumOptions::Email => translate!(i18, "onboard.invite.form.email.label"),
-                                                                    MediumOptions::Telegram => translate!(i18, "onboard.invite.form.phone.label"),
-                                                                }, value: match member.medium.clone() {
-                                                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
-                                                                    MediumOptions::Email => translate!(i18, "onboard.invite.form.email.label"),
-                                                                    MediumOptions::Telegram => translate!(i18, "onboard.invite.form.phone.label"),
-                                                                } }, input: member.account.clone() },
+                                                                value: ComboInputValue {
+                                                                    option: ComboInputOption::Dropdown(dropdown_item),
+                                                                    input: member.account.clone()
+                                                                },
                                                                 placeholder: match member.medium {
                                                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
-                                                                    MediumOptions::Email => translate!(i18, "onboard.invite.form.email.placeholder"),
-                                                                    MediumOptions::Telegram => translate!(i18, "onboard.invite.form.phone.placeholder"),
                                                                 },
                                                                 on_change: move |event: ComboInputValue| {
-                                                                    log::info!("{:?}", event.dropdown.key);
-                                                                    let medium = match event.dropdown.key.as_str() {
-                                                                        "Wallet" => MediumOptions::Wallet,
-                                                                        "Email" => MediumOptions::Email,
-                                                                        "Telegram" => MediumOptions::Telegram,
+                                                                    let medium = match event.option {
+                                                                        ComboInputOption::Dropdown(value) => {
+                                                                            match value.key.as_str() {
+                                                                                "Wallet" => MediumOptions::Wallet,
+                                                                                _ => todo!()
+                                                                            }
+                                                                        },
                                                                         _ => todo!()
                                                                     };
                                                                     if let ActionItem::AddMembers(ref mut meta) = initiative.get_action(index) {
@@ -156,9 +159,99 @@ pub fn InitiativeActions() -> Element {
                                         }
                                     )
                                 },
-                                _ =>  {
+                                ActionItem::KusamaTreasury(meta) =>  {
                                     rsx!(
-                                        span {""}
+                                        ul { class: "form__inputs form__inputs--combo",
+                                            p { class: "form__inputs__disclaimer",
+                                                {translate!(i18, "initiative.steps.actions.kusama_treasury.disclaimer.period_1")}
+                                                if meta.periods.len() > 1 {
+                                                    {translate!(i18, "initiative.steps.actions.kusama_treasury.disclaimer.period_n")}
+                                                }
+                                            }
+                                            {
+                                                meta.periods.iter().enumerate().map(|(index_meta, period)| {
+                                                    let option = if index_meta == 0 {
+                                                        ComboInputOption::None
+                                                    } else {
+                                                        ComboInputOption::Date(period.date.clone())
+                                                    };
+
+                                                    rsx!(
+                                                        li {
+                                                            ComboInput {
+                                                                size: ElementSize::Small,
+                                                                value: ComboInputValue {
+                                                                    option,
+                                                                    input: (period.amount / KUSAMA_PRECISION_DECIMALS).to_string()
+                                                                },
+                                                                error: if period.amount <= 0 {
+                                                                    Some(translate!(i18, "initiative.steps.actions.kusama_treasury.error"))
+                                                                } else {
+                                                                    None
+                                                                },
+                                                                placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
+                                                                on_change: move |event: ComboInputValue| {
+                                                                    let date = match event.option {
+                                                                        ComboInputOption::Date(value) => {
+                                                                          value
+                                                                        },
+                                                                        ComboInputOption::None => {
+                                                                            "".into()
+                                                                        }
+                                                                        _ => todo!()
+                                                                    };
+                                                                    if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(index) {
+                                                                        // Scale amount
+                                                                        let amount = event.input.parse::<f64>().unwrap_or(0.0);
+                                                                        let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
+                                                                        meta.periods[index_meta] = KusamaTreasury { date, amount: scaled_amount as u64 };
+                                                                        initiative.update_action(index, ActionItem::KusamaTreasury(meta.clone()));
+                                                                    }
+                                                                }
+                                                            }
+                                                            IconButton {
+                                                                variant: Variant::Round,
+                                                                size: ElementSize::Small,
+                                                                class: "button--avatar",
+                                                                body: rsx!(
+                                                                    Icon {
+                                                                        icon: MinusCircle,
+                                                                        height: 24,
+                                                                        width: 24,
+                                                                        fill: "var(--state-primary-active)"
+                                                                    }
+                                                                ),
+                                                                on_click: move |_| {
+                                                                    if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(index) {
+                                                                        meta.periods.remove(index_meta);
+                                                                        initiative.update_action(index, ActionItem::KusamaTreasury(meta.clone()));
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    )
+                                                })
+                                            }
+                                            IconButton {
+                                                variant: Variant::Round,
+                                                size: ElementSize::Small,
+                                                class: "button--avatar",
+                                                body: rsx!(
+                                                    Icon {
+                                                        icon: AddPlus,
+                                                        height: 24,
+                                                        width: 24,
+                                                        fill: "var(--state-primary-active)"
+                                                    }
+                                                ),
+                                                on_click: move |_| {
+                                                    if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(index) {
+                                                        meta.add_period(KusamaTreasury::default());
+                                                        initiative.update_action(index, ActionItem::KusamaTreasury(meta.clone()));
+                                                    }
+                                                }
+                                            }
+                                        }
                                     )
                                 }
                             }

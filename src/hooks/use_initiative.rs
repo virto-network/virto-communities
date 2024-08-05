@@ -14,8 +14,6 @@ pub struct InfoForm {
 pub enum MediumOptions {
     #[default]
     Wallet,
-    Telegram,
-    Email,
 }
 
 #[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
@@ -27,9 +25,15 @@ pub struct MemberItem {
 pub type Members = Vec<MemberItem>;
 
 #[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
-pub struct Treasury {
-    pub amount: u128,
-    pub dest: String,
+pub struct KusamaTreasury {
+    pub date: String,
+    pub amount: u64,
+}
+
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
+pub struct KusamaTreasuryPeriod {
+    pub blocks: Option<u64>,
+    pub amount: u64,
 }
 
 #[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
@@ -59,10 +63,40 @@ impl AddMembersAction {
     }
 }
 
+pub type KusamaTreasuryPeriods = Vec<KusamaTreasury>;
+
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct KusamaTreasuryAction {
+    pub periods: KusamaTreasuryPeriods,
+}
+
+impl KusamaTreasuryAction {
+    pub fn add_period(&mut self, period: KusamaTreasury) {
+        self.periods.push(period);
+    }
+
+    pub fn update_period(&mut self, index: usize, period: KusamaTreasury) {
+        if index < self.periods.len() {
+            self.periods[index] = period;
+        } else {
+            println!("Index out of bounds.");
+        }
+    }
+
+    pub fn remove_period(&mut self, index: usize) {
+        if index < self.periods.len() {
+            self.periods.remove(index);
+        } else {
+            println!("Index out of bounds.");
+        }
+    }
+}
+
 #[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
 #[serde(tag = "action_type")]
 pub enum ActionItem {
     AddMembers(AddMembersAction),
+    KusamaTreasury(KusamaTreasuryAction),
 }
 
 impl ActionItem {
@@ -72,12 +106,17 @@ impl ActionItem {
                 key: "AddMembers".to_string(),
                 value: "Add Members".to_string(),
             },
+            ActionItem::KusamaTreasury(_) => DropdownItem {
+                key: "KusamaTreasury".to_string(),
+                value: "Kusama Treasury".to_string(),
+            },
         }
     }
 
     fn to_option(option: String) -> ActionItem {
         match &*option {
             "AddMembers" => ActionItem::AddMembers(AddMembersAction::default()),
+            "KusamaTreasury" => ActionItem::KusamaTreasury(KusamaTreasuryAction::default()),
             _ => todo!(),
         }
     }
@@ -85,6 +124,7 @@ impl ActionItem {
     fn get_options() -> Vec<DropdownItem> {
         vec![
             ActionItem::AddMembers(AddMembersAction::default()).option(),
+            ActionItem::KusamaTreasury(KusamaTreasuryAction::default()).option(),
         ]
     }
 }

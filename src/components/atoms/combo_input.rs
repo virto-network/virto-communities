@@ -1,13 +1,20 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
-use crate::components::atoms::{dropdown::DropdownItem, Dropdown, Input};
+use crate::components::atoms::{dropdown::DropdownItem, input::InputType, Dropdown, Input};
 
 use super::dropdown::ElementSize;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
+pub enum ComboInputOption {
+    Dropdown(DropdownItem),
+    Date(String),
+    None,
+}
+
+#[derive(PartialEq, Clone, Debug)]
 pub struct ComboInputValue {
-    pub dropdown: DropdownItem,
+    pub option: ComboInputOption,
     pub input: String,
 }
 
@@ -15,6 +22,7 @@ pub struct ComboInputValue {
 pub struct ComboInputProps {
     value: ComboInputValue,
     placeholder: String,
+    error: Option<String>,
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
     on_change: EventHandler<ComboInputValue>,
@@ -23,27 +31,14 @@ pub struct ComboInputProps {
 pub fn ComboInput(props: ComboInputProps) -> Element {
     let i18 = use_i18();
 
-    let mut dropdown_value = use_signal::<DropdownItem>(|| props.value.dropdown);
+    let mut option_value = use_signal(|| props.value.option.clone());
     let mut input_value = use_signal::<String>(|| props.value.input.clone());
-    let mut soon = use_signal::<bool>(|| {
-        dropdown_value().key == "Email" || dropdown_value().key == "Telegram"
-    });
 
     let mut items = vec![];
-    let mut dropdown_options = vec![
-        DropdownItem {
-            key: "Wallet".to_string(),
-            value: translate!(i18, "onboard.invite.form.wallet.label"),
-        },
-        // DropdownItem {
-        //     key: "Email".to_string(),
-        //     value: translate!(i18, "onboard.invite.form.email.label"),
-        // },
-        // DropdownItem {
-        //     key: "Telegram".to_string(),
-        //     value: translate!(i18, "onboard.invite.form.phone.label"),
-        // },
-    ];
+    let dropdown_options = vec![DropdownItem {
+        key: "Wallet".to_string(),
+        value: translate!(i18, "onboard.invite.form.wallet.label"),
+    }];
 
     for account in dropdown_options.clone().into_iter() {
         items.push(rsx!(span {
@@ -54,35 +49,49 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
     rsx!(
         div {
             class: "combo-input",
-            class: if soon() { "combo-input--comming-soon" },
-            Dropdown {
-                class: "dropdown--left".to_string(),
-                value: dropdown_value(),
-                placeholder: translate!(i18, "header.cta.account"),
-                size: props.size.clone(),
-                default: None,
-                on_change: move |event: usize| {
-                    let to_assign = &dropdown_options[event];
-
-                    if to_assign.value == "Email" || to_assign.value == "Telegram" {
-                        soon.set(true)
-                    } else  {
-                        soon.set(false)
+            match option_value() {
+                ComboInputOption::Date(value) => rsx!(
+                    Input {
+                        message: value,
+                        size: props.size.clone(),
+                        itype: InputType::Date,
+                        placeholder: props.placeholder.clone(),
+                        error: None,
+                        on_input: move |event: Event<FormData>| {
+                            option_value.set(ComboInputOption::Date(event.value().clone()));
+                            props.on_change.call(ComboInputValue { option: ComboInputOption::Date(event.value().clone()), input: input_value().clone() })
+                        },
+                        on_keypress: move |_| {},
+                        on_click: move |_| {},
                     }
-
-                    dropdown_value.set(to_assign.clone());
-                    props.on_change.call(ComboInputValue { dropdown: dropdown_value(), input: input_value().clone() })
-                },
-                body: items
+                ),
+                ComboInputOption::Dropdown(value) => rsx!(
+                    Dropdown {
+                            class: "dropdown--left".to_string(),
+                            value: value,
+                            placeholder: translate!(i18, "header.cta.account"),
+                            size: props.size.clone(),
+                            default: None,
+                            on_change: move |event: usize| {
+                                let to_assign = &dropdown_options[event];
+                                option_value.set(ComboInputOption::Dropdown(to_assign.clone()));
+                                props.on_change.call(ComboInputValue { option: ComboInputOption::Dropdown(to_assign.clone()), input: input_value().clone() })
+                            },
+                            body: items
+                    }
+                ),
+                ComboInputOption::None => {
+                    rsx!()
+                }
             }
             Input {
                 message: props.value.input.clone(),
                 size: props.size,
                 placeholder: props.placeholder,
-                error: None,
+                error: props.error,
                 on_input: move |event: Event<FormData>| {
                     input_value.set(event.value().clone());
-                    props.on_change.call(ComboInputValue { dropdown: dropdown_value().clone(), input: input_value().clone() })
+                    props.on_change.call(ComboInputValue { option: option_value(), input: input_value().clone() })
                 },
                 on_keypress: move |_| {},
                 on_click: move |_| {},

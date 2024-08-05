@@ -1,14 +1,12 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, CircleCheck,
-            Close, Icon, IconButton, SearchInput, StopSign, Suitcase, Tab, UserGroup,
+            dropdown::ElementSize, AddPlus, ArrowLeft, ArrowRight, Badge, CircleCheck, Icon,
+            IconButton, SearchInput, StopSign, Tab,
         },
         molecules::tabs::TabItem,
     },
@@ -20,13 +18,9 @@ use crate::{
         use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
     },
-    middlewares::is_dao_owner::is_dao_owner,
     services::kreivo::{
-        community_referenda::{
-            get_initiatives_by_community, metadata_of, referendum_count, referendum_info_for,
-            track_queue, Ongoing,
-        },
-        preimage::preimage_for,
+        community_referenda::{metadata_of, referendum_count, referendum_info_for, Ongoing},
+        preimage::{preimage_for, request_status_for},
     },
 };
 
@@ -42,14 +36,10 @@ pub struct InitiativeWrapper {
 #[component]
 pub fn Initiatives(id: u16) -> Element {
     let i18 = use_i18();
-    let mut initiative = use_initiative();
-    let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let mut nav = use_our_navigator();
-    let accounts = use_accounts();
+    let nav = use_our_navigator();
     let spaces_client = use_spaces_client();
 
-    let header_handled = consume_context::<Signal<bool>>();
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
 
     let mut current_page = use_signal::<u8>(|| 1);
@@ -60,74 +50,11 @@ pub fn Initiatives(id: u16) -> Element {
         value: translate!(i18, "dao.tabs.all"),
     }];
 
-    let mut tab_value = use_signal::<String>(|| String::from("all"));
+    let tab_value = use_signal::<String>(|| String::from("all"));
 
-    let mut initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
+    let initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
     let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
     let mut filtered_initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
-
-    let get_initiative_info = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(f) = rx.next().await {
-            // Temporal value for FIFO ongoing initiative
-            let from = 20;
-
-            let count = referendum_count()
-                .await
-                .expect("Should get referendum count");
-
-            for track in from..count {
-                let Ok(response) = referendum_info_for(track).await else {
-                    continue;
-                };
-
-                if response.ongoing.origin.communities.community_id == id {
-                    let name = format!("Ref: {:?}", track);
-                    let mut init = InitiativeWrapper {
-                        id: track,
-                        info: InitiativeInfoContent {
-                            name,
-                            description: String::new(),
-                            tags: vec![],
-                            actions: vec![],
-                        },
-                        ongoing: response.ongoing,
-                    };
-
-                    let Ok(initiative_metadata) = metadata_of(track).await else {
-                        initiatives.with_mut(|c| c.push(init));
-                        continue;
-                    };
-
-                    let initiative_metadata = format!("0x{}", hex::encode(initiative_metadata));
-
-                    log::info!("{}", initiative_metadata);
-
-                    let Ok(room_id_metadata) = preimage_for(&initiative_metadata, 35).await else {
-                        initiatives.with_mut(|c| c.push(init));
-                        continue;
-                    };
-
-                    log::info!("{}", room_id_metadata);
-
-                    let Ok(response) = spaces_client
-                        .get()
-                        .get_initiative_by_id(&room_id_metadata)
-                        .await
-                    else {
-                        initiatives.with_mut(|c| c.push(init));
-                        continue;
-                    };
-
-                    init.info = response.info;
-
-                    initiatives.with_mut(|c| c.push(init));
-                }
-            }
-
-            tooltip.hide();
-            filtered_initiatives.set(initiatives());
-        }
-    });
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         tooltip.handle_tooltip(TooltipItem {
@@ -135,8 +62,68 @@ pub fn Initiatives(id: u16) -> Element {
             body: translate!(i18, "dao.tips.loading.description"),
             show: true,
         });
+        // Temporal value for FIFO ongoing initiative
+        let from = 29;
 
-        get_initiative_info.send(());
+        let count = referendum_count()
+            .await
+            .expect("Should get referendum count");
+
+        for track in from..count {
+            let Ok(response) = referendum_info_for(track).await else {
+                continue;
+            };
+
+            if response.ongoing.origin.communities.community_id == id {
+                let name = format!("Ref: {:?}", track);
+                let mut init = InitiativeWrapper {
+                    id: track,
+                    info: InitiativeInfoContent {
+                        name,
+                        description: String::new(),
+                        tags: vec![],
+                        actions: vec![],
+                    },
+                    ongoing: response.ongoing,
+                };
+
+                log::info!("{:?}", metadata_of(track).await);
+                let Ok(initiative_metadata) = metadata_of(track).await else {
+                    initiatives.with_mut(|c| c.push(init));
+                    continue;
+                };
+
+                let initiative_metadata = format!("0x{}", hex::encode(initiative_metadata));
+
+                let Ok(preimage_len) = request_status_for(&initiative_metadata).await else {
+                    continue;
+                };
+
+                let Ok(room_id_metadata) = preimage_for(&initiative_metadata, preimage_len).await
+                else {
+                    initiatives.with_mut(|c| c.push(init));
+                    continue;
+                };
+
+                let Ok(response) = spaces_client
+                    .get()
+                    .get_initiative_by_id(&room_id_metadata)
+                    .await
+                else {
+                    initiatives.with_mut(|c| c.push(init));
+                    continue;
+                };
+
+                log::info!("{:?}", response.info);
+
+                init.info = response.info;
+
+                initiatives.with_mut(|c| c.push(init));
+            }
+        }
+
+        tooltip.hide();
+        filtered_initiatives.set(initiatives());
     });
 
     rsx! {
@@ -155,7 +142,6 @@ pub fn Initiatives(id: u16) -> Element {
                 div { class: "head__actions",
                     SearchInput {
                         message: search_word(),
-                        itype: InputType::Search,
                         placeholder: translate!(i18, "dao.cta_header.search"),
                         error: None,
                         on_input: move |event: Event<FormData>| {

@@ -25,7 +25,7 @@ use crate::{
     services::kreivo::{
         community_memberships::{get_communities_by_member, get_membership_id},
         community_referenda::{metadata_of, referendum_info_for},
-        preimage::preimage_for,
+        preimage::{preimage_for, request_status_for},
     },
 };
 use wasm_bindgen::prelude::*;
@@ -135,8 +135,6 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let mut content = use_signal(|| String::new());
     let mut can_vote = use_signal(|| false);
 
-    let header_handled = consume_context::<Signal<bool>>();
-
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
 
     let cont = &*content.read();
@@ -204,9 +202,11 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
                 let initiative_metadata = format!("0x{}", hex::encode(initiative_metadata));
 
-                log::info!("{}", initiative_metadata);
+                let Ok(preimage_len) = request_status_for(&initiative_metadata).await else {
+                    continue;
+                }; 
 
-                let Ok(room_id_metadata) = preimage_for(&initiative_metadata, 35).await else {
+                let Ok(room_id_metadata) = preimage_for(&initiative_metadata, preimage_len).await else {
                     continue;
                 };
 

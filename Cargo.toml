@@ -58,6 +58,7 @@ grass = "0.13.2"
 reqwest = { version = "0.12.4", features = ["multipart", "json"] }
 pulldown-cmark = "0.11.0"
 blake2 = "0.10.6"
+chrono = "0.4.38"
 
 [patch.crates-io]
 cookie = { git = "https://github.com/S0c5/cookie-rs.git" }

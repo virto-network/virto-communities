@@ -3,21 +3,17 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        button::Variant, dropdown::ElementSize, input_tags::InputTagsEvent, markdown::MarkdownEvent, Button, Input, InputTags, Markdown
+        dropdown::ElementSize, input_tags::InputTagsEvent, markdown::MarkdownEvent, Input,
+        InputTags, Markdown,
     },
-    hooks::{
-        use_initiative::use_initiative, use_notification::use_notification,
-        use_onboard::use_onboard, use_spaces_client::use_spaces_client,
-    },
+    hooks::{use_initiative::use_initiative, use_onboard::use_onboard},
 };
 
 #[component]
 pub fn InitiativeInfo(error: bool) -> Element {
     let i18 = use_i18();
-    let mut onboard = use_onboard();
+    let onboard = use_onboard();
     let mut initiative = use_initiative();
-    let mut notification = use_notification();
-    let spaces_client = use_spaces_client();
 
     let mut name_maxlength = use_signal(|| 24);
 
@@ -43,10 +39,10 @@ pub fn InitiativeInfo(error: bool) -> Element {
                             None
                         }
                     } else { None },
-                    maxlength: name_maxlength(),
+                    maxlength: 150,
                     required: true,
                     on_input: move |event: Event<FormData>| {
-                        if event.value().as_bytes().len() < 24usize {
+                        if event.value().len() < 150 {
                             initiative.info_mut().with_mut(|info| info.name = event.value());
                         } else {
                             name_maxlength.set(event.value().chars().count().try_into().expect("Should convert usize into u8") );
@@ -86,7 +82,7 @@ pub fn InitiativeInfo(error: bool) -> Element {
                 InputTags {
                     message: initiative.get_info().categories.join(","),
                     size: ElementSize::Small,
-                    placeholder: {translate!(i18, "initiative.steps.info.categories.placeholder")},
+                    placeholder: translate!(i18, "initiative.steps.info.categories.placeholder"),
                     error: if error {
                         if onboard.get_basics().industry.is_empty() {
                             Some(translate!(i18, "errors.form.not_empty"))
@@ -97,7 +93,6 @@ pub fn InitiativeInfo(error: bool) -> Element {
                     maxlength: 5,
                     required: true,
                     on_input: move |event: InputTagsEvent| {
-                        log::info!("tags: {:?}", event.tags);
                         initiative.info_mut().with_mut(|info| info.categories = event.tags);
                     },
                     on_keypress: move |_| {},

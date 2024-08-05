@@ -12,7 +12,6 @@ use virto_communities::{
         use_notification::{use_notification, NotificationHandler},
         use_session::{use_session, UserSession},
         use_startup::use_startup,
-        use_theme::use_theme,
         use_timestamp::{use_timestamp, IsTimestampHandled, TimestampValue},
         use_tooltip::use_tooltip,
     },

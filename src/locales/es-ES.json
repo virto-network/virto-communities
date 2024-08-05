@@ -101,7 +101,15 @@
                     }
                 },
                 "actions": {
-                    "label": "Acciones"
+                    "label": "Acciones",
+                    "kusama_treasury": {
+                        "disclaimer": {
+                            "period_1": "La entrega de recursos por parte del tesoro se realizará instantáneamente, una vez la propuesta sea aprobada.",
+                            "period_n": "\nImportante: Los recursos de los demás periodos serán entregados en las fechas establecidas para cada uno."
+                        },
+                        "error": "Debe ser mayor a 0",
+                        "placeholder": "Fecha de entrega"
+                    } 
                 },
                 "settings": {
                     "label": "Configuraciones"
