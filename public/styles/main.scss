@@ -219,6 +219,9 @@ $fw-bold: 700;
 
 .bg--state-primary-active {
     background: var(--state-primary-active) !important;
+    &:hover {
+        background-color: var(--fill-400) !important;
+    }
 }
 
 .bg--fill-600 {
@@ -733,12 +736,18 @@ $fw-bold: 700;
     border: none;
     color: var(--fill-00);
     background: var(--state-primary-active);
+    &:hover {
+        background-color: var(--fill-400);
+    }
 }
 
 .button--secondary {
     border: none;
     color: var(--text-loud);
     background: var(--fill-100);
+    &:hover {
+        background-color: var(--fill-200);
+    }
 }
 
 .button--tertiary {
@@ -775,7 +784,6 @@ $fw-bold: 700;
     width: 60px;
     padding: 0;
     transition: background-color 0.2s ease-in;
-
     &:hover {
         background-color: var(--fill-600);
     }
