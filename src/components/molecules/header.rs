@@ -262,7 +262,7 @@ pub fn Header() -> Element {
                             IconButton {
                                 variant: Variant::Round,
                                 size: ElementSize::Big,
-                                class: "button--avatar button--comming-soon",
+                                class: "button--avatar button--comming-soon bg--fill-600",
                                 body: rsx!(
                                     Icon {
                                         icon: ArrowUpDown,
