@@ -23,8 +23,8 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Trayendo las comunidades",
-                    "description": "Esto puede tomar un momento"
+                    "title": "Actualizando las comunidades",
+                    "description": "Por favor, espera mientras se completa el proceso."
                 }
             },
             "cta_header": {
@@ -36,13 +36,13 @@
             },
             "cta_cards": {
                 "explore": {
-                    "title": "Explorar DAOs",
-                    "description": "Un ecosistema global de organizaciones autónomas"
+                    "title": "Descubre organizaciones innovadoras",
+                    "description": "Explora DAOS y encuentra tu comunidad"
                 },
                 "create": {
-                    "title": "Crear una DAO",
-                    "description": "Una gobernanza abierta y descentralizada para todas tus ideas",
-                    "cta": "Aprender más"
+                    "title": "Crea tu DAO hoy",
+                    "description": "Configura y lanza tu organización y visión en minutos",
+                    "cta": "Comienza ahora"
                 }
             },
             "footer": {
@@ -57,8 +57,8 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Trayendo las Iniciativas",
-                    "description": "Esto puede tomar un momento"
+                    "title": "Actualizando la lista de iniciativas",
+                    "description": "Por favor, espera mientras se completa el proceso."
                 }
             },
             "cta_header": {
@@ -70,9 +70,9 @@
             },
             "cta_cards": {
                 "create": {
-                    "title": "Crear una Iniciativas",
-                    "description": "Una gobernanza abierta y descentralizada para todas tus ideas",
-                    "cta": "Aprender más"
+                    "title": "Crea una iniciativa de impacto",
+                    "description": "¿Tienes una idea? Crea tu iniciativa de manera rápida y sencilla",
+                    "cta": "Crear iniciativa ahora"
                 }
             },
             "footer": {
@@ -86,18 +86,18 @@
                     "label": "Información",
                     "name": {
                         "label": "Nombre",
-                        "description": "Lorem Ipsum Dolor",
-                        "placeholder": "Escribe un nombre"
+                        "description": "Asegúrate de introducir un nombre claro y conciso para tu iniciativa",
+                        "placeholder": "Dale identidad a tu iniciativa. Escribe aquí."
                     },
                     "description": {
                         "label": "Descripción",
-                        "description": "Lorem Ipsum Dolor",
-                        "placeholder": "Escribe una descripción"
+                        "description": "¿Quieres lograr un impacto con tu iniciativa?",
+                        "placeholder": "Utiliza la descripción para explicar el propósito de tu iniciativa, objetivos y planes."
                     },
                     "categories": {
                         "label": "Categorías",
-                        "description": "Utiliza palabras para categorizar tu iniciativa basada en su propósito, por ejemplo, 'Impacto Social', 'Finanzas', etc.",
-                        "placeholder": "Escribe categorías separadas por comas"
+                        "description": "Selecciona y agrega las categorías que mejor describan tu iniciativa. /n Puedes seleccionar varias categorías, esto ayudará a otros miembros a encontrar tu propuesta.",
+                        "placeholder": "Agrega las categorías para tu iniciativa, asegúrate de separarlas por comas ( Finanzas, Proptech)"
                     }
                 },
                 "actions": {
@@ -151,15 +151,15 @@
                 "cancel": "Cancelar",
                 "continue": "Continuar"
             },
-            "disclaimer": "Aviso: Esta sección está en desarrollo. ¡Siéntete libre de interactuar con ella!",
+            "disclaimer": "¡Esta información es para ti! Estamos trabajando para ti, funcionalidad en construcción.",
             "tips": {
                 "loading": {
-                    "title": "Crea tu Iniciativa",
+                    "title": "Tu iniciativa está en proceso",
                     "description": "Esto puede tomar un momento"
                 },
                 "created": {
-                    "title": "Todo ha salido bien",
-                    "description": "La iniciativa ha sido creada"
+                    "title": "¡Excelente! 🚀",
+                    "description": "¡Tu iniciativa ha sido creada con éxito!"
                 }
             }
         },
@@ -217,7 +217,7 @@
                 }
             },
             "success": {
-                "title": "Todo ha estado perfecto¡Haz creado un referendo! 🥳",
+                "title": "¡Felicitaciones!” 🎉 ¡Haz creado una iniciativa con todo éxito!",
                 "form": {
                     "cta_send": "Continuar"
                 }
@@ -295,12 +295,12 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Crea tu Organización",
+                    "title": "La creación de tu organización está en proceso",
                     "description": "Esto puede tomar un momento"
                 },
                 "created": {
-                    "title": "Todo ha salido bien",
-                    "description": "La comunidad ha sido creada"
+                    "title": "¡Excelente! 🚀",
+                    "description": "¡Tu organización ha sido creada con éxito!"
                 }
             }
         },
@@ -310,7 +310,7 @@
                     "edit": "Editor",
                     "preview": "Ver"
                 },
-                "value": "¡Modifícame!"
+                "value": "Haz la descripción de tu iniciativa, personaliza el contenido como quieras"
             },
             "vote_preview": {
                 "title": "Esta es la previsualización de una iniciativa",
@@ -321,54 +321,54 @@
             "title": "Todo ha salido bien"
         },
         "warnings": {
-            "title": "Atención",
+            "title": "⚠️Atención: Está información es para ti",
             "middleware": {
-                "has_dao": "La cuenta no puede crear más DAOs",
-                "chain_unavailable": "No podemos hacer esto ahora"
+                "has_dao": "¡Lo sentimos! 😞 No puedes crear más organizaciones asociadas a esta cuenta.",
+                "chain_unavailable": "En este posible no es posible completar está acción."
             }
         },
         "errors": {
             "session": {
-                "persist": "No se ha podido guardar la sesión"
+                "persist": "¡Lo sentimos! 😞 No hemos logrado guardar sesión. Por favor, intenta de nuevo. "
             },
             "wallet": {
-                "accounts_not_found": "No se han encontrado cuentas",
-                "account_address": "No se ha encontrado la dirección pública",
-                "connection_failed": "La conexión ha fallado, si el problema persiste comunícate con nosotros"
+                "accounts_not_found": "¡Revisa la información ingresada!⚠️ No hemos encontrado la cuenta proporcionada",
+                "account_address": "¡Revisa la información ingresada!⚠️ No hemos encontrado la dirección pública",
+                "connection_failed": "¡Ups! La conexión ha fallado 🔴 Comunícate con nosotros si el problema persiste"
             },
             "communities": {
-                "query_failed": "No se ha podido traer comunidades"
+                "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲"
             },
             "initiatives": {
-                "query_failed": "No se ha podido traer iniciativas"
+                "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲"
             },
             "vote": {
                 "persist_failed": "No se ha podido guardar el voto",
                 "chain": "No se ha podido votar"
             },
             "timestamp": {
-                "query_failed": "No se ha podido traer el estado actual"
+                "query_failed": "¡Lo sentimos! 😞 No hemos logrado actualizar el estado. ¡Inténtalo de nuevo! 🤲"
             },
             "attach": {
-                "title": "Error al subir",
+                "title": "¡Ups! ✋ Hemos presentado un error al cargar tu archivo",
                 "not_found": {
                     "explanation": "Archivo no encontrado.",
-                    "details": "No hemos podido encontrar el archivo."
+                    "details": "No hemos logrado encontrar tu archivo"
                 },
                 "size": {
-                    "explanation": "El archivo excede el límite de tamaño.",
-                    "details": "Sube un archivo que sea menor de 2 MB."
+                    "explanation": "¡Ups! ✋Tu archivo excede el limite de tamaño.",
+                    "details": "¡Por favor! Carga un archivo no mayor a 2MB."
                 },
                 "mime": {
-                    "explanation": "Formato de archivo inválido.",
-                    "details": "Sube un archivo que esté en formato .jpeg o .png"
+                    "explanation": "¡Ups! ✋ El formato de archivo es inválido.",
+                    "details": "Por favor, asegúrate que su archivo corresponda a un formato .jpeg o .png"
                 }
             },
             "form": {
-                "not_empty": "No puede estar vacío.",
-                "upload_fail": "No se ha podido subir el archivo",
-                "community_creation": "No se ha podido crear la comunidad",
-                "initiative_creation": "No se ha podido crear la iniciativa"
+                "not_empty": "¡Ups! ✋ Este campo no puede estar vacio.",
+                "upload_fail": "¡Ups! ✋ No se pudo subir el archivo. Por favor, inténtalo de nuevo.",
+                "community_creation": "¡Ups! ✋ No logramos crear tu comunidad. Por favor, verifica e inténtalo de nuevo.",
+                "initiative_creation": "¡Ups! ✋ No logramos crear tu iniciativa. Por favor, inténtalo de nuevo."
             }
         }
     }

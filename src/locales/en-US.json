@@ -23,8 +23,8 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Fetching communities",
-                    "description": "This may take a moment"
+                    "title": "Updating communities",
+                    "description": "Please wait, this may take a moment"
                 }
             },
             "cta_header": {
@@ -36,13 +36,13 @@
             },
             "cta_cards": {
                 "explore": {
-                    "title": "Explore DAOs",
-                    "description": "A Global Ecosystem of autonomous infrastructure."
+                    "title": "Discover innovative organizations",
+                    "description": "Explore DAOs and find your community."
                 },
                 "create": {
-                    "title": "Create a DAO",
-                    "description": "A Decentralized and open governed entity for all of your Ideas.",
-                    "cta": "Learn more"
+                    "title": "Create your DAO today",
+                    "description": "Set up and launch your organization and vision in minutes",
+                    "cta": "Start now"
                 }
             },
             "footer": {
@@ -57,8 +57,8 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Fetching Initiatives",
-                    "description": "This may take a moment"
+                    "title": "Updating the list of initiatives",
+                    "description": "Please wait, this may take a moment"
                 }
             },
             "cta_header": {
@@ -70,9 +70,9 @@
             },
             "cta_cards": {
                 "create": {
-                    "title": "Create an Initiative",
-                    "description": "A Decentralized and open governed entity for all of your Ideas.",
-                    "cta": "Learn more"
+                    "title": "Create an impactful initiative",
+                    "description": "Do you have an idea? Create your initiative quickly and easily",
+                    "cta": "Create initiative now"
                 },
                 "vote": {
                     "title": "Preview an Initiative",
@@ -85,24 +85,24 @@
             }
         },
         "initiative": {
-            "title": "Create an Initiative",
+            "title": "Create an impactful initiative",
             "steps": {
                 "info": {
                     "label": "Info",
                     "name": {
                         "label": "Name",
-                        "description": "Lorem Ipsum Dolor",
-                        "placeholder": "Write a name"
+                        "description": "Make sure to enter a clear and concise name for your initiative",
+                        "placeholder": "Give your initiative an identity. Write here."
                     },
                     "description": {
-                        "label": "Name",
-                        "description": "Lorem Ipsum Dolor",
-                        "placeholder": "Write a description"
+                        "label": "Description",
+                        "description": "Do you want to make an impact with your initiative?",
+                        "placeholder": "Use the description to explain the purpose of your initiative, goals, and plans."
                     },
                     "categories": {
                         "label": "Categories",
-                        "description": "Use words to categorize your initiative base on its purpose. i.e. “Social Impact”,  “Finance” etc.",
-                        "placeholder": "Write categories separate by commas"
+                        "description": "Select and add the categories that best describe your initiative. You can select multiple categories; this will help other members find your proposal.",
+                        "placeholder": "Add the categories for your initiative, make sure to separate them with commas (Finance, Proptech)"
                     }
                 },
                 "actions": {
@@ -156,15 +156,15 @@
                 "cancel": "Cancel",
                 "continue": "Continue"
             },
-            "disclaimer": "Disclaimer: This section is a work in progress. Feel free to interact with it!",
+            "disclaimer": "This information is for you! We are working for you, functionality under construction.",
             "tips": {
                 "loading": {
-                    "title": "Create your Initiative",
+                    "title": "Your initiative is in process",
                     "description": "This may take a moment"
                 },
                 "created": {
-                    "title": "Everything went well",
-                    "description": "The initiative has been created"
+                    "title": "Excellent! 🚀",
+                    "description": "Your initiative has been successfully created"
                 }
             }
         },
@@ -221,7 +221,7 @@
                 }
             },
             "success": {
-                "title": "Everything was perfect! You have created a referendum! 🥳",
+                "title": "Congratulations! 🎉 You have successfully created an initiative!",
                 "form": {
                     "cta_send": "Continue"
                 }
@@ -299,20 +299,20 @@
             },
             "tips": {
                 "loading": {
-                    "title": "Create your Organization",
+                    "title": "The creation of your organization is in process",
                     "description": "This may take a moment"
                 },
                 "created": {
-                    "title": "Everything went well",
-                    "description": "The community has been created"
+                    "title": "Excellent! 🚀",
+                    "description": "Your organization has been successfully created"
                 }
             }
         },
         "warnings": {
-            "title": "Warning",
+            "title": "⚠️Attention: This information is for you",
             "middleware": {
-                "has_dao": "The account cannot create more DAOs",
-                "chain_unavailable": "We cannot do this right now"
+                "has_dao": "We're sorry! 😞 You cannot create more organizations associated with this account.",
+                "chain_unavailable": "At this time, it is not possible to complete this action."
             }
         },
         "utils": {
@@ -321,7 +321,7 @@
                     "edit": "Editor",
                     "preview": "Preview"
                 },
-                "value": "Update me!"
+                "value": "Describe your initiative, customize the content as you wish"
             },
             "vote_preview": {
                 "title": "This is a preview of an initiative",
@@ -333,46 +333,46 @@
         },
         "errors": {
             "session": {
-                "persist": "Failed to save session"
+                "persist": "We're sorry! 😞 We couldn't save the session. Please try again."
             },
             "wallet": {
-                "accounts_not_found": "No accounts found",
-                "account_address": "Public address not found",
-                "connection_failed": "Connection failed, if the problem persists please contact us"
+                "accounts_not_found": "Check the entered information!⚠️ We couldn't find the provided account",
+                "account_address": "Check the entered information!⚠️ We couldn't find the public address",
+                "connection_failed": "Oops! The connection has failed 🔴 Contact us if the problem persists"
             },
             "communities": {
-                "query_failed": "Failed to fetch communities"
+                "query_failed": "We're sorry! 😞 We couldn't load the information correctly. Please try again! 🤲"
             },
             "initiatives": {
-                "query_failed": "Failed to fetch initiatives"
+                "query_failed": "We're sorry! 😞 We couldn't load the information correctly. Please try again! 🤲"
             },
             "vote": {
                 "persist_failed": "The vote could not be saved",
                 "chain": "The vote could not be cast"
             },
             "timestamp": {
-                "query_failed": "Failed to fetch timestamp"
+                "query_failed": "We're sorry! 😞 We couldn't update the status. Please try again! 🤲"
             },
             "attach": {
-                "title": "Failed to upload",
+                "title": "Oops! ✋ We encountered an error loading your file",
                 "not_found": {
                     "explanation": "File not found.",
-                    "details": "We were unable to find the file."
+                    "details": "We couldn't find your file"
                 },
                 "size": {
-                    "explanation": "File exceeds size limit.",
-                    "details": "Upload a file that is less than 2 MB in size."
+                    "explanation": "Oops! ✋ Your file exceeds the size limit.",
+                    "details": "Please upload a file no larger than 2MB."
                 },
                 "mime": {
-                    "explanation": "File invalid format.",
-                    "details": "Upload a file that is in .jpeg or .png"
+                    "explanation": "Oops! ✋ The file format is invalid.",
+                    "details": "Please ensure your file is in .jpeg or .png format."
                 }
             },
             "form": {
-                "not_empty": "Cannot be empty.",
-                "upload_fail": "The file could not be uploaded",
-                "community_creation": "The community could not be created",
-                "initiative_creation": "The initiative could not be created"
+                "not_empty": "Oops! ✋ This field cannot be empty",
+                "upload_fail": "Oops! ✋ The file could not be uploaded. Please try again.",
+                "community_creation": "Oops! ✋ We couldn't create your community. Please check and try again.",
+                "initiative_creation": "Oops! ✋ We couldn't create the initiative. Please try again."
             }
         }
     }
