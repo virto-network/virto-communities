@@ -232,9 +232,16 @@ pub fn Header() -> Element {
                             IconButton {
                                 variant: Variant::Round,
                                 size: ElementSize::Big,
-                                class: "button--avatar button--comming-soon",
-                                body: rsx!(Icon { icon : ArrowUpDown, height : 32, width : 32, fill : "var(--fill-00)" }),
-                                on_click: move |_| {}
+                                class: "button--avatar button--comming-soon bg--fill-600",
+                                body: rsx!(
+                                    Icon {
+                                        icon: ArrowUpDown,
+                                        height: 32,
+                                        width: 32,
+                                        fill: "var(--fill-00)"
+                                    }
+                                ),
+                                on_click: move |_| { }
                             }
                         }
                         div { class: "balances",
