@@ -281,7 +281,7 @@
             "title": "⚠️Atención: Está información es para ti",
             "middleware": {
                 "has_dao": "¡Lo sentimos! 😞 No puedes crear más organizaciones asociadas a esta cuenta.",
-                "chain_unavailable": "En este posible no es posible completar está acción."
+                "chain_unavailable": "En este momento no es posible completar está acción."
             }
         },
         "errors": {
