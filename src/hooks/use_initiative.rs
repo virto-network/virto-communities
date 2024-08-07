@@ -131,7 +131,17 @@ pub enum VoteType {
     SplitAbstain(SplitAbstainVote),
 }
 
-#[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
+impl Default for VoteType {
+    fn default() -> Self {
+        VoteType::Standard(StandardVote {
+            aye: true,
+            conviction: ConvictionVote::None,
+            balance: 0,
+        })
+    }
+}
+
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub struct VotingOpenGov {
     pub poll_index: u64,
     pub vote: VoteType,

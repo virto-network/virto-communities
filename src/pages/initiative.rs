@@ -16,8 +16,7 @@ use crate::{
     },
     hooks::{
         use_initiative::{
-            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
-            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod,
+            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent, InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov, VotingOpenGovAction
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -303,6 +302,28 @@ pub fn Initiative(id: u16) -> Element {
                                 let treasury_action = treasury_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<KusamaTreasuryPeriod>>();
 
                                 log::info!("treasury {:?}", treasury_action);
+
+                                let votiong_open_gov_action = initiative.get_actions().into_iter().filter_map(|action| {
+                                    match action {
+                                        ActionItem::VotingOpenGov(votiong_open_gov_action) => {
+                                            Some(votiong_open_gov_action.proposals.clone()
+                                            .into_iter()
+                                            .filter_map(|proposal|{
+                                                if proposal.poll_index > 0 {
+                                                    Some(proposal)
+                                                } else {
+                                                    None
+                                                }
+                                            })
+                                            .collect::<Vec<VotingOpenGov>>())
+                                        },
+                                        _ => None
+                                    }
+                                }).collect::<Vec<Vec<VotingOpenGov>>>();
+
+                                let votiong_open_gov_action = votiong_open_gov_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<VotingOpenGov>>();
+
+                                log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
 
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                 .map_err(|_| {
