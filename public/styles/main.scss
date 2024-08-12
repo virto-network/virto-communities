@@ -462,6 +462,31 @@ $fw-bold: 700;
     padding: 44px 0;
 }
 
+.form__inputs__wrapper {
+    width: 100%;
+}
+
+.form__inputs__wrapper>* {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.form__inputs__wrapper:first-child {
+    margin-top: 0;
+}
+
+.form__inputs__container__cta {
+    margin-top: 4px;
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.form__inputs__container {
+    display: flex;
+                                                        gap: 4px;
+}
+
 .form__inputs__disclaimer {
     @extend %text-sm-font-medium;
     color: var(--text-secondary);

@@ -3,7 +3,7 @@ use sube::{sube, Response};
 use crate::services::kreivo::community_track::ChainStateError;
 
 pub async fn preimage_for(hash: &str, len: u32) -> Result<String, ChainStateError> {
-    let query = format!("ws://localhost:12281/preimage/preimageFor/{}/{}", hash, len);
+    let query = format!("wss://kreivo.io/preimage/preimageFor/{}/{}", hash, len);
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;
@@ -25,7 +25,7 @@ pub async fn preimage_for(hash: &str, len: u32) -> Result<String, ChainStateErro
 }
 
 pub async fn request_status_for(hash: &str) -> Result<u32, ChainStateError> {
-    let query = format!("ws://localhost:12281/preimage/requestStatusFor/{}", hash);
+    let query = format!("wss://kreivo.io/preimage/requestStatusFor/{}", hash);
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;

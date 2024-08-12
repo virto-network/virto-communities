@@ -15,7 +15,7 @@ pub enum ChainStateError {
 }
 
 pub async fn is_admin(address: &[u8]) -> Result<bool, ChainStateError> {
-    let query = format!("ws://localhost:12281/communities/communityIdFor");
+    let query = format!("wss://kreivo.io/communities/communityIdFor");
 
     let response = sube!(&query)
         .await

@@ -17,8 +17,7 @@ use super::{
     use_tooltip::TooltipItem,
 };
 
-// const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
-const SPACES_CLIENT_URL: &str = "http://localhost:8000";
+const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
 
 pub fn use_startup() {
     use_context_provider::<Signal<Theme>>(|| Signal::new(Theme::default()));

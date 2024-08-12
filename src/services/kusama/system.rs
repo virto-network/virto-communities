@@ -3,7 +3,7 @@ use sube::{sube, Response};
 use crate::services::kreivo::communities::ChainStateError;
 
 pub async fn number() -> Result<u32, ChainStateError> {
-    let query = format!("ws://localhost:10000/system/number");
+    let query = format!("wss://kusama-rpc.dwellir.com/system/number");
 
     let response = sube!(&query)
         .await
