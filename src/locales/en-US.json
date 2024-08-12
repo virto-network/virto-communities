@@ -114,6 +114,35 @@
                         },
                         "error": "Must be greater than 0",
                         "placeholder": "Delivery date"
+                    },
+                    "voting_open_gov": {
+                        "poll_index": "Poll Index",
+                        "standard": {
+                            "title": "Standard",
+                            "aye": "Vote AYE",
+                            "nay": "Vote NAY",
+                            "conviction": {
+                                "none": "None",
+                                "locked_1": "Locked x1",
+                                "locked_2": "Locked x2",
+                                "locked_3": "Locked x3",
+                                "locked_4": "Locked x4",
+                                "locked_5": "Locked x5",
+                                "locked_6": "Locked x6"
+                            },
+                            "balance": "Balance"
+                        },
+                        "split": {
+                            "title": "Split",
+                            "aye": "Balance AYE",
+                            "nay": "Balance NAY"
+                        },
+                        "split_abstain": {
+                            "title": "Split Abstain",
+                            "aye": "Balance AYE",
+                            "nay": "Balance NAY",
+                            "abstain": "Balance abstain"
+                        }
                     }
                 },
                 "settings": {

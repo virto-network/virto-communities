@@ -4,7 +4,7 @@ use sube::{sube, Response};
 use super::community_track::ChainStateError;
 
 pub async fn now() -> Result<u64, ChainStateError> {
-    let query = format!("ws://localhost:12281/timestamp/now");
+    let query = format!("wss://kreivo.io/timestamp/now");
 
     let response = sube!(&query)
         .await

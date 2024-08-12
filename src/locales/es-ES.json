@@ -109,6 +109,35 @@
                         },
                         "error": "Debe ser mayor a 0",
                         "placeholder": "Fecha de entrega"
+                    },
+                    "voting_open_gov": {
+                        "poll_index": "Número de la propuesta",
+                        "standard": {
+                            "title": "Standard",
+                            "aye": "Votar a favor",
+                            "nay": "Votar en contra",
+                            "conviction": {
+                                "none": "Ninguna",
+                                "locked_1": "Bloqueado x1",
+                                "locked_2": "Bloqueado x2",
+                                "locked_3": "Bloqueado x3",
+                                "locked_4": "Bloqueado x4",
+                                "locked_5": "Bloqueado x5",
+                                "locked_6": "Bloqueado x6"
+                            },
+                            "balance": "Cantidad a votar"
+                        },
+                        "split": {
+                            "title": "Split",
+                            "aye": "Balance a favor",
+                            "nay": "Balance en contra"
+                        },
+                        "split_abstain": {
+                            "title": "Split Abstain",
+                            "aye": "Balance a favor",
+                            "nay": "Balance en contra",
+                            "abstain": "Balance en abstención"
+                        }
                     } 
                 },
                 "settings": {

@@ -141,10 +141,53 @@ impl Default for VoteType {
     }
 }
 
+impl VoteType {
+    pub fn key_string(&self) -> &str {
+        match *self {
+            VoteType::Standard(_) => "Standard",
+            VoteType::Split(_) => "Split",
+            VoteType::SplitAbstain(_) => "SplitAbstain",
+        }
+    }
+}
+
 #[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub struct VotingOpenGov {
     pub poll_index: u64,
     pub vote: VoteType,
+}
+
+impl VotingOpenGov {
+    pub fn serialize_vote_type(&self) -> serde_json::Value {
+        match &self.vote {
+            VoteType::Standard(vote) => serde_json::json!({
+               "pollIndex": self.poll_index,
+               "vote": {
+                    "type": "Standard",
+                    "aye": vote.aye,
+                    "conviction": vote.conviction,
+                    "balance": vote.balance
+               }
+            }),
+            VoteType::Split(vote) => serde_json::json!({
+                "pollIndex": self.poll_index,
+                "vote": {
+                    "type": "Split",
+                    "aye": vote.aye,
+                    "nay": vote.nay,
+                }
+            }),
+            VoteType::SplitAbstain(vote) => serde_json::json!({
+                "pollIndex": self.poll_index,
+                "vote": {
+                    "type": "SplitAbstain",
+                    "aye": vote.aye,
+                    "nay": vote.nay,
+                    "abstain": vote.abstain,
+                }
+            }),
+        }
+    }
 }
 
 pub type VotingOpenGovActionProposals = Vec<VotingOpenGov>;

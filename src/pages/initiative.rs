@@ -16,7 +16,9 @@ use crate::{
     },
     hooks::{
         use_initiative::{
-            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent, InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov, VotingOpenGovAction
+            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
+            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov,
+            VotingOpenGovAction,
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -51,6 +53,7 @@ extern "C" {
         membership_accounts_add: JsValue,
         membership_accounts_remove: JsValue,
         periods_treasury_request: JsValue,
+        proposals_voting_open_gov: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
 
@@ -224,32 +227,30 @@ pub fn Initiative(id: u16) -> Element {
                                     translate!(i18, "errors.form.initiative_creation")
                                 })?;
 
-                                // let response_bot = spaces_client
-                                //     .get()
-                                //     .create_initiative(InitiativeData {
-                                //         init: InitiativeInitContent {
-                                //             sender: session
-                                //                 .get()
-                                //                 .expect("should get a signer for the session")
-                                //                 .address,
-                                //             is_admin: false,
-                                //         },
-                                //         info: InitiativeInfoContent {
-                                //             name: initiative.get_info().name,
-                                //             description: initiative.get_info().description,
-                                //             tags: initiative.get_info().categories,
-                                //             actions: initiative.get_actions(),
-                                //         },
-                                //     })
-                                //     .await
-                                //     .map_err(|_| {
-                                //         log::warn!("Failed to create off-chain");
-                                //         translate!(i18, "errors.form.initiative_creation")
-                                //     })?;
+                                let response_bot = spaces_client
+                                    .get()
+                                    .create_initiative(InitiativeData {
+                                        init: InitiativeInitContent {
+                                            sender: session
+                                                .get()
+                                                .expect("should get a signer for the session")
+                                                .address,
+                                            is_admin: false,
+                                        },
+                                        info: InitiativeInfoContent {
+                                            name: initiative.get_info().name,
+                                            description: initiative.get_info().description,
+                                            tags: initiative.get_info().categories,
+                                            actions: initiative.get_actions(),
+                                        },
+                                    })
+                                    .await
+                                    .map_err(|_| {
+                                        log::warn!("Failed to create off-chain");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
 
-                                // let room_id = response_bot.get_id();
-
-                                let room_id = "matrix.org";
+                                let room_id = response_bot.get_id();
 
                                 let add_members_action = initiative.get_actions().into_iter().filter_map(|action| {
                                     match action {
@@ -322,8 +323,15 @@ pub fn Initiative(id: u16) -> Element {
                                 }).collect::<Vec<Vec<VotingOpenGov>>>();
 
                                 let votiong_open_gov_action = votiong_open_gov_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<VotingOpenGov>>();
+                                let votiong_open_gov_action = votiong_open_gov_action.into_iter().map(|v| v.serialize_vote_type()).collect::<Vec<serde_json::Value>>();
 
                                 log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
+
+                                let votiong_open_gov_action = convert_to_jsvalue(&votiong_open_gov_action)
+                                .map_err(|_| {
+                                    log::warn!("Malformed voting open gov");
+                                    translate!(i18, "errors.form.initiative_creation")
+                                })?;
 
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                 .map_err(|_| {
@@ -363,13 +371,14 @@ pub fn Initiative(id: u16) -> Element {
                                     membership_accounts_add,
                                     membership_accounts_remove,
                                     treasury_action,
+                                    votiong_open_gov_action
                                 )
                                 .await;
 
                                 tooltip.hide();
 
-                                // let path = format!("/dao/{id}/initiatives");
-                                // nav.push(vec![], &path);
+                                let path = format!("/dao/{id}/initiatives");
+                                nav.push(vec![], &path);
 
                                 Ok::<(), String>(())
                             }

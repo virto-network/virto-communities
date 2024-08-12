@@ -16,7 +16,7 @@ pub struct CollectionDetails {
 
 pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainStateError> {
     let query = format!(
-        "ws://localhost:12281/communityMemberships/collection/{}",
+        "wss://kreivo.io/communityMemberships/collection/{}",
         collection
     );
 
@@ -36,7 +36,7 @@ pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainState
 }
 
 pub async fn item(item: u16, member: Option<u16>) -> Result<u16, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityMemberships/item/{}", item);
+    let query = format!("wss://kreivo.io/communityMemberships/item/{}", item);
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;
@@ -50,7 +50,7 @@ pub async fn item(item: u16, member: Option<u16>) -> Result<u16, ChainStateError
 
 pub async fn get_membership_id(address: &str, community_id: u16) -> Result<u16, ChainStateError> {
     let query = format!(
-        "ws://localhost:12281/communityMemberships/account/{}/{}",
+        "wss://kreivo.io/communityMemberships/account/{}/{}",
         address, community_id
     );
     let response = sube!(&query)
@@ -85,7 +85,7 @@ pub async fn get_membership_id(address: &str, community_id: u16) -> Result<u16, 
 
 pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError> {
     let query = format!(
-        "ws://localhost:12281/communityMemberships/account/{}",
+        "wss://kreivo.io/communityMemberships/account/{}",
         address
     );
     let response = sube!(&query)
@@ -128,7 +128,7 @@ pub async fn get_communities_by_member(member: &[u8]) -> Result<Vec<Community>, 
 
     for community in community_trackIds.communities.iter() {
         let query = format!(
-            "ws://localhost:12281/communityMemberships/account/{}/{}",
+            "wss://kreivo.io/communityMemberships/account/{}/{}",
             address, community
         );
 

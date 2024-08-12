@@ -32,14 +32,8 @@ pub fn VotingAction(props: VotingProps) -> Element {
                 props.meta.proposals.iter().enumerate().map(|(index_meta, proposal)| {
                     rsx!(
                         li {
-                            div {
-                                style: "
-                                    width: 100%;
-                                ",
+                            div { class: "form__inputs__wrapper",
                                 div {
-                                    style: "
-                                        width: 100%;
-                                    ",
                                     ComboInput {
                                         size: ElementSize::Small,
                                         value: ComboInputValue {
@@ -49,38 +43,44 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                             }),
                                             input: proposal.poll_index.to_string()
                                         },
-                                        placeholder: "Selecciona...",
+                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
                                         options: vec![
                                             DropdownItem {
                                                 key: "Standard".to_string(),
-                                                value: "Standard".to_string(),
+                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"),
                                             },
                                             DropdownItem {
                                                 key: "Split".to_string(),
-                                                value: "Split".to_string(),
+                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.split.title"),
                                             },
                                             DropdownItem {
                                                 key: "SplitAbstain".to_string(),
-                                                value: "SplitAbstain".to_string(),
+                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.title"),
                                             }
                                         ],
                                         on_change: move |event: ComboInputValue| {
-                                            let vote = match event.option {
-                                                ComboInputOption::Dropdown(value) => {
-                                                    match value.key.as_str() {
-                                                        "Standard" => VoteType::Standard(StandardVote::default()),
-                                                        "Split" => VoteType::Split(SplitVote::default()),
-                                                        "SplitAbstain" => VoteType::SplitAbstain(SplitAbstainVote::default()),
-                                                        _ => todo!()
-                                                    }
-                                                },
-                                                _ => todo!()
-                                            };
                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
+                                                let vote = match event.option {
+                                                    ComboInputOption::Dropdown(value) => {
+                                                        if value.key.as_str() == meta.proposals[index_meta].vote.key_string() {
+                                                            meta.proposals[index_meta].vote.clone()
+                                                        } else {
+                                                            match value.key.as_str() {
+                                                                "Standard" => VoteType::Standard(StandardVote::default()),
+                                                                "Split" => VoteType::Split(SplitVote::default()),
+                                                                "SplitAbstain" => VoteType::SplitAbstain(SplitAbstainVote::default()),
+                                                                _ => VoteType::Standard(StandardVote::default())
+                                                            }
+                                                        }
+
+                                                    },
+                                                    _ => todo!()
+                                                };
+
                                                 let poll_index: u64 = event.input.parse().unwrap_or(0);
                                                 meta.proposals[index_meta] = VotingOpenGov {
                                                     poll_index,
-                                                    vote
+                                                    vote: vote
                                                 };
                                                 initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
                                             }
@@ -88,10 +88,6 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                     }
                                 }
                                 div {
-                                    style: "
-                                        width: 100%;
-                                        margin-top: 4px;
-                                    ",
                                     match &proposal.vote {
                                         VoteType::Standard(vote) => {
                                             let vote_a = vote.clone();
@@ -107,37 +103,37 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                                 key: "None".to_string(),
                                                                 value: "None".to_string(),
                                                             }),
-                                                            input: vote.balance.to_string()
+                                                            input: (vote.balance / KUSAMA_PRECISION_DECIMALS).to_string()
                                                         },
-                                                        placeholder: "Selecciona...",
+                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.balance"),
                                                         options: vec![
                                                             DropdownItem {
                                                                 key: "None".to_string(),
-                                                                value: "None".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.none"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked1x".to_string(),
-                                                                value: "Locked x1".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_1"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked2x".to_string(),
-                                                                value: "Locked x2".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_2"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked3x".to_string(),
-                                                                value: "Locked x3".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_3"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked4x".to_string(),
-                                                                value: "Locked x4".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_4"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked5x".to_string(),
-                                                                value: "Locked x5".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_5"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked6x".to_string(),
-                                                                value: "Locked x6".to_string(),
+                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
                                                             }
                                                         ],
                                                         on_change: move |event: ComboInputValue| {
@@ -157,24 +153,19 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                                 _ => todo!()
                                                             };
                                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                                let balance: u64 = event.input.parse().unwrap_or(0);
+                                                                let amount = event.input.parse::<f64>().unwrap_or(0.0);
+                                                                let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
 
                                                                 meta.proposals[index_meta].vote = VoteType::Standard(
-                                                                    StandardVote { aye: vote_a.aye, conviction, balance }
+                                                                    StandardVote { aye: vote_a.aye, conviction, balance: scaled_amount as u64 }
                                                                 );
                                                                 initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
                                                             }
                                                         }
                                                     }
-                                                    div {
-                                                        style: "
-                                                            margin-top: 4px;
-                                                            display: flex;
-                                                            gap: 4px;
-                                                            width: 100%;
-                                                        ",
+                                                    div { class: "form__inputs__container__cta",
                                                         RadioButton {
-                                                            title: "Vote Aye",
+                                                            title: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.aye"),
                                                             name: "Aye",
                                                             checked: vote.aye.clone(),
                                                             on_change: move |_| {
@@ -186,7 +177,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                             }
                                                         }
                                                         RadioButton {
-                                                            title: "Vote Nay",
+                                                            title: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.nay"),
                                                             name: "Nay",
                                                             checked: !vote.aye.clone(),
                                                             on_change: move |_| {
@@ -206,15 +197,11 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                             let mut vote_b = vote.clone();
 
                                             rsx!(
-                                                div {
-                                                    style: "
-                                                        display: flex;
-                                                        gap: 4px;
-                                                    ",
+                                                div { class: "form__inputs__container",
                                                     Input {
                                                         message: vote.aye / KUSAMA_PRECISION_DECIMALS,
                                                         size: ElementSize::Small,
-                                                        placeholder: "Aye",
+                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split.aye"),
                                                         error: None,
                                                         on_input: move |event: Event<FormData>| {
                                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
@@ -233,7 +220,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                     Input {
                                                         message: vote.nay / KUSAMA_PRECISION_DECIMALS,
                                                         size: ElementSize::Small,
-                                                        placeholder: "Nay",
+                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split.nay"),
                                                         error: None,
                                                         on_input: move |event: Event<FormData>| {
                                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
@@ -258,15 +245,11 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                             let mut vote_c = vote.clone();
 
                                             rsx!(
-                                                div {
-                                                    style: "
-                                                        display: flex;
-                                                        gap: 4px;
-                                                    ",
+                                                div { class: "form__inputs__container",
                                                     Input {
                                                         message: vote.aye / KUSAMA_PRECISION_DECIMALS,
                                                         size: ElementSize::Small,
-                                                        placeholder: "Aye",
+                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.aye"),
                                                         error: None,
                                                         on_input: move |event: Event<FormData>| {
                                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
@@ -285,7 +268,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                     Input {
                                                         message: vote.nay / KUSAMA_PRECISION_DECIMALS,
                                                         size: ElementSize::Small,
-                                                        placeholder: "Nay",
+                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.nay"),
                                                         error: None,
                                                         on_input: move |event: Event<FormData>| {
                                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
@@ -304,7 +287,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                     Input {
                                                         message: vote.abstain / KUSAMA_PRECISION_DECIMALS,
                                                         size: ElementSize::Small,
-                                                        placeholder: "Abstain",
+                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.abstain"),
                                                         error: None,
                                                         on_input: move |event: Event<FormData>| {
                                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
