@@ -111,24 +111,9 @@ pub struct StandardVote {
     pub balance: u64,
 }
 
-#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
-pub struct SplitVote {
-    pub aye: u64,
-    pub nay: u64,
-}
-
-#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
-pub struct SplitAbstainVote {
-    pub aye: u64,
-    pub nay: u64,
-    pub abstain: u64,
-}
-
 #[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
 pub enum VoteType {
     Standard(StandardVote),
-    Split(SplitVote),
-    SplitAbstain(SplitAbstainVote),
 }
 
 impl Default for VoteType {
@@ -144,9 +129,7 @@ impl Default for VoteType {
 impl VoteType {
     pub fn key_string(&self) -> &str {
         match *self {
-            VoteType::Standard(_) => "Standard",
-            VoteType::Split(_) => "Split",
-            VoteType::SplitAbstain(_) => "SplitAbstain",
+            VoteType::Standard(_) => "Standard"
         }
     }
 }
@@ -168,24 +151,7 @@ impl VotingOpenGov {
                     "conviction": vote.conviction,
                     "balance": vote.balance
                }
-            }),
-            VoteType::Split(vote) => serde_json::json!({
-                "pollIndex": self.poll_index,
-                "vote": {
-                    "type": "Split",
-                    "aye": vote.aye,
-                    "nay": vote.nay,
-                }
-            }),
-            VoteType::SplitAbstain(vote) => serde_json::json!({
-                "pollIndex": self.poll_index,
-                "vote": {
-                    "type": "SplitAbstain",
-                    "aye": vote.aye,
-                    "nay": vote.nay,
-                    "abstain": vote.abstain,
-                }
-            }),
+            })
         }
     }
 }

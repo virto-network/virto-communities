@@ -9,8 +9,8 @@ use crate::{
         AddPlus, ComboInput, Icon, IconButton, Input, MinusCircle, RadioButton,
     },
     hooks::use_initiative::{
-        use_initiative, ActionItem, ConvictionVote, SplitAbstainVote, SplitVote, StandardVote,
-        VoteType, VotingOpenGov, VotingOpenGovAction,
+        use_initiative, ActionItem, ConvictionVote, StandardVote, VoteType, VotingOpenGov,
+        VotingOpenGovAction,
     },
 };
 
@@ -34,58 +34,71 @@ pub fn VotingAction(props: VotingProps) -> Element {
                         li {
                             div { class: "form__inputs__wrapper",
                                 div {
-                                    ComboInput {
+                                    Input {
+                                        message: if proposal.poll_index > 0 { proposal.poll_index.to_string() } else { String::new() },
                                         size: ElementSize::Small,
-                                        value: ComboInputValue {
-                                            option: ComboInputOption::Dropdown(DropdownItem {
-                                                key: "Standard".to_string(),
-                                                value: "Standard".to_string(),
-                                            }),
-                                            input: proposal.poll_index.to_string()
-                                        },
-                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
-                                        options: vec![
-                                            DropdownItem {
-                                                key: "Standard".to_string(),
-                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"),
-                                            },
-                                            DropdownItem {
-                                                key: "Split".to_string(),
-                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.split.title"),
-                                            },
-                                            DropdownItem {
-                                                key: "SplitAbstain".to_string(),
-                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.title"),
-                                            }
-                                        ],
-                                        on_change: move |event: ComboInputValue| {
+                                        placeholder: "Ex: 000",
+                                        error: None,
+                                        label: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
+                                        on_input: move |event: Event<FormData>| {
                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                let vote = match event.option {
-                                                    ComboInputOption::Dropdown(value) => {
-                                                        if value.key.as_str() == meta.proposals[index_meta].vote.key_string() {
-                                                            meta.proposals[index_meta].vote.clone()
-                                                        } else {
-                                                            match value.key.as_str() {
-                                                                "Standard" => VoteType::Standard(StandardVote::default()),
-                                                                "Split" => VoteType::Split(SplitVote::default()),
-                                                                "SplitAbstain" => VoteType::SplitAbstain(SplitAbstainVote::default()),
-                                                                _ => VoteType::Standard(StandardVote::default())
-                                                            }
-                                                        }
-
-                                                    },
-                                                    _ => todo!()
-                                                };
-
-                                                let poll_index: u64 = event.input.parse().unwrap_or(0);
-                                                meta.proposals[index_meta] = VotingOpenGov {
-                                                    poll_index,
-                                                    vote: vote
-                                                };
+                                                let poll_index: u64 = event.value().parse().unwrap_or(0);
+                                                meta.proposals[index_meta].poll_index = poll_index;
                                                 initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
                                             }
-                                        }
+                                        },
+                                        on_keypress: move |_| {},
+                                        on_click: move |_| {},
                                     }
+                                    // ComboInput {
+                                    //     size: ElementSize::Small,
+                                    //     value: ComboInputValue {
+                                    //         option: ComboInputOption::Dropdown(DropdownItem {
+                                    //             key: "Standard".to_string(),
+                                    //             value: "Standard".to_string(),
+                                    //         }),
+                                    //         input: proposal.poll_index.to_string()
+                                    //     },
+                                    //     placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
+                                    //     options: vec![
+                                    //         DropdownItem {
+                                    //             key: "Standard".to_string(),
+                                    //             value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"),
+                                    //         },
+                                    //         DropdownItem {
+                                    //             key: "Split".to_string(),
+                                    //             value: translate!(i18, "initiative.steps.actions.voting_open_gov.split.title"),
+                                    //         },
+                                    //         DropdownItem {
+                                    //             key: "SplitAbstain".to_string(),
+                                    //             value: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.title"),
+                                    //         }
+                                    //     ],
+                                    //     on_change: move |event: ComboInputValue| {
+                                    //         if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
+                                    //             let vote = match event.option {
+                                    //                 ComboInputOption::Dropdown(value) => {
+                                    //                     if value.key.as_str() == meta.proposals[index_meta].vote.key_string() {
+                                    //                         meta.proposals[index_meta].vote.clone()
+                                    //                     } else {
+                                    //                         match value.key.as_str() {
+                                    //                             "Standard" => VoteType::Standard(StandardVote::default())
+                                    //                         }
+                                    //                     }
+
+                                    //                 },
+                                    //                 _ => todo!()
+                                    //             };
+
+                                    //             let poll_index: u64 = event.input.parse().unwrap_or(0);
+                                    //             meta.proposals[index_meta] = VotingOpenGov {
+                                    //                 poll_index,
+                                    //                 vote: vote
+                                    //             };
+                                    //             initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
+                                    //         }
+                                    //     }
+                                    // }
                                 }
                                 div {
                                     match &proposal.vote {
@@ -103,9 +116,16 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                                 key: "None".to_string(),
                                                                 value: "None".to_string(),
                                                             }),
-                                                            input: (vote.balance / KUSAMA_PRECISION_DECIMALS).to_string()
+                                                            input: if vote.balance / KUSAMA_PRECISION_DECIMALS > 0 { (vote.balance / KUSAMA_PRECISION_DECIMALS).to_string() } else { String::new() },
                                                         },
                                                         placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.balance"),
+                                                        right_text: {
+                                                            rsx!(
+                                                                span { class: "input--right__text",
+                                                                    "KSM"
+                                                                }
+                                                            )
+                                                        },
                                                         options: vec![
                                                             DropdownItem {
                                                                 key: "None".to_string(),
@@ -188,120 +208,6 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                                 }
                                                             },
                                                         }
-                                                    }
-                                                }
-                                            )
-                                        },
-                                        VoteType::Split(ref vote) => {
-                                            let mut vote_a = vote.clone();
-                                            let mut vote_b = vote.clone();
-
-                                            rsx!(
-                                                div { class: "form__inputs__container",
-                                                    Input {
-                                                        message: vote.aye / KUSAMA_PRECISION_DECIMALS,
-                                                        size: ElementSize::Small,
-                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split.aye"),
-                                                        error: None,
-                                                        on_input: move |event: Event<FormData>| {
-                                                            if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                                // Scale amount
-                                                                let amount = event.value().parse::<f64>().unwrap_or(0.0);
-                                                                let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
-
-                                                                vote_a.aye = scaled_amount as u64;
-                                                                meta.proposals[index_meta].vote = VoteType::Split(vote_a.clone());
-                                                                initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
-                                                            }
-                                                        },
-                                                        on_keypress: move |_| {},
-                                                        on_click: move |_| {},
-                                                    }
-                                                    Input {
-                                                        message: vote.nay / KUSAMA_PRECISION_DECIMALS,
-                                                        size: ElementSize::Small,
-                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split.nay"),
-                                                        error: None,
-                                                        on_input: move |event: Event<FormData>| {
-                                                            if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                                // Scale amount
-                                                                let amount = event.value().parse::<f64>().unwrap_or(0.0);
-                                                                let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
-
-                                                                vote_b.nay = scaled_amount as u64;
-                                                                meta.proposals[index_meta].vote = VoteType::Split(vote_b.clone());
-                                                                initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
-                                                            }
-                                                        },
-                                                        on_keypress: move |_| {},
-                                                        on_click: move |_| {},
-                                                    }
-                                                }
-                                            )
-                                        },
-                                        VoteType::SplitAbstain(vote) => {
-                                            let mut vote_a = vote.clone();
-                                            let mut vote_b = vote.clone();
-                                            let mut vote_c = vote.clone();
-
-                                            rsx!(
-                                                div { class: "form__inputs__container",
-                                                    Input {
-                                                        message: vote.aye / KUSAMA_PRECISION_DECIMALS,
-                                                        size: ElementSize::Small,
-                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.aye"),
-                                                        error: None,
-                                                        on_input: move |event: Event<FormData>| {
-                                                            if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                                // Scale amount
-                                                                let amount = event.value().parse::<f64>().unwrap_or(0.0);
-                                                                let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
-
-                                                                vote_a.aye = scaled_amount as u64;
-                                                                meta.proposals[index_meta].vote = VoteType::SplitAbstain(vote_a.clone());
-                                                                initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
-                                                            }
-                                                        },
-                                                        on_keypress: move |_| {},
-                                                        on_click: move |_| {},
-                                                    }
-                                                    Input {
-                                                        message: vote.nay / KUSAMA_PRECISION_DECIMALS,
-                                                        size: ElementSize::Small,
-                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.nay"),
-                                                        error: None,
-                                                        on_input: move |event: Event<FormData>| {
-                                                            if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                                // Scale amount
-                                                                let amount = event.value().parse::<f64>().unwrap_or(0.0);
-                                                                let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
-
-                                                                vote_b.nay = scaled_amount as u64;
-                                                                meta.proposals[index_meta].vote = VoteType::SplitAbstain(vote_b.clone());
-                                                                initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
-                                                            }
-                                                        },
-                                                        on_keypress: move |_| {},
-                                                        on_click: move |_| {},
-                                                    }
-                                                    Input {
-                                                        message: vote.abstain / KUSAMA_PRECISION_DECIMALS,
-                                                        size: ElementSize::Small,
-                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.abstain"),
-                                                        error: None,
-                                                        on_input: move |event: Event<FormData>| {
-                                                            if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                                                // Scale amount
-                                                                let amount = event.value().parse::<f64>().unwrap_or(0.0);
-                                                                let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
-
-                                                                vote_c.abstain = scaled_amount as u64;
-                                                                meta.proposals[index_meta].vote = VoteType::SplitAbstain(vote_c.clone());
-                                                                initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
-                                                            }
-                                                        },
-                                                        on_keypress: move |_| {},
-                                                        on_click: move |_| {},
                                                     }
                                                 }
                                             )
