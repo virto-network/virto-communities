@@ -7,13 +7,15 @@ use futures_util::{StreamExt, TryFutureExt};
 use crate::{
     components::atoms::{
         button::Variant, dropdown::ElementSize, key_value::Variant as KeyValueVariant, Badge,
-        Button, KeyValue,
+        Button, CircleCheck, Icon, KeyValue, Request, StopSign,
     },
     hooks::{
         use_accounts::use_accounts,
         use_initiative::{
-            use_initiative, InitiativeHistory, InitiativeInfoContent, InitiativeVoteContent,
-            InitiativeVoteData, Vote, VoteOf,
+            use_initiative, ActionItem, AddMembersAction, ConvictionVote, InitiativeHistory,
+            InitiativeInfoContent, InitiativeVoteContent, InitiativeVoteData, KusamaTreasury,
+            KusamaTreasuryAction, MemberItem, StandardVote, Vote, VoteOf, VoteType, VotingOpenGov,
+            VotingOpenGovAction,
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -204,9 +206,10 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
                 let Ok(preimage_len) = request_status_for(&initiative_metadata).await else {
                     continue;
-                }; 
+                };
 
-                let Ok(room_id_metadata) = preimage_for(&initiative_metadata, preimage_len).await else {
+                let Ok(room_id_metadata) = preimage_for(&initiative_metadata, preimage_len).await
+                else {
                     continue;
                 };
 
@@ -274,168 +277,356 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move { on_handle_vote.send(()) });
 
+    let requests = [
+        ActionItem::AddMembers(AddMembersAction {
+            members: vec![
+                MemberItem {
+                    medium: crate::hooks::use_initiative::MediumOptions::Wallet,
+                    account: "5Gq2VNFP4yqK1bk5zt552hBxU68Q3ABewGN99zY7qGbpVTFc".to_string(),
+                },
+                MemberItem {
+                    medium: crate::hooks::use_initiative::MediumOptions::Wallet,
+                    account: "5Gq2VNFP4yqK1bk5zt552hBxU68Q3ABewGN99zY7qGbpVTFc".to_string(),
+                },
+            ],
+        }),
+        ActionItem::KusamaTreasury(KusamaTreasuryAction {
+            periods: vec![
+                KusamaTreasury {
+                    date: "2024-12-10".to_string(),
+                    amount: 1_100_000_000_000,
+                },
+                KusamaTreasury {
+                    date: "2024-12-10".to_string(),
+                    amount: 20_000_000_000_000,
+                },
+            ],
+        }),
+        ActionItem::VotingOpenGov(VotingOpenGovAction {
+            proposals: vec![VotingOpenGov {
+                poll_index: 400,
+                vote: VoteType::Standard(StandardVote {
+                    aye: true,
+                    conviction: ConvictionVote::Locked1x,
+                    balance: 20_000_000_000_000,
+                }),
+            }],
+        }),
+    ];
+
+    let mut show_requests = use_signal(|| false);
+    let mut show_vote = use_signal(|| false);
+
     rsx! {
         div { class: "page--initiative",
             div { class: "initiative__form",
-                div { class: "form__wrapper form__wrapper--initiative",
-                    h2 { class: "form__title",
-                        {translate!(i18, "governance.title")}
-                    }
-                    if let Some(ref initiative) = &*initiative_wrapper.read() {
+                if let Some(ref initiative) = &*initiative_wrapper.read() {
+                    div { class: "form__wrapper form__wrapper--initiative",
+                        h2 { class: "form__title",
+                            "{initiative.info.name}"
+                        }
+                        div { class: "details__metadata",
+                            KeyValue {
+                                class: "key-value",
+                                text: format!("{}: ", translate!(i18, "governance.description.details.by")),
+                                size: ElementSize::Medium,
+                                variant: KeyValueVariant::Secondary,
+                                body: rsx!(
+                                    {
+                                        let hex_string = hex::encode(&initiative.ongoing.submission_deposit.who);
+                                        format!("0x{}", hex_string)
+                                    }
+                                )
+                            }
+                        }
                         div { class: "steps__wrapper",
                             div { class: "row",
-                                section { class: "details__proposal",
-                                    div { class: "vote-card",
-                                        div { class: "details__metadata",
-                                            KeyValue {
-                                                class: "key-value",
-                                                text: format!("{}: ", translate!(i18, "governance.description.details.by")),
-                                                size: ElementSize::Medium,
-                                                variant: KeyValueVariant::Secondary,
-                                                body: rsx!(
-                                                    {
-                                                        let hex_string = hex::encode(&initiative.ongoing.submission_deposit.who);
-                                                        format!("0x{}", hex_string)
+                                div { class: "vote-card",
+                                    h4 { class: "vote-card__title",
+                                        "Request"
+                                    }
+                                    button { class: "button--tertiary",
+                                        onclick: move |_| show_requests.toggle(),
+                                        Request {
+                                            name: if show_requests() { "Hide all requests" } else { "See all requests" },
+                                            details: "9",
+                                            size: ElementSize::Small
+                                        }
+                                    }
+                                    if show_requests() {
+                                        {
+                                            requests.iter().map(|request| {
+                                                rsx!(
+                                                    div { class: "requests",
+                                                        match request {
+                                                            ActionItem::AddMembers(action) => {
+                                                                rsx!(
+                                                                    Request {
+                                                                        name: "Add Members",
+                                                                        details: action.members.len().to_string()
+                                                                    }
+                                                                    ul { class: "requests",
+                                                                        {
+                                                                            action.members.iter().map(|member| {
+                                                                                rsx!(
+                                                                                    li {
+                                                                                        Request {
+                                                                                            name: format!("{}...", member.account[..10].to_string()),
+                                                                                        }
+                                                                                    }
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    }
+                                                                )
+                                                            },
+                                                            ActionItem::KusamaTreasury(action) => {
+                                                                rsx!(
+                                                                    Request {
+                                                                        name: "Kusama Treasury Request"
+                                                                    }
+                                                                    ul { class: "requests",
+                                                                        {
+                                                                            action.periods.iter().enumerate().map(|(index, period)| {
+                                                                                rsx!(
+                                                                                    li {
+                                                                                        Request {
+                                                                                            name: format!("Periodo: #{}", index),
+                                                                                            details: format!("{} KSM", period.amount as f64 / 1_000_000_000_000.0 )
+                                                                                        }
+                                                                                    }
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    }
+                                                                )
+                                                            },
+                                                            ActionItem::VotingOpenGov(action) => {
+                                                                rsx!(
+                                                                    Request {
+                                                                        name: "Voting Open Gov",
+                                                                        details: action.proposals.len().to_string()
+                                                                    }
+                                                                    ul { class: "requests",
+                                                                        {
+                                                                            action.proposals.iter().map(|proposal| {
+                                                                                rsx!(
+                                                                                    li {
+                                                                                        match &proposal.vote {
+                                                                                            VoteType::Standard(vote) => {
+                                                                                                let conviction = match vote.conviction {
+                                                                                                    ConvictionVote::None => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.none"),
+                                                                                                    ConvictionVote::Locked1x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_1"),
+                                                                                                    ConvictionVote::Locked2x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_2"),
+                                                                                                    ConvictionVote::Locked3x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_3"),
+                                                                                                    ConvictionVote::Locked4x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_4"),
+                                                                                                    ConvictionVote::Locked5x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_5"),
+                                                                                                    ConvictionVote::Locked6x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
+                                                                                                };
+                                                                                                rsx!(
+                                                                                                    Request {
+                                                                                                        name: format!("{} - {}", translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"), proposal.poll_index),
+                                                                                                        details: format!("{} - {}", conviction, vote.balance as f64 / 1_000_000_000_000.0 ),
+                                                                                                    }
+                                                                                                )
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    }
+                                                                )
+                                                            },
+                                                        }
                                                     }
                                                 )
-                                            }
+                                            })
                                         }
-                                        div { class: "details__tags",
-                                            div { class: "card__tags",
-                                                for tag in initiative.clone().info.tags {
-                                                    {
-                                                        rsx!(
-                                                            Badge {
-                                                                class: "badge--lavanda-dark",
-                                                                text: tag
+                                    }
+                                }
+                                div { class: "vote-card",
+                                    KeyValue {
+                                        class: "key-value--row",
+                                        text: translate!(i18, "governance.description.details.status.title"),
+                                        variant: KeyValueVariant::Secondary,
+                                        body: {
+                                            let status = ProposalStatus::VOTING;
+                                            let (badge_title, badge_color) = match status {
+                                                ProposalStatus::APPROVED => (translate!(i18, "governance.description.details.status.options.approved"), "badge--green-dark"),
+                                                ProposalStatus::REJECTED => (translate!(i18, "governance.description.details.status.options.rejected"), "badge--red-dark"),
+                                                ProposalStatus::VOTING => (translate!(i18, "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
+                                            };
+
+                                            rsx!(
+                                                Badge {
+                                                    text: badge_title,
+                                                    class: badge_color.to_string()
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                                section { class: "details__voting",
+                                    div { class: "vote-card",
+                                        div { class: "details__statistics",
+                                            div { class: "details__head",
+                                                h2 { class: "vote-card__title statistics__title",
+                                                    {translate!(i18, "governance.description.voting.title")}
+                                                }
+                                                Button {
+                                                    text: if show_vote() { "Hide vote" } else { "Vote" },
+                                                    size: ElementSize::Small,
+                                                    variant: Variant::Secondary,
+                                                    on_click: move |_| {
+                                                        show_vote.toggle();
+                                                    },
+                                                    status: None,
+                                                }
+                                            }
+                                            if show_vote() {
+                                                div { class: "badge badge--note",
+                                                    "Explain that this is a dynamic voting, and thresholds might change."
+                                                }
+                                            }
+                                            if show_vote() {
+                                            // if can_vote() {
+                                                div { class: "row",
+                                                    Button {
+                                                        class: "vote-cta",
+                                                        text: translate!(i18, "governance.description.voting.cta.for"),
+                                                        size: ElementSize::Medium,
+                                                        variant: Variant::Secondary,
+                                                        on_click: move |_| {
+                                                            handle_vote(true)
+                                                        },
+                                                        status: None,
+                                                        left_icon: rsx!(
+                                                            Icon {
+                                                                icon: CircleCheck,
+                                                                height: 16,
+                                                                width: 16,
+                                                                stroke_width: 2,
+                                                                stroke: "#56C95F"
                                                             }
+                                                        )
+                                                    }
+                                                    Button {
+                                                        class: "vote-cta",
+                                                        text: translate!(i18, "governance.description.voting.cta.against"),
+                                                        size: ElementSize::Medium,
+                                                        variant: Variant::Secondary,
+                                                        on_click: move |_| {
+                                                            handle_vote(false)
+                                                        },
+                                                        status: None,
+                                                        left_icon: rsx!(
+                                                            Icon {
+                                                                icon: StopSign,
+                                                                height: 16,
+                                                                width: 16,
+                                                                stroke_width: 2,
+                                                                stroke: "#f44336bd"
+                                                            }
+                                                        )
+                                                    }
+                                                }
+                                            // }
+                                            }
+                                            div {
+                                                div {
+                                                    class: "statistics__bar",
+                                                    span {
+                                                        class: "statistics__bar__content statistics__bar__content--aye",
+                                                        style: format!("width: {}%", votes_statistics().percent_aye()),
+                                                        p { class: "votes-counter__title",
+                                                            {translate!(i18, "governance.description.voting.for")}
+                                                        }
+                                                    }
+                                                    span {
+                                                        class: "statistics__bar__content statistics__bar__content--nay",
+                                                        style: format!("width: {}%", votes_statistics().percent_nay()),
+                                                        p { class: "votes-counter__title",
+                                                            {translate!(i18, "governance.description.voting.against")}
+                                                        }
+                                                    }
+                                                }
+                                                div {
+                                                    class: "statistics__bar__percent",
+                                                    p { class: "votes-counter__percent",
+                                                            {format!("{:.1}%", votes_statistics().percent_aye())}
+                                                    }
+                                                    p { class: "votes-counter__percent",
+                                                        {format!("{:.1}%", votes_statistics().percent_nay())}
+                                                    }
+                                                }
+                                            }
+                                            if show_vote() {
+                                                div {
+                                                    div { class: "votes-counter votes-counter--for",
+                                                        Icon {
+                                                            icon: CircleCheck,
+                                                            height: 16,
+                                                            width: 16,
+                                                            stroke_width: 2,
+                                                            stroke: "#56C95F"
+                                                        }
+                                                        p { class: "votes-counter__total",
+                                                            "{votes_statistics().aye} " {translate!(i18, "governance.description.voting.votes")}
+                                                        }
+                                                    }
+
+                                                    div { class: "votes-counter votes-counter--against",
+                                                        Icon {
+                                                            icon: StopSign,
+                                                            height: 16,
+                                                            width: 16,
+                                                            stroke_width: 2,
+                                                            stroke: "#f44336bd"
+                                                        }
+                                                        p { class: "votes-counter__total",
+                                                            "{votes_statistics().nay} " {translate!(i18, "governance.description.voting.votes")}
+                                                        }
+                                                    }
+                                                }
+
+                                                div { class: "statistics__card",
+
+                                                    KeyValue {
+                                                        class: "key-value--row",
+                                                        size: ElementSize::Small,
+                                                        text: translate!(i18, "governance.description.voting.total.title"),
+                                                        body: rsx!(
+                                                            "{votes_statistics().total()} " {translate!(i18, "governance.description.voting.total.voters")}
                                                         )
                                                     }
                                                 }
                                             }
                                         }
-
-                                        hr { class: "form__divider" }
-
-                                        div { class: "details__title",
-                                            "{initiative.info.name}"
-                                        }
-
-                                        div { class: "details__description markdown-preview",
-                                            dangerous_inner_html: "{html_buf}"
-                                        }
                                     }
                                 }
-
-                                section { class: "details__voting",
-                                    div { class: "vote-card",
-                                        KeyValue {
-                                            class: "key-value--row",
-                                            text: translate!(i18, "governance.description.details.status.title"),
-                                            variant: KeyValueVariant::Secondary,
-                                            body: {
-                                                let status = ProposalStatus::VOTING;
-                                                let (badge_title, badge_color) = match status {
-                                                    ProposalStatus::APPROVED => (translate!(i18, "governance.description.details.status.options.approved"), "badge--green-dark"),
-                                                    ProposalStatus::REJECTED => (translate!(i18, "governance.description.details.status.options.rejected"), "badge--red-dark"),
-                                                    ProposalStatus::VOTING => (translate!(i18, "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
-                                                };
-
+                            }
+                            section { class: "details__proposal",
+                                div { class: "details__subtitle",
+                                    "Content"
+                                }
+                                div { class: "details__tags",
+                                    div { class: "card__tags",
+                                        for tag in initiative.clone().info.tags {
+                                            {
                                                 rsx!(
                                                     Badge {
-                                                        text: badge_title,
-                                                        class: badge_color.to_string()
+                                                        class: "badge--lavanda-dark",
+                                                        text: tag
                                                     }
                                                 )
                                             }
                                         }
                                     }
-                                    div { class: "vote-card",
-                                        div { class: "details__statistics",
-                                            h2 { class: "statistics__title",
-                                                {translate!(i18, "governance.description.voting.title")}
-                                            }
-                                            div {
-                                                class: "statistics__bar",
-                                                class: if votes_statistics().percent_aye() > 50.0 {"statistics__bar--aye"} else {"statistics__bar--nay"},
-                                                div {
-                                                    class: "statistics__bar__content statistics__bar__content--aye",
-                                                    style: format!("width: {}%", votes_statistics().percent_aye())
-                                                }
-                                                div {
-                                                    class: "statistics__bar__content statistics__bar__content--nay",
-                                                    style: format!("width: {}%", votes_statistics().percent_nay())
-                                                }
-                                            }
-                                            div { class: "statistics__votes",
-                                                div { class: "votes-counter votes-counter--for",
-                                                    div { class: "votes-counter__line" }
-                                                    p { class: "votes-counter__title",
-                                                        {translate!(i18, "governance.description.voting.for")}
-                                                    }
-                                                    p { class: "votes-counter__percent",
-                                                        {format!("{:.2} %", votes_statistics().percent_aye())}
-                                                    }
-                                                    p { class: "votes-counter__total",
-                                                        "{votes_statistics().aye} " {translate!(i18, "governance.description.voting.votes")}
-                                                    }
-                                                }
+                                }
 
-                                                div { class: "votes-counter votes-counter--against",
-                                                    div { class: "votes-counter__line" }
-                                                    p { class: "votes-counter__title",
-                                                        {translate!(i18, "governance.description.voting.against")}
-                                                    }
-                                                    p { class: "votes-counter__percent",
-                                                    {format!("{:.2} %", votes_statistics().percent_nay())}
-                                                    }
-                                                    p { class: "votes-counter__total",
-                                                        "{votes_statistics().nay} " {translate!(i18, "governance.description.voting.votes")}
-                                                    }
-                                                }
-                                            }
-
-                                            hr { class: "form__divider" }
-
-                                            div { class: "statistics__card",
-
-                                                KeyValue {
-                                                    class: "key-value--row",
-                                                    size: ElementSize::Small,
-                                                    text: translate!(i18, "governance.description.voting.total.title"),
-                                                    body: rsx!(
-                                                        "{votes_statistics().total()} " {translate!(i18, "governance.description.voting.total.voters")}
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if can_vote() {
-                                        div { class: "vote-card",
-                                            div { class: "row",
-                                                Button {
-                                                    class: "",
-                                                    text: translate!(i18, "governance.description.voting.cta.for"),
-                                                    size: ElementSize::Small,
-                                                    variant: Variant::Secondary,
-                                                    on_click: move |_| {
-                                                        handle_vote(true)
-                                                    },
-                                                    status: None,
-                                                }
-                                                Button {
-                                                    class: "",
-                                                    text: translate!(i18, "governance.description.voting.cta.against"),
-                                                    size: ElementSize::Small,
-                                                    variant: Variant::Secondary,
-                                                    on_click: move |_| {
-                                                        handle_vote(false)
-                                                    },
-                                                    status: None,
-                                                }
-                                            }
-                                        }
-                                    }
+                                div { class: "details__description markdown-preview",
+                                    dangerous_inner_html: "{html_buf}"
                                 }
                             }
                         }
