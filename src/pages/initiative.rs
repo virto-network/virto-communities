@@ -17,7 +17,8 @@ use crate::{
     hooks::{
         use_initiative::{
             use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
-            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod,
+            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov,
+            VotingOpenGovAction,
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -52,6 +53,7 @@ extern "C" {
         membership_accounts_add: JsValue,
         membership_accounts_remove: JsValue,
         periods_treasury_request: JsValue,
+        proposals_voting_open_gov: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
 
@@ -302,6 +304,35 @@ pub fn Initiative(id: u16) -> Element {
 
                                 log::info!("treasury {:?}", treasury_action);
 
+                                let votiong_open_gov_action = initiative.get_actions().into_iter().filter_map(|action| {
+                                    match action {
+                                        ActionItem::VotingOpenGov(votiong_open_gov_action) => {
+                                            Some(votiong_open_gov_action.proposals.clone()
+                                            .into_iter()
+                                            .filter_map(|proposal|{
+                                                if proposal.poll_index > 0 {
+                                                    Some(proposal)
+                                                } else {
+                                                    None
+                                                }
+                                            })
+                                            .collect::<Vec<VotingOpenGov>>())
+                                        },
+                                        _ => None
+                                    }
+                                }).collect::<Vec<Vec<VotingOpenGov>>>();
+
+                                let votiong_open_gov_action = votiong_open_gov_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<VotingOpenGov>>();
+                                let votiong_open_gov_action = votiong_open_gov_action.into_iter().map(|v| v.serialize_vote_type()).collect::<Vec<serde_json::Value>>();
+
+                                log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
+
+                                let votiong_open_gov_action = convert_to_jsvalue(&votiong_open_gov_action)
+                                .map_err(|_| {
+                                    log::warn!("Malformed voting open gov");
+                                    translate!(i18, "errors.form.initiative_creation")
+                                })?;
+
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                 .map_err(|_| {
                                     log::warn!("Malformed membership accounts add");
@@ -340,11 +371,11 @@ pub fn Initiative(id: u16) -> Element {
                                     membership_accounts_add,
                                     membership_accounts_remove,
                                     treasury_action,
+                                    votiong_open_gov_action
                                 )
                                 .await;
 
-                                // log::info!("response initiative: {:?}", response);
-                                // tooltip.hide();
+                                tooltip.hide();
 
                                 let path = format!("/dao/{id}/initiatives");
                                 nav.push(vec![], &path);
@@ -422,4 +453,3 @@ fn convert_treasury_to_period(
         }
     }
 }
-

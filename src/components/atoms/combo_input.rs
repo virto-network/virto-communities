@@ -25,6 +25,7 @@ pub struct ComboInputProps {
     value: ComboInputValue,
     placeholder: String,
     error: Option<String>,
+    options: Option<Vec<DropdownItem>>,
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
     left_text: Option<Element>,
@@ -39,12 +40,18 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
     let mut input_value = use_signal::<String>(|| props.value.input.clone());
 
     let mut items = vec![];
-    let dropdown_options = vec![DropdownItem {
-        key: "Wallet".to_string(),
-        value: translate!(i18, "onboard.invite.form.wallet.label"),
-    }];
+    let dropdown_options = use_signal::<Vec<DropdownItem>>(|| {
+        let Some(options) = props.options else {
+            return vec![DropdownItem {
+                key: "Wallet".to_string(),
+                value: translate!(i18, "onboard.invite.form.wallet.label"),
+            }];
+        };
 
-    for account in dropdown_options.clone().into_iter() {
+        options
+    });
+
+    for account in dropdown_options().clone().into_iter() {
         items.push(rsx!(span {
             "{account.value}"
         }))
@@ -77,7 +84,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                             size: props.size.clone(),
                             default: None,
                             on_change: move |event: usize| {
-                                let to_assign = &dropdown_options[event];
+                                let to_assign = &dropdown_options()[event];
                                 option_value.set(ComboInputOption::Dropdown(to_assign.clone()));
                                 props.on_change.call(ComboInputValue { option: ComboInputOption::Dropdown(to_assign.clone()), input: input_value().clone() })
                             },

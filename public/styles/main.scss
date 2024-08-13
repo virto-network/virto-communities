@@ -221,6 +221,10 @@ $fw-bold: 700;
 
 .bg--fill-600 {
     background: var(--fill-600) !important;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: 100%;
 }
 
 .bg--fill-50 {
@@ -456,6 +460,31 @@ $fw-bold: 700;
     gap: 16px;
     align-self: stretch;
     padding: 44px 0;
+}
+
+.form__inputs__wrapper {
+    width: 100%;
+}
+
+.form__inputs__wrapper>* {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.form__inputs__wrapper:first-child {
+    margin-top: 0;
+}
+
+.form__inputs__container__cta {
+    margin-top: 4px;
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.form__inputs__container {
+    display: flex;
+    gap: 4px;
 }
 
 .form__inputs__disclaimer {
@@ -1663,9 +1692,7 @@ textarea::placeholder {
     color: var(--text-secondary);
 }
 
-
-// here
-
+.radio-button,
 .step-card {
     background: var(--fill-50);
     border: none;
@@ -1700,13 +1727,17 @@ textarea::placeholder {
     align-items: center;
 }
 
+.radio-button__header,
 .step-card__header {
     display: flex;
-    justify-content: space-between;
     width: 100%;
     gap: 8px;
     padding: 12px;
     align-items: center;
+}
+
+.step-card__header {
+    justify-content: space-between;
 }
 
 .step-card__info {
@@ -1727,16 +1758,19 @@ textarea::placeholder {
     justify-content: center;
 }
 
+.radio-button__cta,
 .step__cta {
     position: absolute;
     right: 20px;
     top: 20px;
 }
 
+.radio-button input[type='radio'],
 .step-card input[type='radio'] {
     display: none;
 }
 
+.radio-custom,
 .step-custom {
     position: relative;
     width: 20px;
@@ -1748,6 +1782,7 @@ textarea::placeholder {
     box-shadow: 0px 0.5px 0px 0px rgba(26, 26, 26, 0.08), 0px 1px 3px 0px rgba(26, 26, 26, 0.08);
 }
 
+.radio-button input[type='radio']:checked+.radio-button__header>.radio-custom:after,
 .step-card input[type='radio']:checked+.step-card__header>.step-custom:after {
     border-radius: 11px;
     width: 12px;
@@ -1760,6 +1795,7 @@ textarea::placeholder {
     background: var(--white);
 }
 
+.radio-button input[type='radio']:checked+.radio-button__header>.radio-custom,
 .step-card input[type='radio']:checked+.step-card__header>.step-custom {
     border: 1px solid #4BAA54;
     background: var(--state-primary-active);
@@ -1807,23 +1843,21 @@ textarea::placeholder {
 }
 
 .combo-input .dropdown__container {
-    border-radius: 0;
+    border-radius: 12px 0 0 12px;
     background: var(--fill-200);
 }
 
 .combo-input .input-wrapper {
     background: var(--fill-00);
-    border-radius: 0;
+    border-radius: 0 12px 12px 0;
     margin: 0;
     box-shadow: none;
 }
 
 .combo-input {
     display: flex;
-    border-radius: 12px;
     width: 100%;
     border: none;
-    overflow: hidden;
 }
 
 .combo-input--reverse {
@@ -2584,10 +2618,10 @@ textarea::placeholder {
 
     .page {
         grid-template-areas:
-        "header"
-        "main"
-        "footer"
-        "sidebar";
+            "header"
+            "main"
+            "footer"
+            "sidebar";
         grid-template-rows: 80px auto 1fr 80px;
     }
 
