@@ -50,55 +50,6 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                         on_keypress: move |_| {},
                                         on_click: move |_| {},
                                     }
-                                    // ComboInput {
-                                    //     size: ElementSize::Small,
-                                    //     value: ComboInputValue {
-                                    //         option: ComboInputOption::Dropdown(DropdownItem {
-                                    //             key: "Standard".to_string(),
-                                    //             value: "Standard".to_string(),
-                                    //         }),
-                                    //         input: proposal.poll_index.to_string()
-                                    //     },
-                                    //     placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
-                                    //     options: vec![
-                                    //         DropdownItem {
-                                    //             key: "Standard".to_string(),
-                                    //             value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"),
-                                    //         },
-                                    //         DropdownItem {
-                                    //             key: "Split".to_string(),
-                                    //             value: translate!(i18, "initiative.steps.actions.voting_open_gov.split.title"),
-                                    //         },
-                                    //         DropdownItem {
-                                    //             key: "SplitAbstain".to_string(),
-                                    //             value: translate!(i18, "initiative.steps.actions.voting_open_gov.split_abstain.title"),
-                                    //         }
-                                    //     ],
-                                    //     on_change: move |event: ComboInputValue| {
-                                    //         if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
-                                    //             let vote = match event.option {
-                                    //                 ComboInputOption::Dropdown(value) => {
-                                    //                     if value.key.as_str() == meta.proposals[index_meta].vote.key_string() {
-                                    //                         meta.proposals[index_meta].vote.clone()
-                                    //                     } else {
-                                    //                         match value.key.as_str() {
-                                    //                             "Standard" => VoteType::Standard(StandardVote::default())
-                                    //                         }
-                                    //                     }
-
-                                    //                 },
-                                    //                 _ => todo!()
-                                    //             };
-
-                                    //             let poll_index: u64 = event.input.parse().unwrap_or(0);
-                                    //             meta.proposals[index_meta] = VotingOpenGov {
-                                    //                 poll_index,
-                                    //                 vote: vote
-                                    //             };
-                                    //             initiative.update_action(props.index, ActionItem::VotingOpenGov(meta.clone()));
-                                    //         }
-                                    //     }
-                                    // }
                                 }
                                 div {
                                     match &proposal.vote {

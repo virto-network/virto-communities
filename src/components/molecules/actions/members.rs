@@ -21,9 +21,6 @@ pub fn MembersAction(props: VotingProps) -> Element {
     let i18 = use_i18();
     let mut initiative = use_initiative();
 
-    // let mut option_value = use_signal(|| props.value.option.clone());
-    // let mut input_value = use_signal::<String>(|| props.value.input.clone());
-
     rsx!(
         ul { class: "form__inputs form__inputs--combo",
             {
