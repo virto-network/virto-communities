@@ -1,8 +1,8 @@
-name: Deploy
+name: Deploy Prod
 
 on:
   workflow_run:
-    workflows: ["Build"]
+    workflows: ["Build Prod"]
     types:
       - completed
 
@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup GitHub CLI
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Extract artifact URL
         id: extract_url
         run: |
-          ARTIFACT_URL=$(jq -r '.artifacts[] | select(.name=="build-artifact") | .archive_download_url' artifacts.json | head -n 1)
+          ARTIFACT_URL=$(jq -r '.artifacts[] | select(.name=="build-artifact-prod") | .archive_download_url' artifacts.json | head -n 1)
           echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
 
       - name: Download artifact
@@ -43,10 +43,8 @@ jobs:
           unzip artifact.zip -d dist
 
       - name: Publish Cloudflare
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: virto-communities
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy dist --project-name=${{ vars.PROJECT_NAME }} --branch=${{ vars.BRANCH_PROD }} --commit-dirty=true

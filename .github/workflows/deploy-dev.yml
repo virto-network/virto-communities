@@ -1,0 +1,50 @@
+name: Deploy Dev
+
+on:
+  workflow_run:
+    workflows: ["Build Dev"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" > ~/.github_token
+          gh auth login --with-token < ~/.github_token
+
+      - name: List artifacts
+        id: list_artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -H "Accept: application/vnd.github.v3+json" /repos/${{ github.repository }}/actions/artifacts > artifacts.json
+
+      - name: Extract artifact URL
+        id: extract_url
+        run: |
+          ARTIFACT_URL=$(jq -r '.artifacts[] | select(.name=="build-artifact-dev") | .archive_download_url' artifacts.json | head -n 1)
+          echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
+
+      - name: Download artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p dist
+          curl -L -H "Authorization: token $GITHUB_TOKEN" -o artifact.zip ${{ env.ARTIFACT_URL }}
+          unzip artifact.zip -d dist
+
+      - name: Publish Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ vars.PROJECT_NAME }} --branch=${{ vars.BRANCH_DEV }} --commit-dirty=true

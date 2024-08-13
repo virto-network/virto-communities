@@ -1,0 +1,40 @@
+name: Build Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install latest
+        uses: dtolnay/rust-toolchain@master
+        with:
+            toolchain: nightly
+            target: wasm32-unknown-unknown
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Install dependencies
+        run: cargo install dioxus-cli@0.5.0
+
+      - name: Build
+        run: dx build --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact-dev
+          path: ./dist
+  
