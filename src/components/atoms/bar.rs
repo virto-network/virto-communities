@@ -22,17 +22,17 @@ pub struct BarProps {
 
 pub fn Bar(props: BarProps) -> Element {
     let variant = match props.variant {
-        Variant::Remaign => "statistics__bar--remaign",
-        Variant::Vote => "statistics__bar--vote",
-        Variant::Participation => "statistics__bar--participation",
+        Variant::Remaign => "bar--remaign",
+        Variant::Vote => "bar--vote",
+        Variant::Participation => "bar--participation",
     };
 
     rsx!(
         section {
             div {
-                class: "statistics__bar {variant}",
+                class: "bar {variant}",
                 span {
-                    class: "statistics__bar__content statistics__bar__content--left",
+                    class: "bar__content bar__content--left",
                     style: format!("width: {}%", props.left_value),
                     p { class: "votes-counter__title",
                         {props.left_helper}
@@ -40,12 +40,12 @@ pub fn Bar(props: BarProps) -> Element {
                 }
                 if let Some(value) = props.center_value {
                     span {
-                        class: "statistics__bar__content__threshold",
+                        class: "bar__content__threshold",
                         style: format!("left: {}%", value),
                     }
                 }
                 span {
-                    class: "statistics__bar__content statistics__bar__content--right",
+                    class: "bar__content bar__content--right",
                     style: format!("width: {}%", props.right_value),
                     p { class: "votes-counter__title",
                         {props.right_helper}
@@ -53,7 +53,7 @@ pub fn Bar(props: BarProps) -> Element {
                 }
             }
             div {
-                class: "statistics__bar__percent",
+                class: "bar__percent",
                 p { class: "votes-counter__percent",
                     {props.left_title}
                 }

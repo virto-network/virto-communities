@@ -7,7 +7,7 @@ use futures_util::{StreamExt, TryFutureExt};
 use crate::{
     components::atoms::{
         button::Variant, dropdown::ElementSize, key_value::Variant as KeyValueVariant, Badge, Bar,
-        Button, CircleCheck, Icon, KeyValue, Request, StopSign,
+        Button, CircleCheck, Icon, KeyValue, ActionRequest, StopSign,
     },
     hooks::{
         use_initiative::{
@@ -305,7 +305,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                         }
                                         button { class: "button--tertiary",
                                             onclick: move |_| show_requests.toggle(),
-                                            Request {
+                                            ActionRequest {
                                                 name: if show_requests() { "Hide all requests" } else { "See all requests" },
                                                 details: initiative_wrapper.info.actions.iter().map(|item| {
                                                     match item {
@@ -325,7 +325,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                             match request {
                                                                 ActionItem::AddMembers(action) => {
                                                                     rsx!(
-                                                                        Request {
+                                                                        ActionRequest {
                                                                             name: "Add Members",
                                                                             details: action.members.len().to_string()
                                                                         }
@@ -334,7 +334,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                                                 action.members.iter().map(|member| {
                                                                                     rsx!(
                                                                                         li {
-                                                                                            Request {
+                                                                                            ActionRequest {
                                                                                                 name: format!("{}...", member.account[..10].to_string()),
                                                                                             }
                                                                                         }
@@ -346,7 +346,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                                 },
                                                                 ActionItem::KusamaTreasury(action) => {
                                                                     rsx!(
-                                                                        Request {
+                                                                        ActionRequest {
                                                                             name: "Kusama Treasury Request"
                                                                         }
                                                                         ul { class: "requests",
@@ -354,7 +354,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                                                 action.periods.iter().enumerate().map(|(index, period)| {
                                                                                     rsx!(
                                                                                         li {
-                                                                                            Request {
+                                                                                            ActionRequest {
                                                                                                 name: format!("Periodo: #{}", index + 1),
                                                                                                 details: format!("{} KSM", period.amount as f64 / 1_000_000_000_000.0 )
                                                                                             }
@@ -367,7 +367,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                                 },
                                                                 ActionItem::VotingOpenGov(action) => {
                                                                     rsx!(
-                                                                        Request {
+                                                                        ActionRequest {
                                                                             name: "Voting Open Gov",
                                                                             details: action.proposals.len().to_string()
                                                                         }
@@ -388,7 +388,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                                                                         ConvictionVote::Locked6x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
                                                                                                     };
                                                                                                     rsx!(
-                                                                                                        Request {
+                                                                                                        ActionRequest {
                                                                                                             name: format!("{} - {}", translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"), proposal.poll_index),
                                                                                                             details: format!("{} - {} KSM", conviction, vote.balance as f64 / 1_000_000_000_000.0 ),
                                                                                                         }

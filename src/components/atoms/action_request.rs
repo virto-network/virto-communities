@@ -10,21 +10,21 @@ pub struct RequestProps {
     size: ElementSize,
 }
 
-pub fn Request(props: RequestProps) -> Element {
+pub fn ActionRequest(props: RequestProps) -> Element {
     let size = match props.size {
-        ElementSize::Big => "vote-card__request--big",
-        ElementSize::Medium => "vote-card__request--medium",
-        ElementSize::Small => "vote-card__request--small",
+        ElementSize::Big => "action-request--big",
+        ElementSize::Medium => "action-request--medium",
+        ElementSize::Small => "action-request--small",
     };
 
     rsx!(
         div {
-            class: "vote-card__request {size}",
-            span { class: "vote-card__request__title",
+            class: "action-request {size}",
+            span { class: "action-request__title",
                 {props.name}
             }
             if let Some(details) = props.details {
-                span { class: "vote-card__request__details",
+                span { class: "action-request__details",
                     {details}
                 }
             }

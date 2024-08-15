@@ -923,7 +923,7 @@ $fw-bold: 700;
     color: var(--text-secondary);
 }
 
-.statistics__bar {
+.bar {
     width: 100%;
     border-radius: 16px;
     display: flex;
@@ -931,46 +931,46 @@ $fw-bold: 700;
     position: relative;
 }
 
-.statistics__bar--vote {
+.bar--vote {
     background: #f44336bd;
 }
 
-.statistics__bar--vote > .statistics__bar__content--left {
+.bar--vote > .bar__content--left {
     background: #56C95F;
 }
 
 
-.statistics__bar--remaign {
+.bar--remaign {
     background: #c7eedb;
 }
 
-.statistics__bar--remaign > .statistics__bar__content--left {
+.bar--remaign > .bar__content--left {
     background: #89c3e9;
 }
 
-.statistics__bar--participation {
+.bar--participation {
     background: var(--white);
 }
 
-.statistics__bar__content__threshold {
+.bar__content__threshold {
     width: 1px;
     height: 18px;
     background: black;
     position: absolute;
 }
 
-.statistics__bar__percent {
+.bar__percent {
     width: 100%;
     border-radius: 16px;
     display: flex;
     justify-content: space-between;
 }
 
-.statistics__bar__content {
+.bar__content {
     display: inline-block;
 }
 
-.statistics__bar__content--right {
+.bar__content--right {
     &>p {
         text-align: right;
     }
@@ -1072,7 +1072,7 @@ $fw-bold: 700;
     gap: 8px;
 }
 
-.vote-card__request {
+.action-request {
     background: var(--white);
     display: flex;
     justify-content: space-between;
@@ -1080,24 +1080,24 @@ $fw-bold: 700;
     padding: 0 8px;
 }
 
-.vote-card__request--big {
+.action-request--big {
     border-radius: 12px;
 }
 
-.vote-card__request--medium {
+.action-request--medium {
     border-radius: 12px;
 }
 
-.vote-card__request--small {
+.action-request--small {
     border-radius: 100px;
 }
 
-.vote-card__request__title {
+.action-request__title {
     @extend %text-base-font-regular;
     color: var(--text-tertiary);
 }
 
-.vote-card__request__details {
+.action-request__details {
     @extend %text-xs-font-regular;
     line-height: normal;
     color: var(--text-tertiary);
@@ -1433,7 +1433,7 @@ $fw-bold: 700;
 
 .dropdown__container--big,
 .button--big,
-.vote-card__request--big,
+.action-request--big,
 .tab--big,
 .input-wrapper__container--big,
 .icon-button--big {
@@ -1447,7 +1447,7 @@ $fw-bold: 700;
 
 .dropdown__container--medium,
 .button--medium,
-.vote-card__request--medium,
+.action-request--medium,
 .tab--medium,
 .input-wrapper__container--medium,
 .icon-button--medium {
@@ -1459,7 +1459,7 @@ $fw-bold: 700;
 .dropdown__container--small,
 .button--small,
 .tab--small,
-.vote-card__request--small,
+.action-request--small,
 .input-wrapper__container--small,
 .icon-button--small {
     @extend %text-sm-font-semibold;
