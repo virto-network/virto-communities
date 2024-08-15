@@ -116,6 +116,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let mut current_block = use_signal(|| 0);
     let mut track_info = use_signal(|| None);
     let mut members = use_signal(|| 0);
+    let mut room_id = use_signal(|| None);
 
     let cont = &*content.read();
     let parser = pulldown_cmark::Parser::new(cont);
@@ -154,10 +155,6 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
             };
 
             members.set(item_details);
-
-            if community_tracks.iter().any(|community| community.id == id) {
-                can_vote.set(true);
-            }
 
             // get current block
             let Ok(block) = number().await else {
@@ -227,12 +224,18 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     continue;
                 };
 
+                room_id.set(Some(room_id_metadata));
+
                 content.set(response.info.description.clone());
 
                 log::info!("{:#?}", response);
                 wrapper.info = response.info.clone();
 
                 initiative_wrapper.set(Some(wrapper.clone()));
+            }
+
+            if community_tracks.iter().any(|community| community.id == id) {
+                can_vote.set(true);
             }
         }
     });
@@ -263,18 +266,24 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .await
                     .map_err(|_| translate!(i18, "errors.wallet.account_address"))?;
 
-                spaces_client
-                    .get()
-                    .vote_initiative(InitiativeVoteData {
-                        user: account_address,
-                        room: String::from("!aOgBsDPlVOIDTisUsJ:matrix.org"),
-                        vote: Vote::Standard(if is_vote_aye { VoteOf::Yes } else { VoteOf::No }),
-                    })
-                    .await
-                    .map_err(|e| {
-                        log::warn!("Failed to persist vote: {:?}", e);
-                        translate!(i18, "errors.vote.persist_failed")
-                    })?;
+                if let Some(room_id) = room_id() {
+                    spaces_client
+                        .get()
+                        .vote_initiative(InitiativeVoteData {
+                            user: account_address,
+                            room: room_id,
+                            vote: Vote::Standard(if is_vote_aye {
+                                VoteOf::Yes
+                            } else {
+                                VoteOf::No
+                            }),
+                        })
+                        .await
+                        .map_err(|e| {
+                            log::warn!("Failed to persist vote: {:?}", e);
+                            translate!(i18, "errors.vote.persist_failed")
+                        })?;
+                }
 
                 topup_then_initiative_vote(membership_id, initiativeid, is_vote_aye)
                     .await
@@ -479,7 +488,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
                                                     let decision = match &*track_info.read() {
                                                         Some(info) => info.decision_period,
-                                                        None => 0
+                                                        None => 36000
                                                     };
 
 
