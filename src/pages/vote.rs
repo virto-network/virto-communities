@@ -6,7 +6,7 @@ use futures_util::{StreamExt, TryFutureExt};
 
 use crate::{
     components::atoms::{
-        button::Variant, dropdown::ElementSize, key_value::Variant as KeyValueVariant, Badge,
+        button::Variant, dropdown::ElementSize, key_value::Variant as KeyValueVariant, Badge, Bar,
         Button, CircleCheck, Icon, KeyValue, Request, StopSign,
     },
     hooks::{
@@ -18,72 +18,18 @@ use crate::{
         use_our_navigator::use_our_navigator,
         use_session::use_session,
         use_spaces_client::use_spaces_client,
-        use_tooltip::{use_tooltip, TooltipItem},
+        use_tooltip::{use_tooltip, TooltipItem}, use_vote::{ProposalStatus, VoteDigest},
     },
     pages::initiatives::InitiativeWrapper,
     services::kreivo::{
         community_memberships::{get_communities_by_member, get_membership_id, item},
-        community_referenda::{metadata_of, referendum_info_for},
-        community_track::{tracks, Curve},
+        community_referenda::{metadata_of, referendum_info_for, Deciding},
+        community_track::{tracks, TrackInfo},
         preimage::{preimage_for, request_status_for},
         system::number,
     },
 };
 use wasm_bindgen::prelude::*;
-
-#[derive(Clone, Debug)]
-pub enum InitiativeStep {
-    Info,
-    Actions,
-    Settings,
-    Confirmation,
-    None,
-}
-
-#[derive(Clone, Debug)]
-pub enum ProposalStatus {
-    APPROVED,
-    REJECTED,
-    VOTING,
-    QUEUE,
-}
-
-#[derive(Clone, Debug)]
-pub enum BadgeColor {
-    YELLOW,
-    RED,
-    GREEN,
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct VoteDigest {
-    pub aye: u64,
-    pub nay: u64,
-}
-
-impl VoteDigest {
-    fn total(&self) -> u64 {
-        self.aye + self.nay
-    }
-
-    fn percent_aye(&self) -> f64 {
-        if self.total() > 0 {
-            let percent_unit = 100.0 / self.total() as f64;
-            percent_unit * self.aye as f64
-        } else {
-            50.0
-        }
-    }
-
-    fn percent_nay(&self) -> f64 {
-        if self.total() > 0 {
-            let percent_unit = 100.0 / self.total() as f64;
-            percent_unit * self.nay as f64
-        } else {
-            50.0
-        }
-    }
-}
 
 #[wasm_bindgen]
 extern "C" {
@@ -110,13 +56,16 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let mut can_vote = use_signal(|| false);
 
     let mut show_requests = use_signal(|| false);
-    let mut show_vote = use_signal(|| false);
+    let mut show_vote = use_signal(|| true);
 
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
     let mut current_block = use_signal(|| 0);
     let mut track_info = use_signal(|| None);
     let mut members = use_signal(|| 0);
     let mut room_id = use_signal(|| None);
+
+    let mut approval_threshold = use_signal(|| 100.0);
+    let mut participation_threshold = use_signal(|| 100.0);
 
     let cont = &*content.read();
     let parser = pulldown_cmark::Parser::new(cont);
@@ -187,8 +136,27 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                         actions: vec![],
                     },
                     ongoing: response.ongoing,
-                }))
+                }));
             };
+
+            let threshold = get_approval_threshold(
+                &*track_info.read(),
+                &initiative_wrapper.unwrap().ongoing.deciding,
+                current_block(),
+            );
+
+            approval_threshold.set(threshold);
+
+            let threshold = get_participation_threshold(
+                &*track_info.read(),
+                &initiative_wrapper.unwrap().ongoing.deciding,
+                current_block(),
+            );
+            participation_threshold.set(threshold);
+
+            if community_tracks.iter().any(|community| community.id == id) {
+                can_vote.set(true);
+            }
 
             if let Some(wrapper) = initiative_wrapper() {
                 votes_statistics.set(VoteDigest::default());
@@ -228,14 +196,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
                 content.set(response.info.description.clone());
 
-                log::info!("{:#?}", response);
                 wrapper.info = response.info.clone();
 
                 initiative_wrapper.set(Some(wrapper.clone()));
-            }
-
-            if community_tracks.iter().any(|community| community.id == id) {
-                can_vote.set(true);
             }
         }
     });
@@ -491,40 +454,23 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         None => 36000
                                                     };
 
-
                                                     let consumed_percent = 100.0 / decision as f64 * consumed as f64;
 
                                                     rsx!(
-                                                        div {
-                                                            class: "statistics__bar statistics__bar--remaign",
-                                                                span {
-                                                                    class: "statistics__bar__content statistics__bar__content--consumed",
-                                                                    style: format!("width: {}%", consumed_percent),
-                                                                }
-                                                                span {
-                                                                    class: "statistics__bar__content statistics__bar__content--right",
-                                                                    style: format!("width: {}%", 100.0 - consumed_percent),
-                                                                    p { class: "votes-counter__title",
-                                                                        if blocks_to_days(decision - consumed) == 0 {
-                                                                            "{blocks_to_days(decision - consumed) + 1}"
-                                                                        } else {
-                                                                            "{blocks_to_days(decision - consumed)}"
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                            div {
-                                                                class: "statistics__bar__percent",
-                                                                p { class: "votes-counter__percent",
-                                                                "Decision"
-                                                            }
-                                                            p { class: "votes-counter__percent",
-                                                                match blocks_to_times(decision) {
-                                                                    Times::Minutes(time) => {format!("{} Minutes", time)},
-                                                                    Times::Hours(time) => {format!("{} Hours", time)},
-                                                                    Times::Days(time) => {format!("{} Days", time)},
-                                                                }
-                                                            }
+                                                        Bar {
+                                                            left_value: consumed_percent,
+                                                            right_value: 100.0 - consumed_percent,
+                                                            right_helper: if blocks_to_days(decision - consumed) == 0 {
+                                                                format!("{}", blocks_to_days(decision - consumed) + 1)
+                                                            } else {
+                                                                format!("{}", blocks_to_days(decision - consumed))
+                                                            },
+                                                            left_title: "Decision",
+                                                            right_title: match blocks_to_times(decision) {
+                                                                Times::Minutes(time) => {format!("{} Minutes", time)},
+                                                                Times::Hours(time) => {format!("{} Hours", time)},
+                                                                Times::Days(time) => {format!("{} Days", time)},
+                                                            },
                                                         }
                                                     )
                                                 }
@@ -555,76 +501,58 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 }
                                             }
                                             if show_vote() {
-                                            // if can_vote() {
-                                                div { class: "row",
-                                                    Button {
-                                                        class: "vote-cta",
-                                                        text: translate!(i18, "governance.description.voting.cta.for"),
-                                                        size: ElementSize::Medium,
-                                                        variant: Variant::Secondary,
-                                                        on_click: move |_| {
-                                                            handle_vote(true)
-                                                        },
-                                                        status: None,
-                                                        left_icon: rsx!(
-                                                            Icon {
-                                                                icon: CircleCheck,
-                                                                height: 16,
-                                                                width: 16,
-                                                                stroke_width: 2,
-                                                                stroke: "#56C95F"
-                                                            }
-                                                        )
-                                                    }
-                                                    Button {
-                                                        class: "vote-cta",
-                                                        text: translate!(i18, "governance.description.voting.cta.against"),
-                                                        size: ElementSize::Medium,
-                                                        variant: Variant::Secondary,
-                                                        on_click: move |_| {
-                                                            handle_vote(false)
-                                                        },
-                                                        status: None,
-                                                        left_icon: rsx!(
-                                                            Icon {
-                                                                icon: StopSign,
-                                                                height: 16,
-                                                                width: 16,
-                                                                stroke_width: 2,
-                                                                stroke: "#f44336bd"
-                                                            }
-                                                        )
+                                                if can_vote() {
+                                                    div { class: "row",
+                                                        Button {
+                                                            class: "vote-cta",
+                                                            text: translate!(i18, "governance.description.voting.cta.for"),
+                                                            size: ElementSize::Medium,
+                                                            variant: Variant::Secondary,
+                                                            on_click: move |_| {
+                                                                handle_vote(true)
+                                                            },
+                                                            status: None,
+                                                            left_icon: rsx!(
+                                                                Icon {
+                                                                    icon: CircleCheck,
+                                                                    height: 16,
+                                                                    width: 16,
+                                                                    stroke_width: 2,
+                                                                    stroke: "#56C95F"
+                                                                }
+                                                            )
+                                                        }
+                                                        Button {
+                                                            class: "vote-cta",
+                                                            text: translate!(i18, "governance.description.voting.cta.against"),
+                                                            size: ElementSize::Medium,
+                                                            variant: Variant::Secondary,
+                                                            on_click: move |_| {
+                                                                handle_vote(false)
+                                                            },
+                                                            status: None,
+                                                            left_icon: rsx!(
+                                                                Icon {
+                                                                    icon: StopSign,
+                                                                    height: 16,
+                                                                    width: 16,
+                                                                    stroke_width: 2,
+                                                                    stroke: "#f44336bd"
+                                                                }
+                                                            )
+                                                        }
                                                     }
                                                 }
-                                            // }
                                             }
-                                            div {
-                                                div {
-                                                    class: "statistics__bar statistics__bar--vote",
-                                                    span {
-                                                        class: "statistics__bar__content statistics__bar__content--aye",
-                                                        style: format!("width: {}%", votes_statistics().percent_aye()),
-                                                        p { class: "votes-counter__title",
-                                                            {translate!(i18, "governance.description.voting.for")}
-                                                        }
-                                                    }
-                                                    span {
-                                                        class: "statistics__bar__content statistics__bar__content--nay statistics__bar__content--right",
-                                                        style: format!("width: {}%", votes_statistics().percent_nay()),
-                                                        p { class: "votes-counter__title",
-                                                            {translate!(i18, "governance.description.voting.against")}
-                                                        }
-                                                    }
-                                                }
-                                                div {
-                                                    class: "statistics__bar__percent",
-                                                    p { class: "votes-counter__percent",
-                                                        {format!("{:.1}%", votes_statistics().percent_aye())}
-                                                    }
-                                                    p { class: "votes-counter__percent",
-                                                        {format!("{:.1}%", votes_statistics().percent_nay())}
-                                                    }
-                                                }
+                                            Bar {
+                                                left_value: votes_statistics().percent_aye(),
+                                                center_value: approval_threshold(),
+                                                right_value: votes_statistics().percent_nay(),
+                                                left_helper: translate!(i18, "governance.description.voting.for"),
+                                                right_helper: translate!(i18, "governance.description.voting.against"),
+                                                left_title: format!("{:.1}%", votes_statistics().percent_aye()),
+                                                right_title: format!("{:.1}%", votes_statistics().percent_nay()),
+                                                variant: crate::components::atoms::bar::Variant::Vote
                                             }
                                             if show_vote() {
                                                 div { class: "note",
@@ -634,35 +562,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         size: ElementSize::Medium,
                                                         body: rsx!(
                                                             {
-                                                                let threshold = match &*track_info.read() {
-                                                                    Some(info) => {
-                                                                        if let Some(deciding) = &initiative_wrapper.ongoing.deciding {
-                                                                            if  current_block() > 0 {
-                                                                                let consumed = current_block() - deciding.since;
-                                                                                let progress = consumed as f64 / 36000.0;
-
-                                                                                match info.min_approval {
-                                                                                    Curve::LinearDecreasing { ceil, floor, length } => {
-                                                                                        let length = length as f64 / 10_000_000.0;
-                                                                                        let ceil = ceil as f64 / 10_000_000.0;
-                                                                                        let floor = floor as f64 / 10_000_000.0;
-
-                                                                                        let progress = progress / (length / 100.0);
-                                                                                        ceil - progress * (ceil - floor)
-                                                                                    },
-                                                                                    Curve::SteppedDecreasing { begin: _, end: _, step: _, period: _ } => 100.0,
-                                                                                    Curve::Reciprocal { factor: _, x_offset: _, y_offset: _ } => 100.0,
-                                                                                }
-                                                                            } else {
-                                                                                0.0
-                                                                            }
-                                                                        } else {
-                                                                            0.0
-                                                                        }
-                                                                    },
-                                                                    None => 0.0
-                                                                };
-                                                                format!("{:.1}%", threshold)
+                                                                format!("{:.1}%", approval_threshold())
                                                             }
                                                         )
                                                     }
@@ -710,30 +610,14 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 div {
                                                     {
                                                         let consumed_percent =  100.0 / members() as f64 * votes_statistics().total() as f64;
-
                                                         rsx!(
-                                                            div {
-                                                                class: "statistics__bar statistics__bar--remaign",
-                                                                    span {
-                                                                        class: "statistics__bar__content statistics__bar__content--consumed",
-                                                                        style: format!("width: {}%", consumed_percent),
-                                                                        p { class: "votes-counter__title",
-                                                                            "Participation"
-                                                                        }
-                                                                    }
-                                                                    span {
-                                                                        class: "statistics__bar__content statistics__bar__content--right",
-                                                                        style: format!("width: {}%", 100.0 - consumed_percent),
-                                                                    }
-                                                                }
-                                                                div {
-                                                                    class: "statistics__bar__percent",
-                                                                    p { class: "votes-counter__percent",
-                                                                    "{votes_statistics().total()}"
-                                                                }
-                                                                p { class: "votes-counter__percent",
-                                                                    "{members()}"
-                                                                }
+                                                            Bar {
+                                                                left_value: consumed_percent,
+                                                                center_value: participation_threshold(),
+                                                                right_value: 100.0 - consumed_percent,
+                                                                left_helper: "Participation",
+                                                                left_title: "{votes_statistics().total()}",
+                                                                right_title: "{members()}",
                                                             }
                                                         )
                                                     }
@@ -745,35 +629,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         size: ElementSize::Medium,
                                                         body: rsx!(
                                                             {
-                                                                let threshold = match &*track_info.read() {
-                                                                    Some(info) => {
-                                                                        if let Some(deciding) = &initiative_wrapper.ongoing.deciding {
-                                                                            if  current_block() > 0 {
-                                                                                let consumed = current_block() - deciding.since;
-                                                                                let progress = consumed as f64 / 36000.0;
-
-                                                                                match info.min_support {
-                                                                                    Curve::LinearDecreasing { ceil, floor, length } => {
-                                                                                        let length = length as f64 / 10_000_000.0;
-                                                                                        let ceil = ceil as f64 / 10_000_000.0;
-                                                                                        let floor = floor as f64 / 10_000_000.0;
-
-                                                                                        let progress = progress / (length / 100.0);
-                                                                                        ceil - progress * (ceil - floor)
-                                                                                    },
-                                                                                    Curve::SteppedDecreasing { begin: _, end: _, step: _, period: _ } => 100.0,
-                                                                                    Curve::Reciprocal { factor: _, x_offset: _, y_offset: _ } => 100.0,
-                                                                                }
-                                                                            } else {
-                                                                                100.0
-                                                                            }
-                                                                        } else {
-                                                                            100.0
-                                                                        }
-                                                                    },
-                                                                    None => 100.0
-                                                                };
-                                                                format!("{:.1}%", threshold)
+                                                                format!("{:.1}%", participation_threshold())
                                                             }
                                                         )
                                                     }
@@ -851,4 +707,48 @@ fn blocks_to_days(blocks: u32) -> u32 {
     let minutes = seconds / 60;
 
     minutes / (24 * 60)
+}
+
+fn calculate_threshold<F>(
+    track_info: &Option<TrackInfo>,
+    deciding: &Option<Deciding>,
+    current_block: u32,
+    threshold_fn: F,
+) -> f64
+where
+    F: Fn(&TrackInfo, f64) -> f64,
+{
+    let Some(info) = track_info else { return 100.0 };
+    let Some(deciding) = deciding else {
+        return 100.0;
+    };
+
+    if current_block == 0 {
+        return 100.0;
+    }
+
+    let consumed = current_block - deciding.since;
+    let progress = consumed as f64 / 36000.0;
+
+    threshold_fn(info, progress)
+}
+
+fn get_approval_threshold(
+    track_info: &Option<TrackInfo>,
+    deciding: &Option<Deciding>,
+    current_block: u32,
+) -> f64 {
+    calculate_threshold(track_info, deciding, current_block, |info, progress| {
+        info.min_approval.calculate_threshold(progress)
+    })
+}
+
+fn get_participation_threshold(
+    track_info: &Option<TrackInfo>,
+    deciding: &Option<Deciding>,
+    current_block: u32,
+) -> f64 {
+    calculate_threshold(track_info, deciding, current_block, |info, progress| {
+        info.min_support.calculate_threshold(progress)
+    })
 }
