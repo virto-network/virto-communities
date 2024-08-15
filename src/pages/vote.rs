@@ -1,4 +1,4 @@
-use std::{collections::HashMap, str::FromStr};
+use std::str::FromStr;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -10,12 +10,9 @@ use crate::{
         Button, CircleCheck, Icon, KeyValue, Request, StopSign,
     },
     hooks::{
-        use_accounts::use_accounts,
         use_initiative::{
-            use_initiative, ActionItem, AddMembersAction, ConvictionVote, InitiativeHistory,
-            InitiativeInfoContent, InitiativeVoteContent, InitiativeVoteData, KusamaTreasury,
-            KusamaTreasuryAction, MemberItem, StandardVote, Vote, VoteOf, VoteType, VotingOpenGov,
-            VotingOpenGovAction,
+            ActionItem, ConvictionVote, InitiativeInfoContent, InitiativeVoteData, Vote, VoteOf,
+            VoteType,
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -23,11 +20,13 @@ use crate::{
         use_spaces_client::use_spaces_client,
         use_tooltip::use_tooltip,
     },
-    pages::{initiatives::InitiativeWrapper, onboarding::convert_to_jsvalue},
+    pages::initiatives::InitiativeWrapper,
     services::kreivo::{
-        community_memberships::{get_communities_by_member, get_membership_id},
+        community_memberships::{get_communities_by_member, get_membership_id, item},
         community_referenda::{metadata_of, referendum_info_for},
+        community_track::{tracks, Curve},
         preimage::{preimage_for, request_status_for},
+        system::number,
     },
 };
 use wasm_bindgen::prelude::*;
@@ -46,6 +45,7 @@ pub enum ProposalStatus {
     APPROVED,
     REJECTED,
     VOTING,
+    QUEUE,
 }
 
 #[derive(Clone, Debug)]
@@ -83,22 +83,6 @@ impl VoteDigest {
             50.0
         }
     }
-
-    fn add_aye(&mut self) {
-        self.aye = self.aye + 1
-    }
-
-    fn add_nay(&mut self) {
-        self.nay = self.nay + 1
-    }
-
-    fn set_aye(&mut self, aye: u64) {
-        self.aye = aye
-    }
-
-    fn set_nay(&mut self, nay: u64) {
-        self.nay = nay
-    }
 }
 
 #[wasm_bindgen]
@@ -111,33 +95,27 @@ extern "C" {
     ) -> Result<JsValue, JsValue>;
 }
 
-fn filter_latest_votes(votes: Vec<InitiativeVoteContent>) -> Vec<InitiativeVoteContent> {
-    let mut latest_votes: HashMap<String, InitiativeVoteContent> = HashMap::new();
-
-    for vote in votes.iter().rev() {
-        latest_votes.insert(vote.user.clone(), vote.clone());
-    }
-
-    latest_votes.into_values().collect()
-}
-
 #[component]
 pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let i18 = use_i18();
-    let mut initiative = use_initiative();
-    let mut session = use_session();
+    let session = use_session();
     let spaces_client = use_spaces_client();
-    let mut nav = use_our_navigator();
+    let nav = use_our_navigator();
 
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let accounts = use_accounts();
 
     let mut votes_statistics = use_signal(|| VoteDigest::default());
     let mut content = use_signal(|| String::new());
     let mut can_vote = use_signal(|| false);
 
+    let mut show_requests = use_signal(|| false);
+    let mut show_vote = use_signal(|| false);
+
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
+    let mut current_block = use_signal(|| 0);
+    let mut track_info = use_signal(|| None);
+    let mut members = use_signal(|| 0);
 
     let cont = &*content.read();
     let parser = pulldown_cmark::Parser::new(cont);
@@ -168,9 +146,34 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                 return;
             };
 
+            // get community members
+            let response_item = item(id, None).await;
+            let item_details = match response_item {
+                Ok(items) => items,
+                Err(_) => 0u16,
+            };
+
+            members.set(item_details);
+
             if community_tracks.iter().any(|community| community.id == id) {
                 can_vote.set(true);
             }
+
+            // get current block
+            let Ok(block) = number().await else {
+                log::warn!("Failed to get last block kusama");
+                continue;
+            };
+
+            current_block.set(block);
+
+            // get track
+            let Ok(track) = tracks(id).await else {
+                log::warn!("Failed to get track");
+                continue;
+            };
+
+            track_info.set(Some(track));
 
             if initiative_wrapper().is_none() {
                 let Ok(response) = referendum_info_for(initiativeid).await else {
@@ -190,7 +193,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                 }))
             };
 
-            if let Some(mut wrapper) = initiative_wrapper() {
+            if let Some(wrapper) = initiative_wrapper() {
                 votes_statistics.set(VoteDigest::default());
                 votes_statistics.with_mut(|votes| votes.aye = wrapper.ongoing.tally.ayes);
                 votes_statistics.with_mut(|votes| votes.nay = wrapper.ongoing.tally.nays);
@@ -226,7 +229,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
                 content.set(response.info.description.clone());
 
-                log::info!("{:?}", response);
+                log::info!("{:#?}", response);
                 wrapper.info = response.info.clone();
 
                 initiative_wrapper.set(Some(wrapper.clone()));
@@ -234,7 +237,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
         }
     });
 
-    let mut handle_vote = move |is_vote_aye: bool| {
+    let handle_vote = move |is_vote_aye: bool| {
         spawn(
             async move {
                 let account_address = session
@@ -277,53 +280,13 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move { on_handle_vote.send(()) });
 
-    let requests = [
-        ActionItem::AddMembers(AddMembersAction {
-            members: vec![
-                MemberItem {
-                    medium: crate::hooks::use_initiative::MediumOptions::Wallet,
-                    account: "5Gq2VNFP4yqK1bk5zt552hBxU68Q3ABewGN99zY7qGbpVTFc".to_string(),
-                },
-                MemberItem {
-                    medium: crate::hooks::use_initiative::MediumOptions::Wallet,
-                    account: "5Gq2VNFP4yqK1bk5zt552hBxU68Q3ABewGN99zY7qGbpVTFc".to_string(),
-                },
-            ],
-        }),
-        ActionItem::KusamaTreasury(KusamaTreasuryAction {
-            periods: vec![
-                KusamaTreasury {
-                    date: "2024-12-10".to_string(),
-                    amount: 1_100_000_000_000,
-                },
-                KusamaTreasury {
-                    date: "2024-12-10".to_string(),
-                    amount: 20_000_000_000_000,
-                },
-            ],
-        }),
-        ActionItem::VotingOpenGov(VotingOpenGovAction {
-            proposals: vec![VotingOpenGov {
-                poll_index: 400,
-                vote: VoteType::Standard(StandardVote {
-                    aye: true,
-                    conviction: ConvictionVote::Locked1x,
-                    balance: 20_000_000_000_000,
-                }),
-            }],
-        }),
-    ];
-
-    let mut show_requests = use_signal(|| false);
-    let mut show_vote = use_signal(|| false);
-
     rsx! {
-        div { class: "page--initiative",
+        div { class: "page--vote",
             div { class: "initiative__form",
-                if let Some(ref initiative) = &*initiative_wrapper.read() {
+                if let Some(initiative_wrapper) = &*initiative_wrapper.read() {
                     div { class: "form__wrapper form__wrapper--initiative",
                         h2 { class: "form__title",
-                            "{initiative.info.name}"
+                            "{initiative_wrapper.info.name}"
                         }
                         div { class: "details__metadata",
                             KeyValue {
@@ -333,7 +296,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                 variant: KeyValueVariant::Secondary,
                                 body: rsx!(
                                     {
-                                        let hex_string = hex::encode(&initiative.ongoing.submission_deposit.who);
+                                        let hex_string = hex::encode(&initiative_wrapper.ongoing.submission_deposit.who);
                                         format!("0x{}", hex_string)
                                     }
                                 )
@@ -341,129 +304,200 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                         }
                         div { class: "steps__wrapper",
                             div { class: "row",
-                                div { class: "vote-card",
-                                    h4 { class: "vote-card__title",
-                                        "Request"
-                                    }
-                                    button { class: "button--tertiary",
-                                        onclick: move |_| show_requests.toggle(),
-                                        Request {
-                                            name: if show_requests() { "Hide all requests" } else { "See all requests" },
-                                            details: "9",
-                                            size: ElementSize::Small
+                                section { class: "details__voting",
+                                    div { class: "vote-card",
+                                        h4 { class: "vote-card__title",
+                                            "Request"
                                         }
-                                    }
-                                    if show_requests() {
-                                        {
-                                            requests.iter().map(|request| {
-                                                rsx!(
-                                                    div { class: "requests",
-                                                        match request {
-                                                            ActionItem::AddMembers(action) => {
-                                                                rsx!(
-                                                                    Request {
-                                                                        name: "Add Members",
-                                                                        details: action.members.len().to_string()
-                                                                    }
-                                                                    ul { class: "requests",
-                                                                        {
-                                                                            action.members.iter().map(|member| {
-                                                                                rsx!(
-                                                                                    li {
-                                                                                        Request {
-                                                                                            name: format!("{}...", member.account[..10].to_string()),
-                                                                                        }
-                                                                                    }
-                                                                                )
-                                                                            })
+                                        button { class: "button--tertiary",
+                                            onclick: move |_| show_requests.toggle(),
+                                            Request {
+                                                name: if show_requests() { "Hide all requests" } else { "See all requests" },
+                                                details: initiative_wrapper.info.actions.iter().map(|item| {
+                                                    match item {
+                                                        ActionItem::AddMembers(action) => action.members.len(),
+                                                        ActionItem::KusamaTreasury(action) => action.periods.len(),
+                                                        ActionItem::VotingOpenGov(action) => action.proposals.len(),
+                                                    }
+                                                }).sum::<usize>().to_string(),
+                                                size: ElementSize::Small
+                                            }
+                                        }
+                                        if show_requests() {
+                                            {
+                                                initiative_wrapper.info.actions.iter().map(|request| {
+                                                    rsx!(
+                                                        div { class: "requests",
+                                                            match request {
+                                                                ActionItem::AddMembers(action) => {
+                                                                    rsx!(
+                                                                        Request {
+                                                                            name: "Add Members",
+                                                                            details: action.members.len().to_string()
                                                                         }
-                                                                    }
-                                                                )
-                                                            },
-                                                            ActionItem::KusamaTreasury(action) => {
-                                                                rsx!(
-                                                                    Request {
-                                                                        name: "Kusama Treasury Request"
-                                                                    }
-                                                                    ul { class: "requests",
-                                                                        {
-                                                                            action.periods.iter().enumerate().map(|(index, period)| {
-                                                                                rsx!(
-                                                                                    li {
-                                                                                        Request {
-                                                                                            name: format!("Periodo: #{}", index),
-                                                                                            details: format!("{} KSM", period.amount as f64 / 1_000_000_000_000.0 )
-                                                                                        }
-                                                                                    }
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    }
-                                                                )
-                                                            },
-                                                            ActionItem::VotingOpenGov(action) => {
-                                                                rsx!(
-                                                                    Request {
-                                                                        name: "Voting Open Gov",
-                                                                        details: action.proposals.len().to_string()
-                                                                    }
-                                                                    ul { class: "requests",
-                                                                        {
-                                                                            action.proposals.iter().map(|proposal| {
-                                                                                rsx!(
-                                                                                    li {
-                                                                                        match &proposal.vote {
-                                                                                            VoteType::Standard(vote) => {
-                                                                                                let conviction = match vote.conviction {
-                                                                                                    ConvictionVote::None => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.none"),
-                                                                                                    ConvictionVote::Locked1x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_1"),
-                                                                                                    ConvictionVote::Locked2x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_2"),
-                                                                                                    ConvictionVote::Locked3x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_3"),
-                                                                                                    ConvictionVote::Locked4x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_4"),
-                                                                                                    ConvictionVote::Locked5x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_5"),
-                                                                                                    ConvictionVote::Locked6x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
-                                                                                                };
-                                                                                                rsx!(
-                                                                                                    Request {
-                                                                                                        name: format!("{} - {}", translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"), proposal.poll_index),
-                                                                                                        details: format!("{} - {}", conviction, vote.balance as f64 / 1_000_000_000_000.0 ),
-                                                                                                    }
-                                                                                                )
+                                                                        ul { class: "requests",
+                                                                            {
+                                                                                action.members.iter().map(|member| {
+                                                                                    rsx!(
+                                                                                        li {
+                                                                                            Request {
+                                                                                                name: format!("{}...", member.account[..10].to_string()),
                                                                                             }
                                                                                         }
-                                                                                    }
-                                                                                )
-                                                                            })
+                                                                                    )
+                                                                                })
+                                                                            }
                                                                         }
-                                                                    }
-                                                                )
-                                                            },
+                                                                    )
+                                                                },
+                                                                ActionItem::KusamaTreasury(action) => {
+                                                                    rsx!(
+                                                                        Request {
+                                                                            name: "Kusama Treasury Request"
+                                                                        }
+                                                                        ul { class: "requests",
+                                                                            {
+                                                                                action.periods.iter().enumerate().map(|(index, period)| {
+                                                                                    rsx!(
+                                                                                        li {
+                                                                                            Request {
+                                                                                                name: format!("Periodo: #{}", index + 1),
+                                                                                                details: format!("{} KSM", period.amount as f64 / 1_000_000_000_000.0 )
+                                                                                            }
+                                                                                        }
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        }
+                                                                    )
+                                                                },
+                                                                ActionItem::VotingOpenGov(action) => {
+                                                                    rsx!(
+                                                                        Request {
+                                                                            name: "Voting Open Gov",
+                                                                            details: action.proposals.len().to_string()
+                                                                        }
+                                                                        ul { class: "requests",
+                                                                            {
+                                                                                action.proposals.iter().map(|proposal| {
+                                                                                    rsx!(
+                                                                                        li {
+                                                                                            match &proposal.vote {
+                                                                                                VoteType::Standard(vote) => {
+                                                                                                    let conviction = match vote.conviction {
+                                                                                                        ConvictionVote::None => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.none"),
+                                                                                                        ConvictionVote::Locked1x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_1"),
+                                                                                                        ConvictionVote::Locked2x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_2"),
+                                                                                                        ConvictionVote::Locked3x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_3"),
+                                                                                                        ConvictionVote::Locked4x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_4"),
+                                                                                                        ConvictionVote::Locked5x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_5"),
+                                                                                                        ConvictionVote::Locked6x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
+                                                                                                    };
+                                                                                                    rsx!(
+                                                                                                        Request {
+                                                                                                            name: format!("{} - {}", translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"), proposal.poll_index),
+                                                                                                            details: format!("{} - {} KSM", conviction, vote.balance as f64 / 1_000_000_000_000.0 ),
+                                                                                                        }
+                                                                                                    )
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        }
+                                                                    )
+                                                                },
+                                                            }
                                                         }
-                                                    }
-                                                )
-                                            })
+                                                    )
+                                                })
+                                            }
                                         }
                                     }
                                 }
-                                div { class: "vote-card",
-                                    KeyValue {
-                                        class: "key-value--row",
-                                        text: translate!(i18, "governance.description.details.status.title"),
-                                        variant: KeyValueVariant::Secondary,
-                                        body: {
-                                            let status = ProposalStatus::VOTING;
-                                            let (badge_title, badge_color) = match status {
-                                                ProposalStatus::APPROVED => (translate!(i18, "governance.description.details.status.options.approved"), "badge--green-dark"),
-                                                ProposalStatus::REJECTED => (translate!(i18, "governance.description.details.status.options.rejected"), "badge--red-dark"),
-                                                ProposalStatus::VOTING => (translate!(i18, "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
-                                            };
-
-                                            rsx!(
-                                                Badge {
-                                                    text: badge_title,
-                                                    class: badge_color.to_string()
+                                section { class: "details__voting",
+                                    div { class: "vote-card",
+                                        div { class: "details__statistics",
+                                            div { class: "details__head",
+                                                h2 { class: "vote-card__title statistics__title",
+                                                    {translate!(i18, "governance.description.details.status.title")}
                                                 }
-                                            )
+                                                {
+                                                    let status = if initiative_wrapper.ongoing.in_queue | initiative_wrapper.ongoing.deciding.is_none() {
+                                                        ProposalStatus::QUEUE
+                                                    } else {
+                                                        ProposalStatus::VOTING
+                                                    };
+                                                    let (badge_title, badge_color) = match status {
+                                                        ProposalStatus::APPROVED => (translate!(i18, "governance.description.details.status.options.approved"), "badge--green-dark"),
+                                                        ProposalStatus::REJECTED => (translate!(i18, "governance.description.details.status.options.rejected"), "badge--red-dark"),
+                                                        ProposalStatus::VOTING => (translate!(i18, "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
+                                                        ProposalStatus::QUEUE => (translate!(i18, "governance.description.details.status.options.queue"), "badge--blue-light"),
+                                                    };
+
+                                                    rsx!(
+                                                        Badge {
+                                                            text: badge_title,
+                                                            class: badge_color.to_string()
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                            div {
+
+                                                {
+                                                    let mut consumed = 0;
+
+                                                    if let Some(deciding) = &initiative_wrapper.ongoing.deciding {
+                                                        if  current_block() > 0 {
+                                                            consumed = current_block() - deciding.since;
+                                                        }
+                                                    }
+
+                                                    let decision = match &*track_info.read() {
+                                                        Some(info) => info.decision_period,
+                                                        None => 0
+                                                    };
+
+
+                                                    let consumed_percent = 100.0 / decision as f64 * consumed as f64;
+
+                                                    rsx!(
+                                                        div {
+                                                            class: "statistics__bar statistics__bar--remaign",
+                                                                span {
+                                                                    class: "statistics__bar__content statistics__bar__content--consumed",
+                                                                    style: format!("width: {}%", consumed_percent),
+                                                                }
+                                                                span {
+                                                                    class: "statistics__bar__content statistics__bar__content--right",
+                                                                    style: format!("width: {}%", 100.0 - consumed_percent),
+                                                                    p { class: "votes-counter__title",
+                                                                        if blocks_to_days(decision - consumed) == 0 {
+                                                                            "{blocks_to_days(decision - consumed) + 1}"
+                                                                        } else {
+                                                                            "{blocks_to_days(decision - consumed)}"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            div {
+                                                                class: "statistics__bar__percent",
+                                                                p { class: "votes-counter__percent",
+                                                                "Decision"
+                                                            }
+                                                            p { class: "votes-counter__percent",
+                                                                match blocks_to_times(decision) {
+                                                                    Times::Minutes(time) => {format!("{} Minutes", time)},
+                                                                    Times::Hours(time) => {format!("{} Hours", time)},
+                                                                    Times::Days(time) => {format!("{} Days", time)},
+                                                                }
+                                                            }
+                                                        }
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -485,7 +519,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 }
                                             }
                                             if show_vote() {
-                                                div { class: "badge badge--note",
+                                                div { class: "note",
                                                     "Explain that this is a dynamic voting, and thresholds might change."
                                                 }
                                             }
@@ -535,7 +569,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                             }
                                             div {
                                                 div {
-                                                    class: "statistics__bar",
+                                                    class: "statistics__bar statistics__bar--vote",
                                                     span {
                                                         class: "statistics__bar__content statistics__bar__content--aye",
                                                         style: format!("width: {}%", votes_statistics().percent_aye()),
@@ -544,7 +578,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         }
                                                     }
                                                     span {
-                                                        class: "statistics__bar__content statistics__bar__content--nay",
+                                                        class: "statistics__bar__content statistics__bar__content--nay statistics__bar__content--right",
                                                         style: format!("width: {}%", votes_statistics().percent_nay()),
                                                         p { class: "votes-counter__title",
                                                             {translate!(i18, "governance.description.voting.against")}
@@ -554,10 +588,62 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 div {
                                                     class: "statistics__bar__percent",
                                                     p { class: "votes-counter__percent",
-                                                            {format!("{:.1}%", votes_statistics().percent_aye())}
+                                                        {format!("{:.1}%", votes_statistics().percent_aye())}
                                                     }
                                                     p { class: "votes-counter__percent",
                                                         {format!("{:.1}%", votes_statistics().percent_nay())}
+                                                    }
+                                                }
+                                            }
+                                            if show_vote() {
+                                                div { class: "note",
+                                                    KeyValue {
+                                                        class: "key-value--row",
+                                                        text: "Threshold",
+                                                        size: ElementSize::Medium,
+                                                        body: rsx!(
+                                                            {
+                                                                let threshold = match &*track_info.read() {
+                                                                    Some(info) => {
+                                                                        if let Some(deciding) = &initiative_wrapper.ongoing.deciding {
+                                                                            if  current_block() > 0 {
+                                                                                let consumed = current_block() - deciding.since;
+                                                                                let progress = consumed as f64 / 36000.0;
+
+                                                                                match info.min_approval {
+                                                                                    Curve::LinearDecreasing { ceil, floor, length } => {
+                                                                                        let length = length as f64 / 10_000_000.0;
+                                                                                        let ceil = ceil as f64 / 10_000_000.0;
+                                                                                        let floor = floor as f64 / 10_000_000.0;
+
+                                                                                        let progress = progress / (length / 100.0);
+                                                                                        ceil - progress * (ceil - floor)
+                                                                                    },
+                                                                                    Curve::SteppedDecreasing { begin: _, end: _, step: _, period: _ } => 100.0,
+                                                                                    Curve::Reciprocal { factor: _, x_offset: _, y_offset: _ } => 100.0,
+                                                                                }
+                                                                            } else {
+                                                                                0.0
+                                                                            }
+                                                                        } else {
+                                                                            0.0
+                                                                        }
+                                                                    },
+                                                                    None => 0.0
+                                                                };
+                                                                format!("{:.1}%", threshold)
+                                                            }
+                                                        )
+                                                    }
+                                                    KeyValue {
+                                                        class: "key-value--row",
+                                                        text: "Current approval",
+                                                        size: ElementSize::Medium,
+                                                        body: rsx!(
+                                                            {
+                                                                format!("{:.1}%", votes_statistics().percent_aye())
+                                                            }
+                                                        )
                                                     }
                                                 }
                                             }
@@ -590,14 +676,85 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                     }
                                                 }
 
-                                                div { class: "statistics__card",
+                                                div {
+                                                    {
+                                                        let consumed_percent =  100.0 / members() as f64 * votes_statistics().total() as f64;
 
+                                                        rsx!(
+                                                            div {
+                                                                class: "statistics__bar statistics__bar--remaign",
+                                                                    span {
+                                                                        class: "statistics__bar__content statistics__bar__content--consumed",
+                                                                        style: format!("width: {}%", consumed_percent),
+                                                                        p { class: "votes-counter__title",
+                                                                            "Participation"
+                                                                        }
+                                                                    }
+                                                                    span {
+                                                                        class: "statistics__bar__content statistics__bar__content--right",
+                                                                        style: format!("width: {}%", 100.0 - consumed_percent),
+                                                                    }
+                                                                }
+                                                                div {
+                                                                    class: "statistics__bar__percent",
+                                                                    p { class: "votes-counter__percent",
+                                                                    "{votes_statistics().total()}"
+                                                                }
+                                                                p { class: "votes-counter__percent",
+                                                                    "{members()}"
+                                                                }
+                                                            }
+                                                        )
+                                                    }
+                                                }
+                                                div { class: "note",
                                                     KeyValue {
                                                         class: "key-value--row",
-                                                        size: ElementSize::Small,
-                                                        text: translate!(i18, "governance.description.voting.total.title"),
+                                                        text: "Paricipation threshold",
+                                                        size: ElementSize::Medium,
                                                         body: rsx!(
-                                                            "{votes_statistics().total()} " {translate!(i18, "governance.description.voting.total.voters")}
+                                                            {
+                                                                let threshold = match &*track_info.read() {
+                                                                    Some(info) => {
+                                                                        if let Some(deciding) = &initiative_wrapper.ongoing.deciding {
+                                                                            if  current_block() > 0 {
+                                                                                let consumed = current_block() - deciding.since;
+                                                                                let progress = consumed as f64 / 36000.0;
+
+                                                                                match info.min_support {
+                                                                                    Curve::LinearDecreasing { ceil, floor, length } => {
+                                                                                        let length = length as f64 / 10_000_000.0;
+                                                                                        let ceil = ceil as f64 / 10_000_000.0;
+                                                                                        let floor = floor as f64 / 10_000_000.0;
+
+                                                                                        let progress = progress / (length / 100.0);
+                                                                                        ceil - progress * (ceil - floor)
+                                                                                    },
+                                                                                    Curve::SteppedDecreasing { begin: _, end: _, step: _, period: _ } => 100.0,
+                                                                                    Curve::Reciprocal { factor: _, x_offset: _, y_offset: _ } => 100.0,
+                                                                                }
+                                                                            } else {
+                                                                                100.0
+                                                                            }
+                                                                        } else {
+                                                                            100.0
+                                                                        }
+                                                                    },
+                                                                    None => 100.0
+                                                                };
+                                                                format!("{:.1}%", threshold)
+                                                            }
+                                                        )
+                                                    }
+                                                    KeyValue {
+                                                        class: "key-value--row",
+                                                        text: "Current support",
+                                                        size: ElementSize::Medium,
+                                                        body: rsx!(
+                                                            {
+                                                                let consumed_percent =  100.0 / members() as f64 * votes_statistics().total() as f64;
+                                                                format!("{:.1}%", consumed_percent)
+                                                            }
                                                         )
                                                     }
                                                 }
@@ -612,7 +769,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                 }
                                 div { class: "details__tags",
                                     div { class: "card__tags",
-                                        for tag in initiative.clone().info.tags {
+                                        for tag in initiative_wrapper.clone().info.tags {
                                             {
                                                 rsx!(
                                                     Badge {
@@ -633,11 +790,34 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     }
                 }
             }
-            div { class: "form__cta form__cta--initiatives",
-                p { class: "wip",
-                    {translate!(i18, "initiative.disclaimer")}
-                }
-            }
         }
     }
+}
+
+enum Times {
+    Minutes(u32),
+    Hours(u32),
+    Days(u32),
+}
+
+fn blocks_to_times(blocks: u32) -> Times {
+    let seconds = blocks * 12;
+    let minutes = seconds / 60;
+
+    log::info!("minutes {}", minutes);
+
+    if minutes / (24 * 60) > 0 {
+        Times::Days(minutes / (24 * 60))
+    } else if minutes / 60 > 0 {
+        Times::Hours(minutes / 60)
+    } else {
+        Times::Minutes(minutes)
+    }
+}
+
+fn blocks_to_days(blocks: u32) -> u32 {
+    let seconds = blocks * 12;
+    let minutes = seconds / 60;
+
+    minutes / (24 * 60)
 }

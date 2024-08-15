@@ -181,7 +181,8 @@
                             "voting": "In voting",
                             "excecuted": "Executed",
                             "approved": "Approved",
-                            "rejected": "Failed"
+                            "rejected": "Failed",
+                            "queue": "In queue"
                         }
                     },
                     "cta": "View advanced data"

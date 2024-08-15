@@ -176,7 +176,8 @@
                             "voting": "En votación",
                             "excecuted": "Ejecutada",
                             "approved": "Aprobada",
-                            "rejected": "Fallida"
+                            "rejected": "Fallida",
+                            "queue": "En cola"
                         }
                     },
                     "update": "Modificar",

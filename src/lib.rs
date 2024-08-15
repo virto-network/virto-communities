@@ -58,6 +58,7 @@ pub mod services {
         pub mod identity;
         pub mod preimage;
         pub mod timestamp;
+        pub mod system;
     }
 
     pub mod kusama {
