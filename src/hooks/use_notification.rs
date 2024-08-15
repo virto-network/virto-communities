@@ -56,6 +56,18 @@ impl UseNotificationState {
         gloo::timers::callback::Timeout::new(3000, move || this.clear()).forget();
     }
 
+    pub fn handle_success(&mut self, body: &str) {
+        self.handle_notification(NotificationItem {
+            title: translate!(use_i18(), "success.title"),
+            body: String::from(body),
+            variant: NotificationVariant::Success,
+            show: true,
+            handle: NotificationHandle {
+                value: NotificationHandler::None,
+            },
+        });
+    }
+
     pub fn handle_error(&mut self, body: &str) {
         self.handle_notification(NotificationItem {
             title: String::from("Error"),

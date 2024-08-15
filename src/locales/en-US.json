@@ -210,6 +210,16 @@
                     }
                 }
             },
+            "tips": {
+                "voting": {
+                    "title": "Voting",
+                    "description": "This may take a moment"
+                },
+                "voted": {
+                    "title": "Everything went well",
+                    "description": "The vote has been cast"
+                }
+            },
             "success": {
                 "title": "Everything was perfect! You have created a referendum! 🥳",
                 "form": {
@@ -318,6 +328,9 @@
                 "description": "We are seeking funds to create a decentralized governance system on our blockchain platform. We want to enable our community to actively participate in decision-making.\n\n**Key Points**\n\n- Development of governance tools\n- Education and outreach on decentralized governance\n- Ongoing research and development of the governance system\n\n**Use of Funds**\n\n- Development of governance tools: 40%.\n- Education and outreach: 30%.\n- Research and development: 30%."
             }
         },
+        "success": {
+            "title": "Everything went well"
+        },
         "errors": {
             "session": {
                 "persist": "Failed to save session"
@@ -332,6 +345,10 @@
             },
             "initiatives": {
                 "query_failed": "Failed to fetch initiatives"
+            },
+            "vote": {
+                "persist_failed": "The vote could not be saved",
+                "chain": "The vote could not be cast"
             },
             "timestamp": {
                 "query_failed": "Failed to fetch timestamp"

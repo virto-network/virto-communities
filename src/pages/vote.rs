@@ -18,7 +18,7 @@ use crate::{
         use_our_navigator::use_our_navigator,
         use_session::use_session,
         use_spaces_client::use_spaces_client,
-        use_tooltip::use_tooltip,
+        use_tooltip::{use_tooltip, TooltipItem},
     },
     pages::initiatives::InitiativeWrapper,
     services::kreivo::{
@@ -240,6 +240,12 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let handle_vote = move |is_vote_aye: bool| {
         spawn(
             async move {
+                tooltip.handle_tooltip(TooltipItem {
+                    title: translate!(i18, "governance.tips.voting.title"),
+                    body: translate!(i18, "governance.tips.voting.description"),
+                    show: true,
+                });
+
                 let account_address = session
                     .get()
                     .ok_or(translate!(i18, "errors.wallet.account_address"))?
@@ -257,24 +263,40 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .await
                     .map_err(|_| translate!(i18, "errors.wallet.account_address"))?;
 
-                let response = spaces_client
+                spaces_client
                     .get()
                     .vote_initiative(InitiativeVoteData {
                         user: account_address,
                         room: String::from("!aOgBsDPlVOIDTisUsJ:matrix.org"),
                         vote: Vote::Standard(if is_vote_aye { VoteOf::Yes } else { VoteOf::No }),
                     })
-                    .await;
+                    .await
+                    .map_err(|e| {
+                        log::warn!("Failed to persist vote: {:?}", e);
+                        translate!(i18, "errors.vote.persist_failed")
+                    })?;
 
-                topup_then_initiative_vote(membership_id, initiativeid, is_vote_aye).await;
+                topup_then_initiative_vote(membership_id, initiativeid, is_vote_aye)
+                    .await
+                    .map_err(|e| {
+                        log::warn!("Failed to vote on-chain: {:?}", e);
+                        translate!(i18, "errors.vote.chain")
+                    })?;
 
                 on_handle_vote.send(());
+                tooltip.hide();
+
+                notification.handle_success(&translate!(i18, "governance.tips.voted.description"));
+
                 let path = format!("/dao/{id}/initiatives");
                 nav.push(vec![], &path);
 
                 Ok::<(), String>(())
             }
-            .unwrap_or_else(move |e: String| {}),
+            .unwrap_or_else(move |e: String| {
+                tooltip.hide();
+                notification.handle_error(&e);
+            }),
         );
     };
 
