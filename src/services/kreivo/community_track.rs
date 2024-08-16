@@ -56,6 +56,26 @@ pub enum Curve {
     },
 }
 
+impl Curve {
+    pub fn calculate_threshold(&self, progress: f64) -> f64 {
+        match self {
+            Curve::LinearDecreasing {
+                ceil,
+                floor,
+                length,
+            } => {
+                let length = *length as f64 / 10_000_000.0;
+                let ceil = *ceil as f64 / 10_000_000.0;
+                let floor = *floor as f64 / 10_000_000.0;
+
+                let progress = progress / (length / 100.0);
+                ceil - progress * (ceil - floor)
+            }
+            _ => 100.0,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct TrackInfo {
     pub name: [u8; N],
