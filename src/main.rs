@@ -4,7 +4,6 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use gloo::storage::{errors::StorageError, LocalStorage};
 
-use log::LevelFilter;
 use virto_communities::{
     components::atoms::{Notification, Tooltip},
     hooks::{
@@ -20,7 +19,7 @@ use virto_communities::{
 };
 
 fn main() {
-    dioxus_logger::init(LevelFilter::Debug).expect("failed to init logger");
+    wasm_logger::init(wasm_logger::Config::default());
     console_error_panic_hook::set_once();
 
     launch(App);

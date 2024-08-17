@@ -176,7 +176,8 @@
                             "voting": "En votación",
                             "excecuted": "Ejecutada",
                             "approved": "Aprobada",
-                            "rejected": "Fallida"
+                            "rejected": "Fallida",
+                            "queue": "En cola"
                         }
                     },
                     "update": "Modificar",
@@ -203,6 +204,16 @@
                         "for": "A favor",
                         "against": "En contra"
                     }
+                }
+            },
+            "tips": {
+                "voting": {
+                    "title": "Votando",
+                    "description": "Esto puede tomar un momento"
+                },
+                "voted": {
+                    "title": "Todo ha salido bien",
+                    "description": "El voto se ha realizado"
                 }
             },
             "success": {
@@ -306,6 +317,9 @@
                 "description": "Buscamos fondos para crear un sistema de gobernanza descentralizada en nuestra plataforma blockchain. Queremos permitir que nuestra comunidad participe activamente en la toma de decisiones.\n\n**Puntos importantes**\n\n- Desarrollo de herramientas de gobernanza\n- Educación y divulgación sobre gobernanza descentralizada\n- Investigación y desarrollo continuo del sistema de gobernanza\n\n**Uso de fondos**\n\n- Desarrollo de herramientas de gobernanza: 40%.\n- Educación y divulgación: 30%.\n- Investigación y desarrollo: 30%."
             }
         },
+        "success": {
+            "title": "Todo ha salido bien"
+        },
         "warnings": {
             "title": "Atención",
             "middleware": {
@@ -327,6 +341,10 @@
             },
             "initiatives": {
                 "query_failed": "No se ha podido traer iniciativas"
+            },
+            "vote": {
+                "persist_failed": "No se ha podido guardar el voto",
+                "chain": "No se ha podido votar"
             },
             "timestamp": {
                 "query_failed": "No se ha podido traer el estado actual"

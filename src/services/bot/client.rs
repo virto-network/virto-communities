@@ -104,7 +104,7 @@ impl SpacesClient {
         vote: InitiativeVoteData,
     ) -> Result<(), reqwest::Error> {
         let path = format!("{}/initiative/vote", self.base_path);
-        let response = self
+        self
             .client
             .post(path)
             .json(&vote)

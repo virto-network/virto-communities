@@ -1,10 +1,8 @@
-use codec::Decode;
 use serde::{Deserialize, Serialize};
-use serde_json::{from_str, from_value, to_string, Value};
-use std::str::FromStr;
+use serde_json::{from_value, Value};
 use sube::{sube, Response};
 
-use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
+use crate::services::kreivo::community_track::ChainStateError;
 
 #[derive(Debug, Deserialize)]
 pub struct TrackInfo {
@@ -79,6 +77,11 @@ pub struct Deposit {
     pub amount: u64,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Deciding {
+    pub since: u32,
+}
+
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct Tally {
     pub ayes: u64,
@@ -88,11 +91,22 @@ pub struct Tally {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum Alarm {
+    Single(u32),
+    Multiple(Vec<u32>),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Ongoing {
     pub track: u32,
     pub origin: Origin,
+    pub submitted: u32,
     pub submission_deposit: Deposit,
+    pub deciding: Option<Deciding>,
+    pub in_queue: bool,
     pub tally: Tally,
+    pub alarm: Option<Vec<Alarm>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

@@ -37,6 +37,7 @@ pub mod hooks {
     pub mod use_theme;
     pub mod use_timestamp;
     pub mod use_tooltip;
+    pub mod use_vote;
 }
 
 pub mod components {
@@ -57,6 +58,7 @@ pub mod services {
         pub mod community_track;
         pub mod identity;
         pub mod preimage;
+        pub mod system;
         pub mod timestamp;
     }
 
