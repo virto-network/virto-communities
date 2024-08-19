@@ -1,42 +1,45 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
-use super::{use_accounts::use_accounts, use_notification::use_notification};
+use wasm_bindgen::prelude::*;
+
+use super::{use_accounts::use_accounts, use_session::use_session};
+
 pub enum PjsError {
     ConnectionFailed,
     AccountsNotFound,
 }
-pub fn use_connect_wallet() {
-    let i18 = use_i18();
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = globalThis, js_name = initExecutor)]
+    pub fn init_executor();
+}
+
+const APP_NAME: &str = "Virto";
+
+pub async fn use_connect_wallet() -> Result<(), PjsError> {
+    let session = use_session();
     let mut accounts = use_accounts();
-    let mut notification = use_notification();
     let mut pjs = use_context::<Signal<Option<pjs::PjsExtension>>>();
-    use_coroutine(|_: UnboundedReceiver<()>| {
-        async move {
-            let mut vault = pjs::PjsExtension::connect("virto")
-                .await
-                .map_err(|_| PjsError::ConnectionFailed)?;
-            vault.fetch_accounts().await.map_err(|_| PjsError::AccountsNotFound)?;
-            let vault_accounts = vault.accounts();
-            accounts.set(vault_accounts);
-            pjs.set(Some(vault));
-            Ok::<(), PjsError>(())
-        }
-            .unwrap_or_else(move |e: PjsError| {
-                match e {
-                    PjsError::ConnectionFailed => {
-                        notification
-                            .handle_error(
-                                &translate!(i18, "errors.wallet.connection_failed"),
-                            )
-                    }
-                    PjsError::AccountsNotFound => {
-                        notification
-                            .handle_error(
-                                &translate!(i18, "errors.wallet.accounts_not_found"),
-                            );
-                    }
-                };
-            })
-    });
+
+    let mut vault = pjs::PjsExtension::connect(APP_NAME).await.map_err(|_| {
+        if let Err(_) = session.persist_session_file("") {
+            log::warn!("Failed to persist session")
+        };
+
+        PjsError::ConnectionFailed
+    })?;
+
+    init_executor();
+
+    vault
+        .fetch_accounts()
+        .await
+        .map_err(|_| PjsError::AccountsNotFound)?;
+
+    let vault_accounts = vault.accounts();
+
+    accounts.set(vault_accounts);
+    pjs.set(Some(vault));
+
+    Ok(())
 }

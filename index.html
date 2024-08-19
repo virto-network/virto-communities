@@ -228,14 +228,15 @@
     });
 
     globallyInjectPrograms(executor);
+    globalThis.initExecutor = async () => {
+      await executor.initialize("cacas");
+    }
     globalThis.setSigner = async (address) => {
       await executor.setSigner(address);
     };
 
     init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(
-      async (wasm) => {
-        await executor.initialize("virto");
-
+      async (wasm) => {   
         if (wasm.__wbindgen_start == undefined) {
           wasm.main();
         }

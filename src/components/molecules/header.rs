@@ -5,37 +5,35 @@ use futures_util::TryFutureExt;
 use crate::{
     components::atoms::{
         dropdown::{DropdownItem, ElementSize},
-        icon_button::Variant, AccountButton, ArrowUp, ArrowUpDown, Button, Close,
-        Dropdown, Hamburguer, Icon, IconButton, Messages, Profile, Settings, Votes,
+        icon_button::Variant,
+        AccountButton, ArrowUpDown, Button, Close, Dropdown, Hamburguer, Icon, IconButton,
+        Messages, Polkadot, Profile, Settings, Votes,
     },
     hooks::{
         use_accounts::{use_accounts, IsDaoOwner},
-        use_connect_wallet::use_connect_wallet, use_notification::use_notification,
+        use_connect_wallet::{use_connect_wallet, PjsError},
+        use_notification::use_notification,
         use_session::{use_session, UserSession},
     },
     services::kreivo::{balances::account, communities::is_admin},
 };
 use wasm_bindgen::prelude::*;
-use pjs::PjsExtension;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = globalThis, js_name = setSigner)]
     fn set_signer(address: String);
 }
-const APP_NAME: &str = "Virto";
 #[component]
 pub fn Header() -> Element {
     let i18 = use_i18();
     let mut accounts = use_accounts();
     let mut notification = use_notification();
     let mut session = use_session();
-    let mut ksm_balance = use_signal::<
-        (String, String),
-    >(|| ('0'.to_string(), "00".to_string()));
-    let mut usdt_balance = use_signal::<
-        (String, String),
-    >(|| ('0'.to_string(), "00".to_string()));
-    let mut header_handled = consume_context::<Signal<bool>>();
+    let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
+    let mut usdt_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
+    let mut is_active = use_signal(|| false);
+    let mut connect_handled = use_signal(|| false);
+
     let get_account = move || {
         let Some(user_session) = session.get() else {
             return None;
@@ -57,9 +55,6 @@ pub fn Header() -> Element {
                 let Ok(account) = account(&format!("0x{}", hex_address)).await else {
                     ksm_balance.set(('0'.to_string(), "00".to_string()));
                     usdt_balance.set(('0'.to_string(), "00".to_string()));
-                    if !header_handled() {
-                        header_handled.set(true);
-                    }
                     return Ok(());
                 };
                 let is_dao_owner = is_admin(&address.0)
@@ -76,19 +71,16 @@ pub fn Header() -> Element {
                 let unscaled_value = unscaled_value.to_string();
                 let usdt_value = usdt_value.split(".").collect::<Vec<&str>>();
                 let unscaled_value = unscaled_value.split(".").collect::<Vec<&str>>();
-                ksm_balance
-                    .set((
-                        unscaled_value[0].to_string(),
-                        format!("{:.2}", unscaled_value.get(1).unwrap_or(&"00")),
-                    ));
-                usdt_balance
-                    .set((
-                        usdt_value[0].to_string(),
-                        format!("{:.2}", usdt_value.get(1).unwrap_or(&"00")),
-                    ));
-                if !header_handled() {
-                    header_handled.set(true);
-                }
+
+                ksm_balance.set((
+                    unscaled_value[0].to_string(),
+                    format!("{:.2}", unscaled_value.get(1).unwrap_or(&"00")),
+                ));
+                usdt_balance.set((
+                    usdt_value[0].to_string(),
+                    format!("{:.2}", usdt_value.get(1).unwrap_or(&"00")),
+                ));
+
                 Ok::<(), String>(())
             }
                 .unwrap_or_else(move |e: String| notification.handle_warning(&e))
@@ -115,7 +107,6 @@ pub fn Header() -> Element {
         ))
     }
     let mut on_handle_account = move |event: u8| {
-        header_handled.set(false);
         let account = &accounts.get()[event as usize];
         let Ok(serialized_session) = serde_json::to_string(
             &UserSession {
@@ -147,34 +138,14 @@ pub fn Header() -> Element {
     };
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         if session.is_logged() {
-            match PjsExtension::connect(APP_NAME).await {
-                Ok(mut vault) => {
-                    let Ok(_) = vault.fetch_accounts().await else {
-                        notification
-                            .handle_error(
-                                &translate!(i18, "errors.wallet.accounts_not_found"),
-                            );
-                        return;
-                    };
-                    let vault_accounts = vault.accounts();
-                    accounts.set(vault_accounts);
-                    if let Some(user_session) = session.get() {
-                        on_handle_account(user_session.account_id);
-                    }
-                }
-                Err(pjs::Error::NoPermission) => {
-                    if let Err(e) = session.persist_session_file("") {
-                        log::warn!("Failed to persist session {:?}", e)
-                    };
-                }
-                Err(_) => todo!(),
+            let Ok(_) = use_connect_wallet().await else {
+                return;
+            };
+            if let Some(user_session) = session.get() {
+                on_handle_account(user_session.account_id);
             }
-        } else {
-            header_handled.set(true);
         }
     });
-    let mut is_active = use_signal(|| false);
-    let mut connect_handled = use_signal(|| false);
     let active_class = if is_active() { "header--active" } else { "" };
     rsx!(
         div { class: "dashboard__header",
@@ -201,13 +172,32 @@ pub fn Header() -> Element {
                                 text: translate!(i18, "header.cta.connect"),
                                 status: None,
                                 right_icon: rsx!(
-                                    Icon { icon : ArrowUp, height : 14, width : 14, stroke_width : 1, stroke :
-                                    "var(--text-primary, #12352b)" }
+                                    Icon {
+                                        icon: Polkadot,
+                                        height: 20,
+                                        width: 20,
+                                        fill: "var(--text-primary)"
+                                    }
                                 ),
                                 on_click: move |_| {
-                                    use_connect_wallet();
-                                    connect_handled.toggle();
-                                }
+                                    spawn(
+                                        async move {
+                                            use_connect_wallet().await?;
+                                            connect_handled.toggle();
+
+                                            Ok::<(), PjsError>(())
+                                        } .unwrap_or_else(move |e: PjsError| {
+                                            match e {
+                                                PjsError::ConnectionFailed => {
+                                                    notification.handle_error(&translate!(i18, "errors.wallet.connection_failed"))
+                                                }
+                                                PjsError::AccountsNotFound => {
+                                                    notification.handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
+                                                }
+                                            };
+                                        })
+                                    );
+                                },
                             }
                         } else {
                             Dropdown {

@@ -1,12 +1,23 @@
 use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 
-use crate::components::atoms::{
-    button::Variant, dropdown::ElementSize, input::InputType, ArrowLeft, Button, CircleCheck, Icon,
-    Input, VirtoLogo,
+use crate::{
+    components::atoms::{
+        button::Variant, dropdown::ElementSize, input::InputType, Button, CircleCheck, Icon, Input,
+        Polkadot, VirtoLogo,
+    },
+    hooks::{
+        use_connect_wallet::{use_connect_wallet, PjsError},
+        use_notification::use_notification,
+    },
 };
+use futures_util::TryFutureExt;
 
 #[component]
 pub fn Login() -> Element {
+    let i18 = use_i18();
+    let mut notification = use_notification();
+
     rsx! {
         div { class: "page page--onboarding",
             div { class: "login",
@@ -122,12 +133,27 @@ pub fn Login() -> Element {
                                 size: ElementSize::Medium,
                                 variant: Variant::Secondary,
                                 on_click: move |_| {
+                                    spawn(
+                                        async move {
+                                            use_connect_wallet().await?;
 
+                                            Ok::<(), PjsError>(())
+                                        }.unwrap_or_else(move |e: PjsError| {
+                                            match e {
+                                                PjsError::ConnectionFailed => {
+                                                    notification.handle_error(&translate!(i18, "errors.wallet.connection_failed"))
+                                                }
+                                                PjsError::AccountsNotFound => {
+                                                    notification.handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
+                                                }
+                                            };
+                                        })
+                                    );
                                 },
                                 status: None,
                                 left_icon: rsx!(
                                     Icon {
-                                        icon: ArrowLeft,
+                                        icon: Polkadot,
                                         height: 24,
                                         width: 24,
                                         fill: "var(--fill-600)"
