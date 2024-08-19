@@ -60,6 +60,8 @@ pub fn VotingAction(props: VotingProps) -> Element {
 
                                             rsx!(
                                                 div {
+                                                    p {"{vote.balance:?}"}
+                                                    p {}
                                                     ComboInput {
                                                         size: ElementSize::Small,
                                                         value: ComboInputValue {
@@ -67,7 +69,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                                 key: "None".to_string(),
                                                                 value: "None".to_string(),
                                                             }),
-                                                            input: if vote.balance / KUSAMA_PRECISION_DECIMALS > 0 { (vote.balance / KUSAMA_PRECISION_DECIMALS).to_string() } else { String::new() },
+                                                            input: if vote.balance > 0 { (vote.balance as f64 / KUSAMA_PRECISION_DECIMALS as f64).to_string() } else { String::new() },
                                                         },
                                                         placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.balance"),
                                                         right_text: {
