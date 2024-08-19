@@ -60,8 +60,6 @@ pub fn VotingAction(props: VotingProps) -> Element {
 
                                             rsx!(
                                                 div {
-                                                    p {"{vote.balance:?}"}
-                                                    p {}
                                                     ComboInput {
                                                         size: ElementSize::Small,
                                                         value: ComboInputValue {
