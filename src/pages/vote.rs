@@ -5,20 +5,21 @@ use dioxus_std::{i18n::use_i18, translate};
 use futures_util::{StreamExt, TryFutureExt};
 
 use crate::{
-    components::atoms::{
-        button::Variant, dropdown::ElementSize, key_value::Variant as KeyValueVariant, Badge, Bar,
-        Button, CircleCheck, Icon, KeyValue, ActionRequest, StopSign,
+    components::{
+        atoms::{
+            button::Variant, dropdown::ElementSize, key_value::Variant as KeyValueVariant,
+            ActionRequest, Badge, Bar, Button, CircleCheck, Icon, KeyValue, StopSign,
+        },
+        molecules::ActionRequestList,
     },
     hooks::{
-        use_initiative::{
-            ActionItem, ConvictionVote, InitiativeInfoContent, InitiativeVoteData, Vote, VoteOf,
-            VoteType,
-        },
+        use_initiative::{ActionItem, InitiativeInfoContent, InitiativeVoteData, Vote, VoteOf},
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
         use_session::use_session,
         use_spaces_client::use_spaces_client,
-        use_tooltip::{use_tooltip, TooltipItem}, use_vote::{ProposalStatus, VoteDigest},
+        use_tooltip::{use_tooltip, TooltipItem},
+        use_vote::{ProposalStatus, VoteDigest},
     },
     pages::initiatives::InitiativeWrapper,
     services::kreivo::{
@@ -318,94 +319,8 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                             }
                                         }
                                         if show_requests() {
-                                            {
-                                                initiative_wrapper.info.actions.iter().map(|request| {
-                                                    rsx!(
-                                                        div { class: "requests",
-                                                            match request {
-                                                                ActionItem::AddMembers(action) => {
-                                                                    rsx!(
-                                                                        ActionRequest {
-                                                                            name: "Add Members",
-                                                                            details: action.members.len().to_string()
-                                                                        }
-                                                                        ul { class: "requests",
-                                                                            {
-                                                                                action.members.iter().map(|member| {
-                                                                                    rsx!(
-                                                                                        li {
-                                                                                            ActionRequest {
-                                                                                                name: format!("{}...", member.account[..10].to_string()),
-                                                                                            }
-                                                                                        }
-                                                                                    )
-                                                                                })
-                                                                            }
-                                                                        }
-                                                                    )
-                                                                },
-                                                                ActionItem::KusamaTreasury(action) => {
-                                                                    rsx!(
-                                                                        ActionRequest {
-                                                                            name: "Kusama Treasury Request"
-                                                                        }
-                                                                        ul { class: "requests",
-                                                                            {
-                                                                                action.periods.iter().enumerate().map(|(index, period)| {
-                                                                                    rsx!(
-                                                                                        li {
-                                                                                            ActionRequest {
-                                                                                                name: format!("Periodo: #{}", index + 1),
-                                                                                                details: format!("{} KSM", period.amount as f64 / 1_000_000_000_000.0 )
-                                                                                            }
-                                                                                        }
-                                                                                    )
-                                                                                })
-                                                                            }
-                                                                        }
-                                                                    )
-                                                                },
-                                                                ActionItem::VotingOpenGov(action) => {
-                                                                    rsx!(
-                                                                        ActionRequest {
-                                                                            name: "Voting Open Gov",
-                                                                            details: action.proposals.len().to_string()
-                                                                        }
-                                                                        ul { class: "requests",
-                                                                            {
-                                                                                action.proposals.iter().map(|proposal| {
-                                                                                    rsx!(
-                                                                                        li {
-                                                                                            match &proposal.vote {
-                                                                                                VoteType::Standard(vote) => {
-                                                                                                    let conviction = match vote.conviction {
-                                                                                                        ConvictionVote::None => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.none"),
-                                                                                                        ConvictionVote::Locked1x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_1"),
-                                                                                                        ConvictionVote::Locked2x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_2"),
-                                                                                                        ConvictionVote::Locked3x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_3"),
-                                                                                                        ConvictionVote::Locked4x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_4"),
-                                                                                                        ConvictionVote::Locked5x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_5"),
-                                                                                                        ConvictionVote::Locked6x => translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
-                                                                                                    };
-                                                                                                    rsx!(
-                                                                                                        ActionRequest {
-                                                                                                            name: format!("{} - {}", translate!(i18, "initiative.steps.actions.voting_open_gov.standard.title"), proposal.poll_index),
-                                                                                                            details: format!("{} - {} KSM", conviction, vote.balance as f64 / 1_000_000_000_000.0 ),
-                                                                                                        }
-                                                                                                    )
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    )
-                                                                                })
-                                                                            }
-                                                                        }
-                                                                    )
-                                                                },
-                                                            }
-                                                        }
-                                                    )
-                                                })
+                                            ActionRequestList {
+                                                actions: initiative_wrapper.info.actions.clone()
                                             }
                                         }
                                     }
@@ -439,7 +354,6 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 }
                                             }
                                             div {
-
                                                 {
                                                     let mut consumed = 0;
 
@@ -500,47 +414,45 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                     "Explain that this is a dynamic voting, and thresholds might change."
                                                 }
                                             }
-                                            if show_vote() {
-                                                if can_vote() {
-                                                    div { class: "row",
-                                                        Button {
-                                                            class: "vote-cta",
-                                                            text: translate!(i18, "governance.description.voting.cta.for"),
-                                                            size: ElementSize::Medium,
-                                                            variant: Variant::Secondary,
-                                                            on_click: move |_| {
-                                                                handle_vote(true)
-                                                            },
-                                                            status: None,
-                                                            left_icon: rsx!(
-                                                                Icon {
-                                                                    icon: CircleCheck,
-                                                                    height: 16,
-                                                                    width: 16,
-                                                                    stroke_width: 2,
-                                                                    stroke: "#56C95F"
-                                                                }
-                                                            )
-                                                        }
-                                                        Button {
-                                                            class: "vote-cta",
-                                                            text: translate!(i18, "governance.description.voting.cta.against"),
-                                                            size: ElementSize::Medium,
-                                                            variant: Variant::Secondary,
-                                                            on_click: move |_| {
-                                                                handle_vote(false)
-                                                            },
-                                                            status: None,
-                                                            left_icon: rsx!(
-                                                                Icon {
-                                                                    icon: StopSign,
-                                                                    height: 16,
-                                                                    width: 16,
-                                                                    stroke_width: 2,
-                                                                    stroke: "#f44336bd"
-                                                                }
-                                                            )
-                                                        }
+                                            if show_vote() && can_vote(){
+                                                div { class: "row",
+                                                    Button {
+                                                        class: "vote-cta",
+                                                        text: translate!(i18, "governance.description.voting.cta.for"),
+                                                        size: ElementSize::Medium,
+                                                        variant: Variant::Secondary,
+                                                        on_click: move |_| {
+                                                            handle_vote(true)
+                                                        },
+                                                        status: None,
+                                                        left_icon: rsx!(
+                                                            Icon {
+                                                                icon: CircleCheck,
+                                                                height: 16,
+                                                                width: 16,
+                                                                stroke_width: 2,
+                                                                stroke: "#56C95F"
+                                                            }
+                                                        )
+                                                    }
+                                                    Button {
+                                                        class: "vote-cta",
+                                                        text: translate!(i18, "governance.description.voting.cta.against"),
+                                                        size: ElementSize::Medium,
+                                                        variant: Variant::Secondary,
+                                                        on_click: move |_| {
+                                                            handle_vote(false)
+                                                        },
+                                                        status: None,
+                                                        left_icon: rsx!(
+                                                            Icon {
+                                                                icon: StopSign,
+                                                                height: 16,
+                                                                width: 16,
+                                                                stroke_width: 2,
+                                                                stroke: "#f44336bd"
+                                                            }
+                                                        )
                                                     }
                                                 }
                                             }
@@ -657,13 +569,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                 div { class: "details__tags",
                                     div { class: "card__tags",
                                         for tag in initiative_wrapper.clone().info.tags {
-                                            {
-                                                rsx!(
-                                                    Badge {
-                                                        class: "badge--lavanda-dark",
-                                                        text: tag
-                                                    }
-                                                )
+                                            Badge {
+                                                class: "badge--lavanda-dark",
+                                                text: tag
                                             }
                                         }
                                     }
