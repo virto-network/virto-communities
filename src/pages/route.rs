@@ -2,9 +2,8 @@ use dioxus::prelude::*;
 use crate::{
     layouts::{authenticated::Authenticated, onboard::Onboard},
     pages::{
-        dashboard::Dashboard, explore::Explore, initiative::Initiative,
-        initiatives::Initiatives, not_found::PageNotFound, onboarding::Onboarding,
-        vote::Vote,
+        dashboard::Dashboard, explore::Explore, initiative::Initiative, initiatives::Initiatives,
+        login::Login, not_found::PageNotFound, onboarding::Onboarding, vote::Vote,
     },
 };
 #[derive(Clone, Routable, Debug, PartialEq)]
@@ -12,6 +11,8 @@ use crate::{
 pub enum Route {
     #[route("/onboarding")]
     Onboarding {},
+    #[route("/login")]
+    Login {},
     #[layout(Authenticated)]
     #[route("/")]
     Dashboard {},

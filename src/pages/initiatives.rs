@@ -213,8 +213,7 @@ pub fn Initiatives(id: u16) -> Element {
                                         icon: CircleCheck,
                                         height: 16,
                                         width: 16,
-                                        stroke_width: 2,
-                                        stroke: "var(--text-primary)"
+                                        fill: "var(--text-primary)"
                                     }
                                     small { "{initiative.ongoing.tally.ayes} Aye" }
                                 }

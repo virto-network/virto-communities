@@ -8,6 +8,7 @@ pub mod pages {
     pub mod onboarding;
     pub mod route;
     pub mod vote;
+    pub mod login;
 }
 pub mod middlewares {
     pub mod is_chain_available;

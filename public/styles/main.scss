@@ -28,6 +28,8 @@ $fs-24: 24px;
 $fs-30: 30px;
 $fs-32: 32px;
 $fs-40: 40px;
+$fs-80: 80px;
+$fs-128: 128px;
 
 $lh-base: 16;
 
@@ -41,6 +43,8 @@ $lh-38: calc(38 / $lh-base) + rem;
 $lh-40: calc(40 / $lh-base) + rem;
 $lh-42: calc(42 / $lh-base) + rem;
 $lh-48: calc(48 / $lh-base) + rem;
+$lh-80: calc(80 / $lh-base) + rem;
+$lh-120: calc(120 / $lh-base) + rem;
 
 $fw-regular: 400;
 $fw-medium: 500;
@@ -89,6 +93,20 @@ $fw-bold: 700;
     font-size: $fs-40;
     font-weight: $fw-medium;
     line-height: $lh-48;
+}
+
+%text-medium-font-medium {
+    font-family: $font-family;
+    font-size: $fs-80;
+    font-weight: $fw-medium;
+    line-height: $lh-80;
+}
+
+%text-big-font-medium {
+    font-family: $font-family;
+    font-size: $fs-128;
+    font-weight: $fw-medium;
+    line-height: $lh-120;
 }
 
 %text-sm-font-medium {
@@ -1516,7 +1534,7 @@ textarea::placeholder {
 
 .input__label {
     @extend %text-lg-font-medium;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     text-wrap: balance;
 }
 
@@ -2515,6 +2533,124 @@ textarea::placeholder {
     right: 16px;
 }
 
+.login {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+.login>* {
+    flex: 1;
+}
+
+.login__container {
+    max-height: 100vh;
+    width: 100%;
+    padding: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--fill-100);
+}
+
+.login__info__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.login__head {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.login__welcome {
+    @extend %text-4xl-font-medium;
+    color: var(--text-primary);
+}
+
+.login__name {
+    @extend %text-big-font-medium;
+    color: var(--text-primary);
+}
+
+.login__info {
+    display: flex;
+    flex-direction: column;
+    padding: 44px 0;
+    gap: 24px;
+}
+
+.login__info__description {
+    @extend %text-2xl-font-medium;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.login__info__opportunities {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0;
+}
+
+.login__form {
+    padding: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login__form__wrapper {
+    display: flex;
+    padding: 24px 32px 32px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+    border-radius: 12px;
+    background: var(--fill-00);
+    box-shadow: 0px 1px 0px 0px rgba(26, 26, 26, 0.08), 0px 2px 4px -1px rgba(26, 26, 26, 0.08);
+}
+
+.login__form__wrapper .input-wrapper {
+    background: var(--fill-50);
+}
+
+.login__form__head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login__form__cta {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.login__form__title {
+    @extend %text-2xl-font-semibold;
+    color: var(--text-primary);
+}
+
+.login__form__description {
+    @extend %text-lg-font-regular;
+    color: var(--text-secondary);
+}
+
+.icon-text {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.icon-text__title {
+    @extend %text-lg-font-medium;
+    color: var(--text-primary);
+}
+
 .mobile {
     display: none;
 }
@@ -2535,6 +2671,38 @@ textarea::placeholder {
         --element-size-big: 48px;
         --element-size-medium: 36px;
         --element-size-small: 24px;
+    }
+
+    .login {
+        display: inline-block;
+        padding: 32px;
+    }
+
+    .login> *{
+        margin-top: 24px;
+    }
+
+    .login:first-child {
+        margin-top: 0;
+    }
+
+    .login__container {
+        background: transparent;
+        padding: 0;
+    }
+
+    .login__form {
+        padding: 0;
+    }
+
+    .login__info {
+        padding: 0;
+    }
+
+    .login__info__wrapper {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
 
     .onboarding__form {
@@ -2674,6 +2842,9 @@ textarea::placeholder {
 }
 
 @media only screen and (max-width: 768px) {
+    .login__name {
+        @extend %text-medium-font-medium;
+    }
     .onboarding__form {
         max-width: 100%;
     }
@@ -2681,9 +2852,27 @@ textarea::placeholder {
     .onboarding__image {
         display: none;
     }
+
+    .login {
+        padding: 16px;
+    }
+
+    .login__info {
+        padding: 24px 0;
+    }
+
+    .login__info__wrapper {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 @media only screen and (max-width: 600px) {
+    .login__info {
+        display: none;
+    }
+
     .onboarding__form {
         padding: 16px;
     }
