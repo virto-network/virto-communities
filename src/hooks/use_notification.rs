@@ -43,17 +43,20 @@ pub struct UseNotificationState {
     inner: Signal<NotificationItem>,
 }
 
+use gloo::timers::future::TimeoutFuture;
 impl UseNotificationState {
     pub fn get(&self) -> NotificationItem {
         self.inner.read().clone()
     }
 
     pub fn handle_notification(&mut self, item: NotificationItem) {
-        let mut this = self.clone();
         let mut inner = self.inner.clone();
         *inner.write() = item;
 
-        gloo::timers::callback::Timeout::new(3000, move || this.clear()).forget();
+        use_future(move || async move {
+            TimeoutFuture::new(3000).await;
+            *inner.write() = NotificationItem::default();
+        });
     }
 
     pub fn handle_success(&mut self, body: &str) {
