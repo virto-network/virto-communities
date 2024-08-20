@@ -2533,6 +2533,104 @@ textarea::placeholder {
     right: 16px;
 }
 
+.account__container {
+    max-height: 100vh;
+    width: 100%;
+    padding: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+}
+
+.account__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 28px;
+    border-radius: 28px;
+    background: #DAFBDB;
+    box-shadow: 0px 1px 0px 0px rgba(26, 26, 26, 0.08), 0px 2px 4px -1px rgba(26, 26, 26, 0.08);
+}
+
+.account__balance {
+    display: flex;
+    justify-content: space-between;
+}
+
+.account__balance__title {
+    @extend %text-2xl-font-medium;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.account__balance__cta {
+    width: fit-content;
+    display: flex;
+    gap: 8px;
+}
+
+.account__balance__cta>.button {
+    width: fit-content;
+}
+
+.account__actives {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.account__actives__cta {
+    width: fit-content;
+    display: flex;
+    gap: 8px;
+}
+
+.account__actives__cta>.button {
+    width: fit-content;
+}
+
+.actives__list {
+    width: 100%;
+}
+
+th {
+    @extend %text-base-font-medium;
+    color: var(--text-primary);
+    padding: 0 8px;
+    text-align: right;
+}
+
+td {
+    @extend %text-base-font-regular;
+    color: var(--text-secondary);
+    text-align: right;
+    padding: 4px 8px;
+}
+
+
+.list__asset--comming-soon {
+    opacity: .7;
+    filter: grayscale(1);
+}
+
+.list__asset--comming-soon::after {
+    @extend %text-xs-font-regular;
+    content: "Soon";
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    left: 60px;
+    padding: 0 4px;
+    border-radius: 4px;
+    color: var(--text-white);
+    background: var(--state-base-border);
+}
+
+.list__name {
+    text-align: left;
+}
+
 .login {
     display: flex;
     flex-wrap: wrap;
@@ -2678,7 +2776,7 @@ textarea::placeholder {
         padding: 32px;
     }
 
-    .login> *{
+    .login>* {
         margin-top: 24px;
     }
 
@@ -2845,6 +2943,7 @@ textarea::placeholder {
     .login__name {
         @extend %text-medium-font-medium;
     }
+
     .onboarding__form {
         max-width: 100%;
     }

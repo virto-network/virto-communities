@@ -1,14 +1,15 @@
 #![allow(non_snake_case)]
 pub mod pages {
+    pub mod account;
     pub mod dashboard;
     pub mod explore;
     pub mod initiative;
     pub mod initiatives;
+    pub mod login;
     pub mod not_found;
     pub mod onboarding;
     pub mod route;
     pub mod vote;
-    pub mod login;
 }
 pub mod middlewares {
     pub mod is_chain_available;
