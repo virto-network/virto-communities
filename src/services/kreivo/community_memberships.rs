@@ -84,10 +84,7 @@ pub async fn get_membership_id(address: &str, community_id: u16) -> Result<u16, 
 }
 
 pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError> {
-    let query = format!(
-        "wss://kreivo.io/communityMemberships/account/{}",
-        address
-    );
+    let query = format!("wss://kreivo.io/communityMemberships/account/{}", address);
     let response = sube!(&query)
         .await
         .map_err(|_| ChainStateError::FailedQuery)?;
@@ -122,28 +119,36 @@ pub async fn get_communities_by_member(member: &[u8]) -> Result<Vec<Community>, 
     let mut communities = vec![];
 
     let address = format!("0x{}", hex::encode(member));
-    let community_trackIds = tracksIds()
-        .await
-        .map_err(|_| ChainStateError::FailedQuery)?;
+    log::info!("address: {address}, member {member:?}");
+    let community_trackIds = tracksIds().await.map_err(|e| {
+        log::warn!("error: {:?}", e);
+        ChainStateError::FailedQuery
+    })?;
 
     for community in community_trackIds.communities.iter() {
+        log::info!("address: {address}, community {community}");
         let query = format!(
             "wss://kreivo.io/communityMemberships/account/{}/{}",
             address, community
         );
 
-        let response = sube!(&query)
-            .await
-            .map_err(|_| ChainStateError::FailedQuery)?;
+        let response = sube!(&query).await.map_err(|e| {
+            log::warn!("error: {:?}", e);
+            ChainStateError::FailedQuery
+        })?;
 
+        log::info!("{:?}", response);
         let Response::ValueSet(value) = response else {
             continue;
         };
 
         if value.len() > 0 {
             let response_track = tracks(*community).await;
+            log::info!("{:?}", response_track);
             let response_collection = collection(*community).await;
+            log::info!("{:?}", response_collection);
             let response_item = item(*community, None).await;
+            log::info!("{:?}", response_item);
 
             let collection_items = match response_collection {
                 Ok(ref collection) => {

@@ -19,7 +19,12 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
 
     let response = sube!(&query)
         .await
-        .map_err(|_| ChainStateError::FailedQuery)?;
+        .map_err(|e| {
+            log::warn!("{:?}", e);
+            ChainStateError::FailedQuery
+        } )?;
+
+    log::info!("{:?}", response);
 
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
@@ -27,7 +32,10 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
 
     let data = value.as_ref();
     let account_info =
-        CommunityTracks::decode(&mut &data[..]).map_err(|_| ChainStateError::FailedDecode)?;
+        CommunityTracks::decode(&mut &data[..]).map_err(|e| {
+            log::warn!("{:?}", e);
+            ChainStateError::FailedDecode
+        })?;
 
     Ok(account_info)
 }
