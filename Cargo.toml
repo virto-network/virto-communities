@@ -34,7 +34,7 @@ mime = "0.3.17"
 futures-util = "0.3.30"
 uuid = { version = "1.8.0", features = ["v4"] }
 
-sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", branch = "main", default-features = false, features = [
+sube = { package = "sube", git = "https://github.com/virto-network/virto-sdk.git", rev = "a53aceaf314cbdbb8f8960bd7e27b29d7fbb1677", default-features = false, features = [
     "js",
     "wss",
 ] }
