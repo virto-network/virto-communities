@@ -746,6 +746,22 @@ $fw-bold: 700;
     height: 44px;
 }
 
+.tab--comming-soon {
+    opacity: .7;
+    filter: grayscale(1);
+}
+
+.tab--comming-soon::after {
+    @extend %text-xs-font-regular;
+    content: "Soon";
+    position: absolute;
+    bottom: -12px;
+    padding: 0 4px;
+    border-radius: 4px;
+    color: var(--text-white);
+    background: var(--state-base-border);
+}
+
 .tab--active {
     color: var(--text-primary);
     background: var(--fill-50);
@@ -1501,6 +1517,18 @@ $fw-bold: 700;
 .icon-button--small {
     @extend %text-sm-font-semibold;
     height: var(--element-size-small);
+}
+
+.tab--small {
+    padding: 0 16px;
+}
+
+.tab--medium {
+    padding: 0 16px;
+}
+
+.tab--big {
+    padding: 0 16px;
 }
 
 .icon-button--big {
@@ -2533,24 +2561,47 @@ textarea::placeholder {
     right: 16px;
 }
 
-.account__container {
+.wallet, .transfers {
     max-height: 100vh;
     width: 100%;
-    padding: 64px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 16px;
 }
 
-.account__wrapper {
+.account {
+    max-height: 100vh;
+    width: 100%;
+    padding: 24px 56px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    justify-content: center;
+    gap: 16px;
+}
+
+.account__options {
+    display: flex;
+    gap: 4px;
+}
+
+.account__container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     padding: 20px 28px;
     border-radius: 28px;
-    background: #DAFBDB;
+    background: var(--white);
     box-shadow: 0px 1px 0px 0px rgba(26, 26, 26, 0.08), 0px 2px 4px -1px rgba(26, 26, 26, 0.08);
+}
+
+.account__container .balance__title,
+.account__container .balance__subtitle {
+    text-align: left;
+}
+
+.account__container>.balances>.balance__title>* {
+    @extend %text-2xl-font-medium;
 }
 
 .account__balance {
@@ -2560,7 +2611,7 @@ textarea::placeholder {
 
 .account__balance__title {
     @extend %text-2xl-font-medium;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     text-align: left;
 }
 
@@ -2577,7 +2628,7 @@ textarea::placeholder {
 .account__actives {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
 .account__actives__cta {

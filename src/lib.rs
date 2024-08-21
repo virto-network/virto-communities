@@ -59,6 +59,7 @@ pub mod services {
         pub mod timestamp;
     }
     pub mod kusama {
+        pub mod balances;
         pub mod system;
     }
 }
