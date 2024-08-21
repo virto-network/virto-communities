@@ -1,7 +1,8 @@
 use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
+use futures_util::{StreamExt, TryFutureExt};
+
 use crate::{
     components::atoms::{
         dropdown::{DropdownItem, ElementSize},
@@ -12,10 +13,14 @@ use crate::{
     hooks::{
         use_accounts::{use_accounts, IsDaoOwner},
         use_connect_wallet::{use_connect_wallet, PjsError},
+        use_market_client::use_market_client,
         use_notification::use_notification,
         use_session::{use_session, UserSession},
     },
-    services::kreivo::{balances::account, communities::is_admin},
+    services::{
+        kreivo::{balances::account, communities::is_admin},
+        market::types::Tokens,
+    },
 };
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -26,6 +31,7 @@ extern "C" {
 #[component]
 pub fn Header() -> Element {
     let i18 = use_i18();
+    let market_client = use_market_client().get();
     let mut accounts = use_accounts();
     let mut notification = use_notification();
     let mut session = use_session();
@@ -42,6 +48,7 @@ pub fn Header() -> Element {
     };
     let get_balance = move || {
         spawn({
+            let market_client = market_client.to_owned();
             async move {
                 let pjs_account = get_account()
                     .ok_or(translate!(i18, "errors.wallet.accounts_not_found"))?;
@@ -65,7 +72,12 @@ pub fn Header() -> Element {
                     })?;
                 accounts.set_is_active_account_an_admin(IsDaoOwner(is_dao_owner));
                 let unscaled_value = account.data.free as f64 / 10_f64.powf(12f64);
-                const KSM_PRICE: f64 = 32.11;
+
+                let KSM_PRICE = market_client
+                    .get_price_by_token(Tokens::KSM)
+                    .await
+                    .map_err(|_| String::from("No se ha podido consultar el precio"))?;
+
                 let usdt_value = unscaled_value * KSM_PRICE;
                 let usdt_value = usdt_value.to_string();
                 let unscaled_value = unscaled_value.to_string();
@@ -106,43 +118,49 @@ pub fn Header() -> Element {
             AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
         ))
     }
-    let mut on_handle_account = move |event: u8| {
-        let account = &accounts.get()[event as usize];
-        let Ok(serialized_session) = serde_json::to_string(
-            &UserSession {
+
+    let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
+        while let Some(event) = rx.next().await {
+            let account = &accounts.get()[event as usize];
+
+            let Ok(serialized_session) = serde_json::to_string(&UserSession {
                 name: account.name(),
                 address: account.address(),
                 account_id: event,
-            },
-        ) else {
-            return notification.handle_error(&translate!(i18, "errors.session.persist"));
-        };
-        if let Err(e) = session.persist_session_file(&serialized_session) {
-            log::warn!("Failed to persist session {:?}", e)
-        }
-        if let Err(e) = session.update_account(event) {
-            log::warn!("Failed to update account {:?}", e)
-        }
-        log::info!("{:?}", account);
-        accounts.set_account(Some(account.clone()));
-        set_signer(account.address().clone());
-        let account = get_account()
-            .and_then(|account| {
+            }) else {
+                return notification.handle_error(&translate!(i18, "errors.session.persist"));
+            };
+
+            if let Err(e) = session.persist_session_file(&serialized_session) {
+                log::warn!("Failed to persist session {:?}", e)
+            };
+            if let Err(e) = session.update_account(event) {
+                log::warn!("Failed to update account {:?}", e)
+            };
+
+            log::info!("{:?}", account);
+            accounts.set_account(Some(account.clone()));
+            set_signer(account.address().clone());
+
+            let account = get_account().and_then(|account| {
                 Some(DropdownItem {
                     key: account.address().clone(),
                     value: account.name(),
                 })
             });
-        dropdown_value.set(account);
-        get_balance();
-    };
+
+            dropdown_value.set(account);
+            get_balance();
+        }
+    });
+
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         if session.is_logged() {
             let Ok(_) = use_connect_wallet().await else {
                 return;
             };
             if let Some(user_session) = session.get() {
-                on_handle_account(user_session.account_id);
+                on_handle_account.send(user_session.account_id);
             }
         }
     });
@@ -162,7 +180,7 @@ pub fn Header() -> Element {
                             size: ElementSize::Big,
                             default: None,
                             on_change: move |event: usize| {
-                                on_handle_account(event as u8);
+                                on_handle_account.send(event as u8);
                             },
                             body: items
                         }
@@ -207,7 +225,7 @@ pub fn Header() -> Element {
                                 placeholder: translate!(i18, "header.cta.account"),
                                 default: None,
                                 on_change: move |event: usize| {
-                                    on_handle_account(event as u8);
+                                    on_handle_account.send(event as u8);
                                 },
                                 body: items
                             }
@@ -236,10 +254,15 @@ pub fn Header() -> Element {
                         }
                         div { class: "balances",
                             span { class: "balance__title",
-                                span { class: "balance__sign", "$" }
-                                span { class: "balance__value", "{ksm_balance().0}" }
-                                span { class: "balance__decimals", ".{ksm_balance().1}" }
-                                span { class: "balance__asset", "KSM" }
+                                span { class: "balance__value",
+                                    "{ksm_balance().0}"
+                                }
+                                span { class: "balance__decimals",
+                                    ".{ksm_balance().1}"
+                                }
+                                span { class: "balance__asset",
+                                    "KSM"
+                                }
                             }
                             span { class: "balance__subtitle",
                                 span { class: "balance__sign", "$" }

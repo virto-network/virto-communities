@@ -6,8 +6,11 @@ use futures_util::TryFutureExt;
 
 use crate::{
     components::atoms::{button::Variant as ButtonVariant, dropdown::ElementSize, Button, Tab},
-    hooks::{use_notification::use_notification, use_session::use_session},
-    services::{kreivo, kusama},
+    hooks::{
+        use_market_client::use_market_client, use_notification::use_notification,
+        use_session::use_session,
+    },
+    services::{kreivo, kusama, market::types::Tokens},
 };
 use wasm_bindgen::prelude::*;
 
@@ -34,11 +37,13 @@ pub fn Account() -> Element {
     let i18 = use_i18();
     let mut notification = use_notification();
     let session = use_session();
+    let market_client = use_market_client().get();
     let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
     let mut usdt_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
 
     let mut kreivo_balance = use_signal(|| 0.0);
     let mut kusama_balance = use_signal(|| 0.0);
+    let mut ksm_usd = use_signal(|| 0.0);
 
     let get_balance = move || {
         spawn({
@@ -76,7 +81,12 @@ pub fn Account() -> Element {
                 kusama_balance.set(account.data.free as f64 / 10_f64.powf(12f64));
 
                 let unscaled_value = kreivo_balance() + kusama_balance();
-                const KSM_PRICE: f64 = 32.11;
+                let KSM_PRICE = market_client
+                    .get_price_by_token(Tokens::KSM)
+                    .await
+                    .map_err(|_| String::from("No se ha podido consultar el precio"))?;
+
+                ksm_usd.set(KSM_PRICE);
 
                 let usdt_value = unscaled_value * KSM_PRICE;
 
@@ -238,8 +248,12 @@ pub fn Account() -> Element {
                                                         tr {
                                                             td { class: "list__name", "KSM" }
                                                             td { { format!("{:.2}", kreivo_balance()) } }
-                                                            td { "$18.1 USD" }
-                                                            td { "$181.0 USD" }
+                                                            td {
+                                                                { format!("${} USD", if ksm_usd() == 0.0 { "-".to_string() } else { format!("{:.2}", ksm_usd()) } )}
+                                                            }
+                                                            td {
+                                                                { format!("${} USD", if ksm_usd() == 0.0 || kreivo_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kreivo_balance()) } )}
+                                                            }
                                                         }
 
                                                         tr { class: "list__asset--comming-soon",
@@ -260,8 +274,12 @@ pub fn Account() -> Element {
                                                         tr {
                                                             td { class: "list__name", "KSM" }
                                                             td { { format!("{:.2}", kusama_balance()) } }
-                                                            td { "$18.1 USD" }
-                                                            td { "$181.0 USD" }
+                                                            td {
+                                                                { format!("${} USD", if ksm_usd() == 0.0 { "-".to_string() } else { format!("{:.2}", ksm_usd()) } )}
+                                                            }
+                                                            td {
+                                                                { format!("${} USD", if ksm_usd() == 0.0 || kusama_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kusama_balance()) } )}
+                                                            }
                                                         }
 
                                                         tr { class: "list__asset--comming-soon",

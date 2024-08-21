@@ -26,6 +26,7 @@ pub mod hooks {
     pub mod use_connect_wallet;
     pub mod use_initiative;
     pub mod use_language;
+    pub mod use_market_client;
     pub mod use_notification;
     pub mod use_onboard;
     pub mod use_our_navigator;
@@ -44,6 +45,10 @@ pub mod components {
 }
 pub mod services {
     pub mod bot {
+        pub mod client;
+        pub mod types;
+    }
+    pub mod market {
         pub mod client;
         pub mod types;
     }

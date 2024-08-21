@@ -1,7 +1,10 @@
 use dioxus::{hooks::use_context_provider, signals::Signal};
 use pjs::PjsExtension;
 
-use crate::{pages::{dashboard::Community, initiatives::InitiativeWrapper}, services::bot::client::SpacesClient};
+use crate::{
+    pages::initiatives::InitiativeWrapper, services::bot::client::SpacesClient,
+    services::market::client::MarketClient,
+};
 
 use super::{
     use_accounts::{Account, IsDaoOwner},
@@ -15,6 +18,8 @@ use super::{
     use_tooltip::TooltipItem,
 };
 const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
+const MARKET_CLIENT_URL: &str = "https://sapi.coincarp.com/api/v1";
+
 pub fn use_startup() {
     use_context_provider::<Signal<Theme>>(|| Signal::new(Theme::default()));
     use_context_provider::<Signal<BasicsForm>>(|| Signal::new(BasicsForm::default()));
@@ -50,10 +55,15 @@ pub fn use_startup() {
         Signal<ConfirmationForm>,
     >(|| Signal::new(ConfirmationForm::default()));
     use_context_provider::<Signal<TimestampValue>>(|| Signal::new(TimestampValue(0)));
-    use_context_provider::<
-        Signal<IsTimestampHandled>,
-    >(|| Signal::new(IsTimestampHandled(false)));
-    use_context_provider::<
-        Signal<SpacesClient>,
-    >(|| { Signal::new(SpacesClient::new(SPACES_CLIENT_URL)) });
+    use_context_provider::<Signal<IsTimestampHandled>>(|| Signal::new(IsTimestampHandled(false)));
+
+    // Clients
+
+    use_context_provider::<Signal<SpacesClient>>(|| {
+        Signal::new(SpacesClient::new(SPACES_CLIENT_URL))
+    });
+
+    use_context_provider::<Signal<MarketClient>>(|| {
+        Signal::new(MarketClient::new(MARKET_CLIENT_URL))
+    });
 }
