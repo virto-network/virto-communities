@@ -1,10 +1,8 @@
 use dioxus::prelude::*;
-
 pub trait IconShape: PartialEq {
     fn view_box(&self) -> String;
     fn child_elements(&self) -> Element;
 }
-
 #[derive(PartialEq, Clone, Props)]
 pub struct IconProps<T: IconShape + 'static> {
     #[props(default = 20)]
@@ -21,16 +19,14 @@ pub struct IconProps<T: IconShape + 'static> {
     pub class: String,
     pub icon: T,
 }
-
 pub fn Icon<T: IconShape + 'static>(props: IconProps<T>) -> Element {
     let icon_style = format!(
         r#"
         width: 100%;
         max-width: {}px;
     "#,
-        props.width
+        props.width,
     );
-
     rsx! {
         svg {
             style: "{icon_style}",
@@ -42,7 +38,7 @@ pub fn Icon<T: IconShape + 'static>(props: IconProps<T>) -> Element {
             view_box: format_args!("{}", props.icon.view_box()),
             stroke_linecap: "round",
             stroke_linejoin: "round",
-            {props.icon.child_elements()}
+            { props.icon.child_elements() }
         }
     }
 }

@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-
 #[derive(PartialEq, Props, Clone)]
 pub struct StepCardProps {
     name: String,
@@ -12,11 +11,10 @@ pub struct StepCardProps {
     editable: Option<Element>,
     on_change: EventHandler,
 }
-
 pub fn StepCard(props: StepCardProps) -> Element {
     rsx!(
         label {
-            class: "step-card {props.class}" ,
+            class: "step-card {props.class}",
             class: if props.soon { "step-card--comming-soon" },
             input {
                 class: "step__cta",
@@ -24,17 +22,15 @@ pub fn StepCard(props: StepCardProps) -> Element {
                 name: props.name,
                 disabled: props.soon,
                 checked: props.checked,
-                onchange: move |_| {
-                    props.on_change.call(())
-                }
+                onchange: move |_| { props.on_change.call(()) }
             }
             div { class: "step-card__header",
                 div { class: "step-custom" }
-                {props.body}
+                { props.body }
             }
             if props.checked {
                 if let Some(editable) = props.editable {
-                    {editable}
+                    { editable }
                 }
             }
         }

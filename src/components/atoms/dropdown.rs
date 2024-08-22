@@ -1,20 +1,16 @@
 use dioxus::prelude::*;
-
 use crate::components::atoms::{Arrow, Icon};
-
 #[derive(PartialEq, Debug, Clone, Default)]
 pub struct DropdownItem {
     pub key: String,
     pub value: String,
 }
-
 #[derive(PartialEq, Clone)]
 pub enum ElementSize {
     Big,
     Medium,
     Small,
 }
-
 #[derive(PartialEq, Props, Clone)]
 pub struct DropdownProps {
     value: Option<DropdownItem>,
@@ -31,30 +27,17 @@ pub struct DropdownProps {
     size: ElementSize,
     body: Vec<Element>,
 }
-
 pub fn Dropdown(props: DropdownProps) -> Element {
     let mut is_active = use_signal::<bool>(|| false);
-    let disabled = if props.disabled {
-        "button--disabled"
-    } else {
-        ""
-    };
-
-    let placeholder = if let None = props.value {
-        "dropdown__placeholder"
-    } else {
-        ""
-    };
-
+    let disabled = if props.disabled { "button--disabled" } else { "" };
+    let placeholder = if let None = props.value { "dropdown__placeholder" } else { "" };
     let size = match props.size {
         ElementSize::Big => "dropdown__container--big",
         ElementSize::Medium => "dropdown__container--medium",
         ElementSize::Small => "dropdown__container--small",
     };
-
     rsx!(
-        section {
-            class: "dropdown {props.class}",
+        section { class: "dropdown {props.class}",
             if let Some(value) = props.label {
                 label { class: "dropdown__label", "{value}" }
             }
@@ -67,14 +50,10 @@ pub fn Dropdown(props: DropdownProps) -> Element {
                             is_active.toggle();
                         }
                     },
-                    span {
-                        class: "dropdown__content",
-                        span {
-                            class: "dropdown__value {placeholder}",
-                            match props.value {
-                                Some(v) => {v.value}.to_string(),
-                                None => props.placeholder
-                            }
+                    span { class: "dropdown__content",
+                        span { class: "dropdown__value {placeholder}",
+                            match props.value { Some(v) => { v.value }
+                            .to_string(), None => props.placeholder }
                         }
                         Icon {
                             class: if is_active() { "rotate-180" } else { "rotate-0" },
@@ -87,24 +66,9 @@ pub fn Dropdown(props: DropdownProps) -> Element {
                     }
                 }
                 if is_active() {
-                    {rsx!(
-                        ul {
-                            class: "dropdown__list",
-                            {
-                                props.body.into_iter().enumerate().map(|(index, item)| {
-                                    rsx!(
-                                    li {
-                                        class: "dropdown__item",
-                                        onclick: move |_| {
-                                            is_active.toggle();
-                                            props.on_change.call(index)
-                                        },
-                                        {item}
-                                    })
-                                })
-                            }
-                        }
-                    )}
+                    { rsx!(ul { class : "dropdown__list", { props.body.into_iter().enumerate().map(|
+                    (index, item) | { rsx!(li { class : "dropdown__item", onclick : move | _ | {
+                    is_active.toggle(); props.on_change.call(index) }, { item } }) }) } }) }
                 }
             }
         }

@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CommunitySpace {
     pub name: String,
@@ -9,23 +8,19 @@ pub struct CommunitySpace {
     pub description: Option<String>,
     pub industry: String,
 }
-
 #[derive(Deserialize)]
 pub struct CommunityMatrixId {
     id: String,
 }
-
 impl CommunityMatrixId {
     pub fn get_id(self) -> String {
         self.id
     }
 }
-
 #[derive(Deserialize)]
 pub struct Uri {
     uri: String,
 }
-
 impl Uri {
     pub fn get(self) -> String {
         self.uri

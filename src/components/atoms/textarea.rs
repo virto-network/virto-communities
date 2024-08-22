@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-
 #[derive(PartialEq, Props, Clone)]
 pub struct TextareaInputProps {
     value: String,
@@ -9,17 +8,13 @@ pub struct TextareaInputProps {
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
 }
-
 pub fn TextareaInput(props: TextareaInputProps) -> Element {
     let mut sent_handled = use_signal(|| false);
-
     rsx!(
-        section {
-            class: "textarea",
+        section { class: "textarea",
             if let Some(value) = props.label {
                 label { class: "input__label", "{value}" }
             }
-
             textarea {
                 id: "textarea",
                 class: "textarea__wrapper input",
@@ -30,7 +25,6 @@ pub fn TextareaInput(props: TextareaInputProps) -> Element {
                 },
                 onkeypress: move |event| {
                     let modifiers = event.modifiers();
-
                     match modifiers {
                         keyboard_types::Modifiers::SHIFT => {}
                         _ => {
@@ -39,7 +33,6 @@ pub fn TextareaInput(props: TextareaInputProps) -> Element {
                             }
                         }
                     }
-
                     if modifiers.is_empty() {
                         props.on_keypress.call(event)
                     }

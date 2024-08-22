@@ -9,17 +9,14 @@ pub mod pages {
     pub mod route;
     pub mod vote;
 }
-
 pub mod middlewares {
     pub mod is_chain_available;
     pub mod is_dao_owner;
 }
-
 pub mod layouts {
     pub mod authenticated;
     pub mod onboard;
 }
-
 pub mod hooks {
     pub mod use_accounts;
     pub mod use_attach;
@@ -39,12 +36,10 @@ pub mod hooks {
     pub mod use_tooltip;
     pub mod use_vote;
 }
-
 pub mod components {
     pub mod atoms;
     pub mod molecules;
 }
-
 pub mod services {
     pub mod bot {
         pub mod client;
@@ -61,7 +56,6 @@ pub mod services {
         pub mod system;
         pub mod timestamp;
     }
-
     pub mod kusama {
         pub mod system;
     }

@@ -1,7 +1,5 @@
 use dioxus::prelude::*;
-
 use crate::hooks::use_notification::NotificationVariant;
-
 #[derive(PartialEq, Props, Clone)]
 pub struct NotificationProps {
     title: String,
@@ -9,7 +7,6 @@ pub struct NotificationProps {
     variant: NotificationVariant,
     on_click: EventHandler<MouseEvent>,
 }
-
 pub fn Notification(props: NotificationProps) -> Element {
     let variant = match props.variant {
         NotificationVariant::Warning => "notification--warning",
@@ -21,7 +18,6 @@ pub fn Notification(props: NotificationProps) -> Element {
             class: "notification {variant}",
             onclick: move |event| props.on_click.call(event),
             h3 { class: "notification__title", "{props.title}" }
-
             p { class: "notification__body", "{props.body}" }
         }
     )

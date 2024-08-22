@@ -1,23 +1,20 @@
 use std::str::FromStr;
-
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;
-
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant,
-            input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Compass, Icon,
-            IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize,
+            icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight,
+            Avatar, Badge, Chat, Compass, Icon, IconButton, SearchInput, Suitcase, Tab,
+            UserAdd, UserGroup,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_accounts::use_accounts,
-        use_notification::use_notification,
-        use_our_navigator::use_our_navigator,
-        use_session::use_session,
+        use_accounts::use_accounts, use_notification::use_notification,
+        use_our_navigator::use_our_navigator, use_session::use_session,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
@@ -27,13 +24,11 @@ use crate::{
         community_track::{tracks, tracksIds},
     },
 };
-
 #[derive(PartialEq, Clone)]
 pub enum CommunityTag {
     Neighborhood,
     SocialImpact,
 }
-
 #[derive(PartialEq, Clone, Debug)]
 pub struct Community {
     pub id: u16,
@@ -44,9 +39,7 @@ pub struct Community {
     pub tags: Vec<String>,
     pub members: u16,
 }
-
 static SKIP: u8 = 6;
-
 #[component]
 pub fn Dashboard() -> Element {
     let i18 = use_i18();
@@ -54,67 +47,57 @@ pub fn Dashboard() -> Element {
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
     let session = use_session();
-
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
-
-    let tab_items = vec![TabItem {
-        k: String::from("all"),
-        value: translate!(i18, "dashboard.tabs.all"),
-    }];
-
+    let tab_items = vec![
+        TabItem {
+            k: String::from("all"),
+            value: translate!(i18, "dashboard.tabs.all"),
+        },
+    ];
     let tab_value = use_signal::<String>(|| String::from("all"));
-
     let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
     let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
-
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        tooltip.handle_tooltip(TooltipItem {
-            title: translate!(i18, "dao.tips.loading.title"),
-            body: translate!(i18, "dao.tips.loading.description"),
-            show: true,
-        });
-
+        tooltip
+            .handle_tooltip(TooltipItem {
+                title: translate!(i18, "dao.tips.loading.title"),
+                body: translate!(i18, "dao.tips.loading.description"),
+                show: true,
+            });
         let Some(session) = session.get() else {
             log::info!("error here by account");
-            notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+            notification
+                .handle_error(&translate!(i18, "errors.communities.query_failed"));
             tooltip.hide();
             return;
         };
-
         let Ok(address) = sp_core::sr25519::Public::from_str(&session.address) else {
             log::info!("error here by address");
             notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
             tooltip.hide();
             return;
         };
-
         let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
             log::info!("error here by memeber");
-            notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+            notification
+                .handle_error(&translate!(i18, "errors.communities.query_failed"));
             tooltip.hide();
             return;
         };
-
         communities_by_address.set(community_tracks.clone());
         filtered_communities.set(community_tracks.clone());
-
         tooltip.hide();
     });
-
     rsx! {
-        div {
-            class: "dashboard grid-main",
+        div { class: "dashboard grid-main",
             div { class: "dashboard__head",
                 section { class: "tabs",
-                    // body: items
                     for item in tab_items.into_iter() {
                         Tab {
                             text: item.value,
-                            is_active: if tab_value() == item.k {true} else {false},
-                            on_click: move |_| {
-                                // tab_value.set(item.k);
-                            },
+                            is_active: if tab_value() == item.k { true } else { false },
+                            on_click: move |_| {}
                         }
                     }
                 }
@@ -125,32 +108,37 @@ pub fn Dashboard() -> Element {
                         error: None,
                         on_input: move |event: Event<FormData>| {
                             search_word.set(event.value());
-
                             if search_word().trim().is_empty() {
                                 filtered_communities.set(communities_by_address());
                             } else {
                                 let pattern = search_word().trim().to_lowercase();
-                                filtered_communities.set(communities_by_address().into_iter().filter(|community| community.name.to_lowercase().contains(&pattern)).collect::<Vec<Community>>());
+                                filtered_communities
+                                    .set(
+                                        communities_by_address()
+                                            .into_iter()
+                                            .filter(|community| {
+                                                community.name.to_lowercase().contains(&pattern)
+                                            })
+                                            .collect::<Vec<Community>>(),
+                                    );
                             }
                         },
                         on_keypress: move |_| {},
-                        on_click: move |_| {},
+                        on_click: move |_| {}
                     }
                     IconButton {
                         class: "button--avatar desktop",
                         size: ElementSize::Medium,
                         body: rsx!(
-                            Icon {
-                                icon: AddPlus,
-                                height: 26,
-                                width: 26,
-                                stroke_width: 1.5,
-                                fill: "var(--fill-00)"
-                            }
+                            Icon { icon : AddPlus, height : 26, width : 26, stroke_width : 1.5, fill :
+                            "var(--fill-00)" }
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![Box::new(is_chain_available()), Box::new(is_dao_owner())], "/onboarding");
+                            nav.push(
+                                vec![Box::new(is_chain_available()), Box::new(is_dao_owner())],
+                                "/onboarding",
+                            );
                         }
                     }
                 }
@@ -162,24 +150,15 @@ pub fn Dashboard() -> Element {
                             div { class: "card__head",
                                 IconButton {
                                     body: rsx!(
-                                        Avatar {
-                                            name: "{community.name}",
-                                            size: 48,
-                                            uri: community.icon,
-                                            variant: AvatarVariant::SemiRound
-                                        }
+                                        Avatar { name : "{community.name}", size : 48, uri : community.icon, variant :
+                                        AvatarVariant::SemiRound }
                                     ),
-                                    on_click: move |_| { }
+                                    on_click: move |_| {}
                                 }
-                                h3 { class: "card__title",
-                                    "{community.name}"
-                                }
+                                h3 { class: "card__title", "{community.name}" }
                             }
-                            p { class: "card__description",
-                                "{community.description}"
-                            }
+                            p { class: "card__description", "{community.description}" }
                             div { class: "card__metrics",
-
                                 span { class: "card__metric",
                                     Icon {
                                         icon: UserAdd,
@@ -188,9 +167,7 @@ pub fn Dashboard() -> Element {
                                         stroke_width: 2,
                                         stroke: "var(--text-primary)"
                                     }
-                                    small {
-                                        "{community.memberships} Free Memberships"
-                                    }
+                                    small { "{community.memberships} Free Memberships" }
                                 }
                                 span { class: "card__metric",
                                     Icon {
@@ -200,36 +177,22 @@ pub fn Dashboard() -> Element {
                                         stroke_width: 1,
                                         fill: "var(--text-primary)"
                                     }
-                                    small {
-                                        "{community.members} Members"
-                                    }
+                                    small { "{community.members} Members" }
                                 }
                             }
                             div { class: "card__tags",
                                 for tag in community.tags {
-                                    {
-                                        rsx!(
-                                            Badge {
-                                                class: "badge--lavanda-dark",
-                                                text: tag
-                                            }
-                                        )
-                                    }
+                                    { rsx!(Badge { class :
+                                    "badge--lavanda-dark", text : tag }) }
                                 }
                             }
                         }
-
                         div { class: "card__cta",
                             IconButton {
                                 class: "button--avatar buttom--comming-soon",
                                 body: rsx!(
-                                    Icon {
-                                        icon: ArrowRight,
-                                        height: 32,
-                                        width: 32,
-                                        stroke_width: 2,
-                                        fill: "var(--fill-00)"
-                                    }
+                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
+                                    "var(--fill-00)" }
                                 ),
                                 on_click: move |_| {
                                     let path = format!("/dao/{}/initiatives", community.id);
@@ -243,25 +206,19 @@ pub fn Dashboard() -> Element {
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.explore.title")}
+                                { translate!(i18,
+                                "dashboard.cta_cards.explore.title") }
                             }
                         }
                         p { class: "card__description",
-                            {translate!(i18, "dashboard.cta_cards.explore.description")}
+                            {
+                            translate!(i18, "dashboard.cta_cards.explore.description") }
                         }
                     }
-
                     div { class: "card__cta",
                         IconButton {
                             class: "button--avatar",
-                            body: rsx!(
-                                Icon {
-                                    icon: Compass,
-                                    height: 32,
-                                    width: 32,
-                                    fill: "var(--fill-00)"
-                                }
-                            ),
+                            body: rsx!(Icon { icon : Compass, height : 32, width : 32, fill : "var(--fill-00)" }),
                             on_click: move |_| {
                                 nav.push(vec![], "/explore");
                             }
@@ -272,15 +229,16 @@ pub fn Dashboard() -> Element {
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.create.title")}
+                                { translate!(i18, "dashboard.cta_cards.create.title") }
                             }
                         }
                         p { class: "card__description",
-                            {translate!(i18, "dashboard.cta_cards.create.description")}
+                            { translate!(i18,
+                            "dashboard.cta_cards.create.description") }
                         }
                         div { class: "card__head",
                             a { class: "card__learn",
-                                {translate!(i18, "dashboard.cta_cards.create.cta")}
+                                { translate!(i18, "dashboard.cta_cards.create.cta") }
                             }
                             Icon {
                                 icon: ArrowRight,
@@ -291,24 +249,21 @@ pub fn Dashboard() -> Element {
                             }
                         }
                     }
-
                     div { class: "card__cta",
                         IconButton {
                             class: "button--avatar",
                             size: ElementSize::Big,
                             body: rsx!(
-                                Icon {
-                                    icon: AddPlus,
-                                    height: 32,
-                                    width: 32,
-                                    stroke_width: 1.5,
-                                    fill: "var(--fill-00)"
-                                }
+                                Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
+                                "var(--fill-00)" }
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_chain_available()), Box::new(is_dao_owner())], "/onboarding");
-                             }
+                                nav.push(
+                                    vec![Box::new(is_chain_available()), Box::new(is_dao_owner())],
+                                    "/onboarding",
+                                );
+                            }
                         }
                     }
                 }
@@ -316,43 +271,27 @@ pub fn Dashboard() -> Element {
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
                     span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities_by_address.len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
+                        { translate!(i18,
+                        "dashboard.footer.paginator", from : current_page(), to :
+                        (((communities_by_address.len() as f64 + 1f64) / SKIP as f64) as f64).ceil()) }
                     }
                     div { class: "dashboard__footer__paginators",
                         IconButton {
                             class: "button--avatar",
                             size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowLeft,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
+                            body: rsx!(Icon { icon : ArrowLeft, height : 24, width : 24, fill : "var(--white)" }),
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current - 1);
-
-                                // get_community_track.send(current_page())
                             }
                         }
                         IconButton {
                             class: "button--avatar",
                             size: ElementSize::Small,
-                            body: rsx!(
-                                Icon {
-                                    icon: ArrowRight,
-                                    height: 24,
-                                    width: 24,
-                                    fill: "var(--white)"
-                                }
-                            ),
+                            body: rsx!(Icon { icon : ArrowRight, height : 24, width : 24, fill : "var(--white)" }),
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current + 1);
-
-                                // get_community_track.send(current_page())
                             }
                         }
                     }
@@ -361,24 +300,13 @@ pub fn Dashboard() -> Element {
         }
     }
 }
-
 fn nice_money(value: u64) -> String {
     let units = vec!["", "K", "M", "B"];
     let mut l = 0;
     let mut n = value as f64;
-
     while n >= 1000.0 && l < units.len() - 1 {
         n /= 1000.0;
         l += 1;
     }
-
-    format!(
-        "${:.2}{}",
-        n,
-        if n < 10.0 && l > 0 {
-            units[l]
-        } else {
-            units[l]
-        }
-    )
+    format!("${:.2}{}", n, if n < 10.0 && l > 0 { units[l] } else { units[l] })
 }

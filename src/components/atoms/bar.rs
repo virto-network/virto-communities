@@ -1,12 +1,10 @@
 use dioxus::prelude::*;
-
 #[derive(PartialEq, Clone)]
 pub enum Variant {
     Remaign,
     Vote,
-    Participation
+    Participation,
 }
-
 #[derive(PartialEq, Props, Clone)]
 pub struct BarProps {
     left_value: f64,
@@ -19,47 +17,31 @@ pub struct BarProps {
     #[props(default = Variant::Remaign)]
     variant: Variant,
 }
-
 pub fn Bar(props: BarProps) -> Element {
     let variant = match props.variant {
         Variant::Remaign => "bar--remaign",
         Variant::Vote => "bar--vote",
         Variant::Participation => "bar--participation",
     };
-
     rsx!(
         section {
-            div {
-                class: "bar {variant}",
-                span {
-                    class: "bar__content bar__content--left",
-                    style: format!("width: {}%", props.left_value),
-                    p { class: "votes-counter__title",
-                        {props.left_helper}
-                    }
+            div { class: "bar {variant}",
+                span { class: "bar__content bar__content--left", style: format!("width: {}%", props.left_value),
+                    p { class: "votes-counter__title", { props.left_helper } }
                 }
                 if let Some(value) = props.center_value {
-                    span {
-                        class: "bar__content__threshold",
-                        style: format!("left: {}%", value),
-                    }
+                    span { class: "bar__content__threshold", style: format!("left: {}%", value) }
                 }
-                span {
-                    class: "bar__content bar__content--right",
-                    style: format!("width: {}%", props.right_value),
-                    p { class: "votes-counter__title",
-                        {props.right_helper}
-                    }
+                span { class: "bar__content bar__content--right", style: format!("width: {}%", props.right_value),
+                    p { class: "votes-counter__title", { props.right_helper } }
                 }
             }
-            div {
-                class: "bar__percent",
+            div { class: "bar__percent",
                 p { class: "votes-counter__percent",
-                    {props.left_title}
+                    { props
+                    .left_title }
                 }
-                p { class: "votes-counter__percent",
-                    {props.right_title}
-                }
+                p { class: "votes-counter__percent", { props.right_title } }
             }
         }
     )

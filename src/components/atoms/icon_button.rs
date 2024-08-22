@@ -1,13 +1,10 @@
 use dioxus::prelude::*;
-
 use super::dropdown::ElementSize;
-
 #[derive(PartialEq, Clone)]
 pub enum Variant {
     Round,
     SemiRound,
 }
-
 #[derive(PartialEq, Props, Clone)]
 pub struct IconButtonProps {
     body: Element,
@@ -19,24 +16,21 @@ pub struct IconButtonProps {
     size: ElementSize,
     on_click: EventHandler<MouseEvent>,
 }
-
 pub fn IconButton(props: IconButtonProps) -> Element {
     let variant = match props.variant {
         Variant::Round => "icon-button--round",
         Variant::SemiRound => "icon-button--semi-round",
     };
-
     let size = match props.size {
         ElementSize::Big => "icon-button--big",
         ElementSize::Medium => "icon-button--medium",
         ElementSize::Small => "icon-button--small",
     };
-
     rsx!(
         button {
             class: "button button--tertiary padding-reset {props.class} {variant} {size} commin-soon",
             onclick: move |event| props.on_click.call(event),
-            {props.body}
+            { props.body }
         }
     )
 }

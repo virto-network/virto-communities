@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-
 #[derive(PartialEq, Props, Clone)]
 pub struct CheckboxCardProps {
     id: String,
@@ -12,25 +11,18 @@ pub struct CheckboxCardProps {
     soon: bool,
     on_change: EventHandler,
 }
-
 pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
     rsx!(
         label {
             class: "checkbox-card",
             class: if props.soon { "checkbox-card--comming-soon" },
-            div {
-                class: "checkbox-card__media",
-                {props.icon}
+            div { class: "checkbox-card__media",
+                { props
+                .icon }
             }
             div {
-                span {
-                    class: "checkbox-card__title",
-                    "{props.title}"
-                }
-                p {
-                    class: "checkbox-card__description",
-                    "{props.description}"
-                }
+                span { class: "checkbox-card__title", "{props.title}" }
+                p { class: "checkbox-card__description", "{props.description}" }
             }
             input {
                 class: "checkbox__cta",
@@ -38,13 +30,9 @@ pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
                 name: props.name,
                 disabled: props.soon,
                 checked: props.checked,
-                onchange: move |_| {
-                    props.on_change.call(())
-                }
+                onchange: move |_| { props.on_change.call(()) }
             }
-            div {
-                class: "checkbox-custom",
-            }
+            div { class: "checkbox-custom" }
         }
     )
 }

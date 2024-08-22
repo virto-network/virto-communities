@@ -1,9 +1,7 @@
 #![allow(non_snake_case)]
-
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use gloo::storage::{errors::StorageError, LocalStorage};
-
 use virto_communities::{
     components::atoms::{Notification, Tooltip},
     hooks::{
@@ -14,17 +12,13 @@ use virto_communities::{
         use_timestamp::{use_timestamp, IsTimestampHandled, TimestampValue},
         use_tooltip::use_tooltip,
     },
-    pages::route::Route,
-    services::kreivo::timestamp::now,
+    pages::route::Route, services::kreivo::timestamp::now,
 };
-
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     console_error_panic_hook::set_once();
-
     launch(App);
 }
-
 fn App() -> Element {
     use_language();
     use_startup();
@@ -34,33 +28,28 @@ fn App() -> Element {
     let mut session = use_session();
     let mut timestamp = use_timestamp();
     let mut is_timestamp_handled = consume_context::<Signal<IsTimestampHandled>>();
-
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         let Ok(result_now) = now().await else {
             notification.handle_error(&translate!(i18, "errors.timestamp.query_failed"));
             is_timestamp_handled.set(IsTimestampHandled(true));
             return;
         };
-
         timestamp.set(TimestampValue(result_now));
         is_timestamp_handled.set(IsTimestampHandled(true));
     });
-
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        let serialized_session: Result<String, StorageError> =
-            <LocalStorage as gloo::storage::Storage>::get("session_file");
-
+        let serialized_session: Result<String, StorageError> = <LocalStorage as gloo::storage::Storage>::get(
+            "session_file",
+        );
         let Ok(serialized_session) = serialized_session else {
             return;
         };
-
-        let Ok(user_session) = serde_json::from_str::<UserSession>(&serialized_session) else {
+        let Ok(user_session) = serde_json::from_str::<UserSession>(&serialized_session)
+        else {
             return;
         };
-
         session.set(&user_session);
     });
-
     rsx! {
         if notification.get().show {
             Notification {
@@ -75,14 +64,9 @@ fn App() -> Element {
                 }
             }
         }
-
         if tooltip.get().show {
-            Tooltip {
-                title: "{tooltip.get().title}",
-                body: "{tooltip.get().body}",
-            }
+            Tooltip { title: "{tooltip.get().title}", body: "{tooltip.get().body}" }
         }
-
         Router::<Route> {}
     }
 }

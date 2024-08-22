@@ -1,7 +1,5 @@
 use dioxus::prelude::*;
-
 use super::icon::IconShape;
-
 #[derive(PartialEq, Clone)]
 pub struct User;
 impl IconShape for User {

@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-
 use crate::{
     components::atoms::{
         dropdown::{DropdownItem, ElementSize},
@@ -11,16 +10,13 @@ use crate::{
         use_spaces_client::use_spaces_client,
     },
 };
-
 #[component]
 pub fn InitiativeSettings() -> Element {
     let i18 = use_i18();
     let mut onboard = use_onboard();
     let mut notification = use_notification();
     let spaces_client = use_spaces_client();
-
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
-
     let mut items = vec![];
     let mut dropdown_options = vec![
         DropdownItem {
@@ -32,23 +28,17 @@ pub fn InitiativeSettings() -> Element {
             value: "Community".to_string(),
         },
     ];
-
     for account in dropdown_options.clone().into_iter() {
-        items.push(rsx!(span {
-            "{account.value}"
-        }))
+        items.push(rsx!(
+            span { "{account.value}" }
+        ))
     }
-
     rsx!(
         div { class: "form__inputs form__inputs--initiative",
             div { class: "form__input form__input--initiative",
                 div { class: "form__input__info",
-                    span { class: "form__input__info__title",
-                        "Origin"
-                    }
-                    p { class: "form__input__info__description",
-                        "Lorem Ipsum Dolor"
-                    }
+                    span { class: "form__input__info__title", "Origin" }
+                    p { class: "form__input__info__description", "Lorem Ipsum Dolor" }
                 }
                 Dropdown {
                     class: "header__wallet dropdown--left".to_string(),

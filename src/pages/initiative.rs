@@ -1,16 +1,15 @@
 use std::str::FromStr;
-
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::TryFutureExt;
 use wasm_bindgen::prelude::*;
-
 use crate::{
     components::{
         atoms::{
-            button::Variant, dropdown::ElementSize, icon_button::Variant as IconButtonVariant,
-            Arrow, Button, Icon, IconButton, Step, StepCard,
+            button::Variant, dropdown::ElementSize,
+            icon_button::Variant as IconButtonVariant, Arrow, Button, Icon, IconButton,
+            Step, StepCard,
         },
         molecules::{InitiativeActions, InitiativeInfo},
     },
@@ -20,10 +19,8 @@ use crate::{
             InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov,
             VotingOpenGovAction,
         },
-        use_notification::use_notification,
-        use_our_navigator::use_our_navigator,
-        use_session::use_session,
-        use_spaces_client::use_spaces_client,
+        use_notification::use_notification, use_our_navigator::use_our_navigator,
+        use_session::use_session, use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     pages::onboarding::convert_to_jsvalue,
@@ -32,7 +29,6 @@ use crate::{
         kusama::system::number,
     },
 };
-
 #[derive(Clone, Debug)]
 pub enum InitiativeStep {
     Info,
@@ -41,7 +37,6 @@ pub enum InitiativeStep {
     Confirmation,
     None,
 }
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenInitiativeSetup)]
@@ -56,9 +51,7 @@ extern "C" {
         proposals_voting_open_gov: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
-
 const BLOCK_TIME_IN_SECONDS: i64 = 6;
-
 #[component]
 pub fn Initiative(id: u16) -> Element {
     let i18 = use_i18();
@@ -68,14 +61,11 @@ pub fn Initiative(id: u16) -> Element {
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
     let spaces_client = use_spaces_client();
-
     let mut onboarding_step = use_signal::<InitiativeStep>(|| InitiativeStep::Info);
     let mut handle_required_inputs = use_signal::<bool>(|| false);
-
     use_before_render(move || {
         initiative.default();
     });
-
     rsx! {
         div { class: "page--initiative",
             div { class: "progress progress--steps-cube",
@@ -86,7 +76,7 @@ pub fn Initiative(id: u16) -> Element {
                     name: Some(translate!(i18, "initiative.steps.info.label")),
                     on_click: move |_| {
                         onboarding_step.set(InitiativeStep::Info);
-                    },
+                    }
                 }
                 Step {
                     is_active: matches!(*onboarding_step.read(), InitiativeStep::Actions),
@@ -102,98 +92,56 @@ pub fn Initiative(id: u16) -> Element {
                             handle_required_inputs.set(false);
                         }
                         onboarding_step.set(InitiativeStep::Actions);
-                    },
+                    }
                 }
             }
             div { class: "initiative__form",
                 div { class: "form__wrapper form__wrapper--initiative",
                     h2 { class: "form__title",
-                        {translate!(i18, "initiative.title")}
+                        {
+                        translate!(i18, "initiative.title") }
                     }
                     div { class: "steps__wrapper",
                         StepCard {
                             name: translate!(i18, "initiative.steps.info.label"),
-                            checked: matches!(*onboarding_step.read(), InitiativeStep::Info ),
+                            checked: matches!(*onboarding_step.read(), InitiativeStep::Info),
                             body: rsx!(
-                                div { class: "step-card__info",
-                                    span { class: "step-card__title",
-                                        {translate!(i18, "initiative.steps.info.label")}
-                                    }
-                                    IconButton {
-                                        variant: IconButtonVariant::Round,
-                                        size: ElementSize::Big,
-                                        class: "button--drop bg--transparent",
-                                        body: rsx!(
-                                            Icon {
-                                                class: if matches!(*onboarding_step.read(), InitiativeStep::Info ) { "rotate-180" } else { "rotate-0" },
-                                                icon: Arrow,
-                                                height: 24,
-                                                width: 24,
-                                                stroke_width: 2,
-                                                stroke: "var(--fill-400)"
-                                            }
-                                        ),
-                                        on_click: move |_| {
-                                            if matches!(*onboarding_step.read(), InitiativeStep::Info ) {
-                                                onboarding_step.set(InitiativeStep::None);
-                                            } else {
-                                                onboarding_step.set(InitiativeStep::Info);
-                                            }
-                                        }
-                                    }
-                                }
+                                div { class : "step-card__info", span { class : "step-card__title", {
+                                translate!(i18, "initiative.steps.info.label") } } IconButton { variant :
+                                IconButtonVariant::Round, size : ElementSize::Big, class :
+                                "button--drop bg--transparent", body : rsx!(Icon { class : if matches!(*
+                                onboarding_step.read(), InitiativeStep::Info) { "rotate-180" } else { "rotate-0"
+                                }, icon : Arrow, height : 24, width : 24, stroke_width : 2, stroke :
+                                "var(--fill-400)" }), on_click : move | _ | { if matches!(* onboarding_step
+                                .read(), InitiativeStep::Info) { onboarding_step.set(InitiativeStep::None); }
+                                else { onboarding_step.set(InitiativeStep::Info); } } } }
                             ),
                             editable: rsx!(
-                                div { class: "step-card__editable",
-                                    InitiativeInfo {
-                                        error: handle_required_inputs()
-                                    }
-                                }
+                                div { class : "step-card__editable", InitiativeInfo { error :
+                                handle_required_inputs() } }
                             ),
                             on_change: move |_| {
                                 onboarding_step.set(InitiativeStep::Info);
-                            },
+                            }
                         }
                         StepCard {
                             name: translate!(i18, "initiative.steps.actions.label"),
-                            checked: matches!(*onboarding_step.read(), InitiativeStep::Actions ),
+                            checked: matches!(*onboarding_step.read(), InitiativeStep::Actions),
                             body: rsx!(
-                                div { class: "step-card__info",
-                                    span { class: "step-card__title",
-                                        {translate!(i18, "initiative.steps.actions.label")}
-                                    }
-                                    IconButton {
-                                        variant: IconButtonVariant::Round,
-                                        size: ElementSize::Big,
-                                        class: "button--drop  bg--transparent",
-                                        body: rsx!(
-                                            Icon {
-                                                class: if matches!(*onboarding_step.read(), InitiativeStep::Actions ) { "rotate-180" } else { "rotate-0" },
-                                                icon: Arrow,
-                                                height: 24,
-                                                width: 24,
-                                                stroke_width: 2,
-                                                stroke: "var(--fill-400)"
-                                            }
-                                        ),
-                                        on_click: move |_| {
-                                            if matches!(*onboarding_step.read(), InitiativeStep::Actions ) {
-                                                onboarding_step.set(InitiativeStep::None);
-                                            } else {
-                                                onboarding_step.set(InitiativeStep::Actions);
-                                            }
-                                        }
-                                    }
-                                }
+                                div { class : "step-card__info", span { class : "step-card__title", {
+                                translate!(i18, "initiative.steps.actions.label") } } IconButton { variant :
+                                IconButtonVariant::Round, size : ElementSize::Big, class :
+                                "button--drop  bg--transparent", body : rsx!(Icon { class : if matches!(*
+                                onboarding_step.read(), InitiativeStep::Actions) { "rotate-180" } else {
+                                "rotate-0" }, icon : Arrow, height : 24, width : 24, stroke_width : 2, stroke :
+                                "var(--fill-400)" }), on_click : move | _ | { if matches!(* onboarding_step
+                                .read(), InitiativeStep::Actions) { onboarding_step.set(InitiativeStep::None); }
+                                else { onboarding_step.set(InitiativeStep::Actions); } } } }
                             ),
-                            editable: rsx!(
-                                div { class: "step-card__editable",
-                                    InitiativeActions {}
-                                }
-                            ),
+                            editable: rsx!(div { class : "step-card__editable", InitiativeActions {} }),
                             on_change: move |_| {
                                 onboarding_step.set(InitiativeStep::Actions);
-                            },
+                            }
                         }
                     }
                 }
@@ -207,7 +155,7 @@ pub fn Initiative(id: u16) -> Element {
                     on_click: move |_| {
                         nav.go_back();
                     },
-                    status: None,
+                    status: None
                 }
                 Button {
                     class: "",
@@ -216,17 +164,18 @@ pub fn Initiative(id: u16) -> Element {
                     on_click: move |_| {
                         spawn(
                             async move {
-                                tooltip.handle_tooltip(TooltipItem {
-                                    title: translate!(i18, "initiative.tips.loading.title"),
-                                    body: translate!(i18, "initiative.tips.loading.description"),
-                                    show: true
-                                });
-
-                                let last_initiative = referendum_count().await.map_err(|_| {
-                                    log::warn!("Failed to get last initiative");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
-
+                                tooltip
+                                    .handle_tooltip(TooltipItem {
+                                        title: translate!(i18, "initiative.tips.loading.title"),
+                                        body: translate!(i18, "initiative.tips.loading.description"),
+                                        show: true,
+                                    });
+                                let last_initiative = referendum_count()
+                                    .await
+                                    .map_err(|_| {
+                                        log::warn!("Failed to get last initiative");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
                                 let response_bot = spaces_client
                                     .get()
                                     .create_initiative(InitiativeData {
@@ -249,199 +198,228 @@ pub fn Initiative(id: u16) -> Element {
                                         log::warn!("Failed to create off-chain");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
-
                                 let room_id = response_bot.get_id();
-
-                                let add_members_action = initiative.get_actions().into_iter().filter_map(|action| {
-                                    match action {
-                                        ActionItem::AddMembers(add_members_action) => {
-                                            Some(add_members_action.members.clone()
-                                            .into_iter()
-                                            .filter_map(|member|
-                                                if !member.account.is_empty() { Some(member.account) } else { None }
-                                            )
-                                            .collect::<Vec<String>>())
-                                        },
-                                        _ => None
-                                    }
-                                }).collect::<Vec<Vec<String>>>();
-
-                                let add_members_action = add_members_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<String>>();
-
+                                let add_members_action = initiative
+                                    .get_actions()
+                                    .into_iter()
+                                    .filter_map(|action| {
+                                        match action {
+                                            ActionItem::AddMembers(add_members_action) => {
+                                                Some(
+                                                    add_members_action
+                                                        .members
+                                                        .clone()
+                                                        .into_iter()
+                                                        .filter_map(|member| {
+                                                            if !member.account.is_empty() {
+                                                                Some(member.account)
+                                                            } else {
+                                                                None
+                                                            }
+                                                        })
+                                                        .collect::<Vec<String>>(),
+                                                )
+                                            }
+                                            _ => None,
+                                        }
+                                    })
+                                    .collect::<Vec<Vec<String>>>();
+                                let add_members_action = add_members_action
+                                    .into_iter()
+                                    .flat_map(|v| v.into_iter())
+                                    .collect::<Vec<String>>();
                                 log::info!("add_members_action: {:?}", add_members_action);
-
-                                let current_block = number().await.map_err(|_| {
-                                    log::warn!("Failed to get last block kusama");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
-
-                                let now_kusama = now().await.map_err(|_| {
-                                    log::warn!("Failed to get timestamp kusama");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
-
+                                let current_block = number()
+                                    .await
+                                    .map_err(|_| {
+                                        log::warn!("Failed to get last block kusama");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
+                                let now_kusama = now()
+                                    .await
+                                    .map_err(|_| {
+                                        log::warn!("Failed to get timestamp kusama");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
                                 log::info!("{} {}", current_block, now_kusama);
-
-                                let treasury_action = initiative.get_actions().into_iter().filter_map(|action| {
-                                    match action {
-                                        ActionItem::KusamaTreasury(treasury_action) => {
-                                            Some(treasury_action.periods.clone()
-                                            .into_iter()
-                                            .filter_map(|period|{
-                                                if period.amount > 0 {
-                                                    Some(convert_treasury_to_period(period, current_block, now_kusama))
-                                                } else {
-                                                    None
-                                                }
-                                            })
-                                            .collect::<Vec<KusamaTreasuryPeriod>>())
-                                        },
-                                        _ => None
-                                    }
-                                }).collect::<Vec<Vec<KusamaTreasuryPeriod>>>();
-
-                                let treasury_action = treasury_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<KusamaTreasuryPeriod>>();
-
+                                let treasury_action = initiative
+                                    .get_actions()
+                                    .into_iter()
+                                    .filter_map(|action| {
+                                        match action {
+                                            ActionItem::KusamaTreasury(treasury_action) => {
+                                                Some(
+                                                    treasury_action
+                                                        .periods
+                                                        .clone()
+                                                        .into_iter()
+                                                        .filter_map(|period| {
+                                                            if period.amount > 0 {
+                                                                Some(
+                                                                    convert_treasury_to_period(
+                                                                        period,
+                                                                        current_block,
+                                                                        now_kusama,
+                                                                    ),
+                                                                )
+                                                            } else {
+                                                                None
+                                                            }
+                                                        })
+                                                        .collect::<Vec<KusamaTreasuryPeriod>>(),
+                                                )
+                                            }
+                                            _ => None,
+                                        }
+                                    })
+                                    .collect::<Vec<Vec<KusamaTreasuryPeriod>>>();
+                                let treasury_action = treasury_action
+                                    .into_iter()
+                                    .flat_map(|v| v.into_iter())
+                                    .collect::<Vec<KusamaTreasuryPeriod>>();
                                 log::info!("treasury {:?}", treasury_action);
-
-                                let votiong_open_gov_action = initiative.get_actions().into_iter().filter_map(|action| {
-                                    match action {
-                                        ActionItem::VotingOpenGov(votiong_open_gov_action) => {
-                                            Some(votiong_open_gov_action.proposals.clone()
-                                            .into_iter()
-                                            .filter_map(|proposal|{
-                                                if proposal.poll_index > 0 {
-                                                    Some(proposal)
-                                                } else {
-                                                    None
-                                                }
-                                            })
-                                            .collect::<Vec<VotingOpenGov>>())
-                                        },
-                                        _ => None
-                                    }
-                                }).collect::<Vec<Vec<VotingOpenGov>>>();
-
-                                let votiong_open_gov_action = votiong_open_gov_action.into_iter().flat_map(|v| v.into_iter()).collect::<Vec<VotingOpenGov>>();
-                                let votiong_open_gov_action = votiong_open_gov_action.into_iter().map(|v| v.serialize_vote_type()).collect::<Vec<serde_json::Value>>();
-
+                                let votiong_open_gov_action = initiative
+                                    .get_actions()
+                                    .into_iter()
+                                    .filter_map(|action| {
+                                        match action {
+                                            ActionItem::VotingOpenGov(votiong_open_gov_action) => {
+                                                Some(
+                                                    votiong_open_gov_action
+                                                        .proposals
+                                                        .clone()
+                                                        .into_iter()
+                                                        .filter_map(|proposal| {
+                                                            if proposal.poll_index > 0 { Some(proposal) } else { None }
+                                                        })
+                                                        .collect::<Vec<VotingOpenGov>>(),
+                                                )
+                                            }
+                                            _ => None,
+                                        }
+                                    })
+                                    .collect::<Vec<Vec<VotingOpenGov>>>();
+                                let votiong_open_gov_action = votiong_open_gov_action
+                                    .into_iter()
+                                    .flat_map(|v| v.into_iter())
+                                    .collect::<Vec<VotingOpenGov>>();
+                                let votiong_open_gov_action = votiong_open_gov_action
+                                    .into_iter()
+                                    .map(|v| v.serialize_vote_type())
+                                    .collect::<Vec<serde_json::Value>>();
                                 log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
-
-                                let votiong_open_gov_action = convert_to_jsvalue(&votiong_open_gov_action)
-                                .map_err(|_| {
-                                    log::warn!("Malformed voting open gov");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
-
+                                let votiong_open_gov_action = convert_to_jsvalue(
+                                        &votiong_open_gov_action,
+                                    )
+                                    .map_err(|_| {
+                                        log::warn!("Malformed voting open gov");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
-                                .map_err(|_| {
-                                    log::warn!("Malformed membership accounts add");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
-
+                                    .map_err(|_| {
+                                        log::warn!("Malformed membership accounts add");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
                                 let membership_accounts_add = convert_to_jsvalue(&add_members_action)
-                                .map_err(|_| {
-                                    log::warn!("Malformed membership accounts add");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
-
-                                let membership_accounts_remove = convert_to_jsvalue(&Vec::<String>::new())
+                                    .map_err(|_| {
+                                        log::warn!("Malformed membership accounts add");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
+                                let membership_accounts_remove = convert_to_jsvalue(
+                                        &Vec::<String>::new(),
+                                    )
                                     .map_err(|_| {
                                         log::warn!("Malformed membership accounts remove");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
-
-                                let room_id =
-                                    convert_to_jsvalue(&room_id.clone()).map_err(|_| {
+                                let room_id = convert_to_jsvalue(&room_id.clone())
+                                    .map_err(|_| {
                                         log::warn!("Malformed room id");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
-
-                                let remark =
-                                    convert_to_jsvalue(&initiative.get_info().name).map_err(|_| {
+                                let remark = convert_to_jsvalue(&initiative.get_info().name)
+                                    .map_err(|_| {
                                         log::warn!("Malformed remark");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
-
                                 let response = topup_then_initiative_setup(
-                                    id,
-                                    last_initiative,
-                                    room_id,
-                                    remark,
-                                    membership_accounts_add,
-                                    membership_accounts_remove,
-                                    treasury_action,
-                                    votiong_open_gov_action
-                                )
-                                .await;
-
+                                        id,
+                                        last_initiative,
+                                        room_id,
+                                        remark,
+                                        membership_accounts_add,
+                                        membership_accounts_remove,
+                                        treasury_action,
+                                        votiong_open_gov_action,
+                                    )
+                                    .await;
                                 tooltip.hide();
-
                                 let path = format!("/dao/{id}/initiatives");
                                 nav.push(vec![], &path);
-
                                 Ok::<(), String>(())
                             }
-                            .unwrap_or_else(move |e: String| {
-                                tooltip.hide();
-                                notification.handle_error(&e);
-                            })
+                                .unwrap_or_else(move |e: String| {
+                                    tooltip.hide();
+                                    notification.handle_error(&e);
+                                }),
                         );
                     },
-                    status: None,
+                    status: None
                 }
             }
         }
     }
 }
-
 fn calculate_future_block(
     current_block: u32,
     current_date_millis: u64,
     future_date_str: &str,
 ) -> u32 {
-    let future_date_naive = NaiveDate::from_str(future_date_str).expect("Fecha futura no válida");
+    let future_date_naive = NaiveDate::from_str(future_date_str)
+        .expect("Fecha futura no válida");
     let future_date = DateTime::<Utc>::from_utc(future_date_naive.and_hms(0, 0, 0), Utc);
-
-    let current_date = DateTime::<Utc>::from_utc(
+    let current_date = DateTime::<
+        Utc,
+    >::from_utc(
         chrono::NaiveDateTime::from_timestamp(
             (current_date_millis / 1000).try_into().unwrap(),
             ((current_date_millis % 1000) * 1_000_000) as u32,
         ),
         Utc,
     );
-
     let elapsed_time_in_seconds = (future_date - current_date).num_seconds();
     let blocks_to_add = elapsed_time_in_seconds / BLOCK_TIME_IN_SECONDS;
     (current_block + blocks_to_add as u32).into()
 }
-
 fn calculate_date_from_block(
     current_block: u32,
     current_date_millis: u64,
     target_block: u32,
 ) -> DateTime<Utc> {
-    let current_date = DateTime::<Utc>::from_utc(
+    let current_date = DateTime::<
+        Utc,
+    >::from_utc(
         chrono::NaiveDateTime::from_timestamp(
             (current_date_millis / 1000).try_into().unwrap(),
             ((current_date_millis % 1000) * 1_000_000) as u32,
         ),
         Utc,
     );
-
     let blocks_to_add = target_block as i64 - current_block as i64;
     let elapsed_time_in_seconds = blocks_to_add * BLOCK_TIME_IN_SECONDS;
     current_date + Duration::seconds(elapsed_time_in_seconds)
 }
-
 fn convert_treasury_to_period(
     treasury: KusamaTreasury,
     current_block: u32,
     current_date_millis: u64,
 ) -> KusamaTreasuryPeriod {
     if treasury.date != "" {
-        let future_block =
-            calculate_future_block(current_block, current_date_millis, &treasury.date);
+        let future_block = calculate_future_block(
+            current_block,
+            current_date_millis,
+            &treasury.date,
+        );
         KusamaTreasuryPeriod {
             blocks: Some(future_block as u64),
             amount: treasury.amount,
