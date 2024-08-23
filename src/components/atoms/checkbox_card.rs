@@ -4,9 +4,6 @@ pub struct CheckboxCardProps {
     #[props(default = "".to_string())]
     class: String,
     id: String,
-    // title: String,
-    // description: String,
-    // icon: Element,
     name: String,
     checked: bool,
     #[props(default = false)]
