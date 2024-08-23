@@ -1,6 +1,11 @@
 {
     "id": "es-ES",
     "texts": {
+        "dynamic_text": {
+            "dynamic_one": "empresa",
+            "dynamic_two": "organización", 
+            "dynamic_three": "comunidad"
+        },
         "sidebar": {
             "cta": "Agregar comunidad"
         },
@@ -18,8 +23,8 @@
         },
         "dashboard": {
             "tabs": {
-                "all": "DAOS",
-                "owned": "Mis DAOS"
+                "all": "Organizaciones",
+                "owned": "Mis Organizaciones"
             },
             "tips": {
                 "loading": {
@@ -37,10 +42,11 @@
             "cta_cards": {
                 "explore": {
                     "title": "Descubre organizaciones innovadoras",
-                    "description": "Explora DAOS y encuentra tu comunidad"
+                    "description": "Explora organizaciones y encuentra tu comunidad"
                 },
                 "create": {
-                    "title": "Crea tu DAO hoy",
+                    "title_part_one": "Crea tu ",
+                    "title_part_two": " hoy",
                     "description": "Configura y lanza tu organización y visión en minutos",
                     "cta": "Comienza ahora"
                 }

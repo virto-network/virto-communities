@@ -1,6 +1,11 @@
 {
     "id": "en-US",
     "texts": {
+        "dynamic_text": {
+            "dynamic_one": "business",
+            "dynamic_two": "organization", 
+            "dynamic_three": "community"
+        },
         "sidebar": {
             "cta": "Add community"
         },
@@ -18,8 +23,8 @@
         },
         "dashboard": {
             "tabs": {
-                "all": "All DAOs",
-                "owned": "Your DAOs"
+                "all": "All Organizations",
+                "owned": "Your Organizations"
             },
             "tips": {
                 "loading": {
@@ -37,10 +42,11 @@
             "cta_cards": {
                 "explore": {
                     "title": "Discover innovative organizations",
-                    "description": "Explore DAOs and find your community."
+                    "description": "Explore the organizations and find your community."
                 },
                 "create": {
-                    "title": "Create your DAO today",
+                    "title_part_one": "Create your ",
+                    "title_part_two": " today",
                     "description": "Set up and launch your organization and vision in minutes",
                     "cta": "Start now"
                 }
