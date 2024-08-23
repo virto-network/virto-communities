@@ -2,8 +2,7 @@ use dioxus::{hooks::use_context_provider, signals::Signal};
 use pjs::PjsExtension;
 
 use crate::{
-    pages::initiatives::InitiativeWrapper, services::bot::client::SpacesClient,
-    services::market::client::MarketClient,
+    pages::{dashboard::Community, initiatives::InitiativeWrapper}, services::{bot::client::SpacesClient, market::client::MarketClient},
 };
 
 use super::{

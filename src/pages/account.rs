@@ -7,8 +7,7 @@ use futures_util::TryFutureExt;
 use crate::{
     components::atoms::{button::Variant as ButtonVariant, dropdown::ElementSize, Button, Tab},
     hooks::{
-        use_market_client::use_market_client, use_notification::use_notification,
-        use_session::use_session,
+        use_market_client::use_market_client, use_notification::use_notification, use_our_navigator::use_our_navigator, use_session::use_session
     },
     services::{kreivo, kusama, market::types::Tokens},
 };
@@ -36,6 +35,7 @@ extern "C" {
 pub fn Account() -> Element {
     let i18 = use_i18();
     let mut notification = use_notification();
+    let nav = use_our_navigator();
     let session = use_session();
     let market_client = use_market_client().get();
     let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
@@ -149,7 +149,7 @@ pub fn Account() -> Element {
                                         }
                                         div { class: "account__balance__cta",
                                             Button {
-                                                class: "",
+                                                class: "button--comming-soon",
                                                 text: "Deposit",
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
@@ -173,7 +173,7 @@ pub fn Account() -> Element {
                                                 on_click: move |_| {
                                                     spawn(
                                                         async move {
-
+                                                            nav.push(vec![], "/withdraw");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
 
