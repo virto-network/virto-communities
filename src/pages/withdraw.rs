@@ -52,7 +52,7 @@ pub fn Withdraw() -> Element {
     let accounts = use_accounts();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let mut nav = use_our_navigator();
+    let nav = use_our_navigator();
 
     let mut tab_value = use_signal(|| WithdrawKreivoTabs::Accounts);
 
@@ -84,6 +84,10 @@ pub fn Withdraw() -> Element {
                 .withdraw_mut()
                 .with_mut(|w| w.address = account.address())
         }
+    });
+
+    use_before_render(move || {
+        withdraw.default();
     });
 
     rsx!(
