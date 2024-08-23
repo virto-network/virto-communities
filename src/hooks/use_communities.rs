@@ -217,6 +217,17 @@ impl UseCommunitiesState {
 
         self.communities.write()[position].favorite = is_favorite;
 
+        let Ok(cached_communitites) = serde_json::to_string(&*self.communities.read()) else {
+            return Err(CommunitiesError::FailedUpdatingFavorites);
+        };
+
+        if let Err(_) =
+            <LocalStorage as gloo::storage::Storage>::set("communities", cached_communitites)
+        {
+            log::warn!("Failed to persist communities");
+        };
+
+
         Ok(())
     }
 
