@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::{StreamExt, TryFutureExt};
@@ -324,21 +326,34 @@ pub fn Withdraw() -> Element {
                                             show: true,
                                         });
 
-                                        let destination_address = convert_to_jsvalue(&withdraw.get_withdraw().address)
+                                        let address =
+                                            sp_core::sr25519::Public::from_str(&withdraw.get_withdraw().address).map_err(|e| {
+                                                log::warn!("Not found public address: {}", e);
+                                                translate!(i18, "errors.wallet.account_address")
+                                            })?;
+
+                                        let hex_address = hex::encode(address.0);
+
+                                        let destination_address = convert_to_jsvalue(&format!("0x{}", hex_address))
                                             .map_err(|_| {
                                                 log::warn!("Malformed dest account");
                                                 String::from("Invalid address destination")
                                             })?;
 
-                                        let amount = withdraw.get_withdraw().amount.parse::<u64>().map_err(|_| {
+                                        let amount = withdraw.get_withdraw().amount.parse::<f64>().map_err(|_| {
                                             log::warn!("Malformed amount");
                                             String::from("Invalid amount to withdraw")
                                         })?;
 
+                                        let amount = (amount * 1_000_000_000_000.0) as u64;
+
                                         topup_then_withdraw(
                                             destination_address,
                                             amount
-                                        ).await.map_err(|_|String::from("Withdraw Failed"))?;
+                                        ).await.map_err(|e| {
+                                            log::warn!("Withdraw failed {:?}", e);
+                                            String::from("Withdraw Failed")
+                                        })?;
 
                                         tooltip.hide();
                                         notification.handle_success("Your withdraw was completed");
