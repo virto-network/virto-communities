@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
+use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 use crate::{
     components::{
@@ -64,67 +65,85 @@ pub fn Initiatives(id: u16) -> Element {
         },
     ));
 
-    use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        tooltip
-            .handle_tooltip(TooltipItem {
+    let handle_initiatives = use_coroutine(move |mut rx: UnboundedReceiver<u16>| async move {
+        while let Some(id) = rx.next().await {
+            initiatives.set(vec![]);
+            filtered_initiatives.set(vec![]);
+            
+            tooltip.handle_tooltip(TooltipItem {
                 title: translate!(i18, "dao.tips.loading.title"),
                 body: translate!(i18, "dao.tips.loading.description"),
                 show: true,
             });
-        let from = 29;
-        let count = referendum_count().await.expect("Should get referendum count");
-        for track in from..count {
-            let Ok(response) = referendum_info_for(track).await else {
-                continue;
-            };
-            if response.ongoing.origin.communities.community_id == id {
-                let name = format!("Ref: {:?}", track);
-                let mut init = InitiativeWrapper {
-                    id: track,
-                    info: InitiativeInfoContent {
-                        name,
-                        description: String::new(),
-                        tags: vec![],
-                        actions: vec![],
-                    },
-                    ongoing: response.ongoing,
+            // Temporal value for FIFO ongoing initiative
+            let from = 29;
+
+            let count = referendum_count()
+                .await
+                .expect("Should get referendum count");
+
+            for track in from..count {
+                let Ok(response) = referendum_info_for(track).await else {
+                    continue;
                 };
-                log::info!("{:?}", metadata_of(track). await);
-                let Ok(initiative_metadata) = metadata_of(track).await else {
+
+                if response.ongoing.origin.communities.community_id == id {
+                    let name = format!("Ref: {:?}", track);
+                    let mut init = InitiativeWrapper {
+                        id: track,
+                        info: InitiativeInfoContent {
+                            name,
+                            description: String::new(),
+                            tags: vec![],
+                            actions: vec![],
+                        },
+                        ongoing: response.ongoing,
+                    };
+
+                    log::info!("{:?}", metadata_of(track).await);
+                    let Ok(initiative_metadata) = metadata_of(track).await else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    let initiative_metadata = format!("0x{}", hex::encode(initiative_metadata));
+
+                    let Ok(preimage_len) = request_status_for(&initiative_metadata).await else {
+                        continue;
+                    };
+
+                    let Ok(room_id_metadata) =
+                        preimage_for(&initiative_metadata, preimage_len).await
+                    else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    let Ok(response) = spaces_client
+                        .get()
+                        .get_initiative_by_id(&room_id_metadata)
+                        .await
+                    else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    log::info!("{:?}", response.info);
+
+                    init.info = response.info;
+
                     initiatives.with_mut(|c| c.push(init));
-                    continue;
-                };
-                let initiative_metadata = format!(
-                    "0x{}",
-                    hex::encode(initiative_metadata),
-                );
-                let Ok(preimage_len) = request_status_for(&initiative_metadata).await
-                else {
-                    continue;
-                };
-                let Ok(room_id_metadata) = preimage_for(
-                        &initiative_metadata,
-                        preimage_len,
-                    )
-                    .await else {
-                    initiatives.with_mut(|c| c.push(init));
-                    continue;
-                };
-                let Ok(response) = spaces_client
-                    .get()
-                    .get_initiative_by_id(&room_id_metadata)
-                    .await else {
-                    initiatives.with_mut(|c| c.push(init));
-                    continue;
-                };
-                log::info!("{:?}", response.info);
-                init.info = response.info;
-                initiatives.with_mut(|c| c.push(init));
+                }
             }
+
+            tooltip.hide();
+            filtered_initiatives.set(initiatives());
         }
-        tooltip.hide();
-        filtered_initiatives.set(initiatives());
     });
+
+    use_effect(use_reactive(&id, move |_| {
+        handle_initiatives.send(id)
+    }));
 
     use_drop(move || communities.remove_community());
 
