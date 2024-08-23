@@ -55,20 +55,40 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
     rsx!(
         div { class: "combo-input {props.class}",
             match option_value() {
-            ComboInputOption::Date(value) => rsx!(Input { message : value, size : props.size
-            .clone(), itype : InputType::Date, placeholder : props.placeholder.clone(), error
-            : None, on_input : move | event : Event < FormData >| { option_value
-            .set(ComboInputOption::Date(event.value().clone())); props.on_change
-            .call(ComboInputValue { option : ComboInputOption::Date(event.value().clone()),
-            input : input_value().clone() }) }, on_keypress : move | _ | {}, on_click : move
-            | _ | {}, }), ComboInputOption::Dropdown(value) => rsx!(Dropdown { class :
-            "dropdown--left".to_string(), value : value, placeholder : translate!(i18,
-            "header.cta.account"), size : props.size.clone(), default : None, on_change :
-            move | event : usize | { let to_assign = & dropdown_options() [event];
-            option_value.set(ComboInputOption::Dropdown(to_assign.clone())); props.on_change
-            .call(ComboInputValue { option : ComboInputOption::Dropdown(to_assign.clone()),
-            input : input_value().clone() }) }, body : items }), ComboInputOption::None => {
-            rsx!() } },
+                ComboInputOption::Date(value) => rsx!(
+                    Input {
+                        message: value,
+                        size: props.size.clone(),
+                        itype: InputType::Date,
+                        placeholder: props.placeholder.clone(),
+                        error: None,
+                        on_input: move |event: Event<FormData>| {
+                            option_value.set(ComboInputOption::Date(event.value().clone()));
+                            props.on_change.call(ComboInputValue { option: ComboInputOption::Date(event.value().clone()), input: input_value().clone() })
+                        },
+                        on_keypress: move |_| {},
+                        on_click: move |_| {},
+                    }
+                ),
+                ComboInputOption::Dropdown(value) => rsx!(
+                    Dropdown {
+                            class: "dropdown--left".to_string(),
+                            value: value,
+                            placeholder: translate!(i18, "header.cta.account"),
+                            size: props.size.clone(),
+                            default: None,
+                            on_change: move |event: usize| {
+                                let to_assign = &dropdown_options()[event];
+                                option_value.set(ComboInputOption::Dropdown(to_assign.clone()));
+                                props.on_change.call(ComboInputValue { option: ComboInputOption::Dropdown(to_assign.clone()), input: input_value().clone() })
+                            },
+                            body: items
+                    }
+                ),
+                ComboInputOption::None => {
+                    rsx!()
+                }
+            },
             Input {
                 message: props.value.input.clone(),
                 size: props.size,

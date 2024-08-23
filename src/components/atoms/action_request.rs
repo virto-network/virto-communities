@@ -15,12 +15,9 @@ pub fn ActionRequest(props: RequestProps) -> Element {
     };
     rsx!(
         div { class: "action-request {size}",
-            span { class: "action-request__title",
-                {
-                props.name }
-            }
+            span { class: "action-request__title", {props.name} }
             if let Some(details) = props.details {
-                span { class: "action-request__details", { details } }
+                span { class: "action-request__details", {details} }
             }
         }
     )

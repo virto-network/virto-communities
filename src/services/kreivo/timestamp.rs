@@ -1,4 +1,3 @@
-use serde::Deserialize;
 use sube::{sube, Response};
 use super::community_track::ChainStateError;
 pub async fn now() -> Result<u64, ChainStateError> {

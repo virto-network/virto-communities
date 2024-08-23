@@ -21,7 +21,7 @@ pub fn Tab(props: TabProps) -> Element {
             class: "tab {size}",
             class: if props.is_active { "tab--active" },
             onclick: move |event| props.on_click.call(event),
-            { props.icon },
+            {props.icon},
             "{props.text}"
         }
     )

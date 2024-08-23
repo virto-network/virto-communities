@@ -109,12 +109,10 @@ pub fn Header() -> Element {
     let mut items = vec![];
     for account in accounts.get().into_iter() {
         let address = account.address();
-        items
-            .push(
-                rsx!(
-                    AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
-                ),
-            )
+
+        items.push(rsx!(
+            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
+        ))
     }
     let mut on_handle_account = move |event: u8| {
         header_handled.set(false);
@@ -165,7 +163,9 @@ pub fn Header() -> Element {
                     }
                 }
                 Err(pjs::Error::NoPermission) => {
-                    session.persist_session_file("");
+                    if let Err(e) = session.persist_session_file("") {
+                        log::warn!("Failed to persist session {:?}", e)
+                    };
                 }
                 Err(_) => todo!(),
             }
@@ -319,7 +319,7 @@ pub fn Header() -> Element {
                             }
                             ul {
                                 li {
-                                    span { { translate!(i18, "header.menu.invitations") } }
+                                    span { {translate!(i18, "header.menu.invitations")} }
                                     IconButton {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
@@ -329,7 +329,7 @@ pub fn Header() -> Element {
                                     }
                                 }
                                 li {
-                                    span { { translate!(i18, "header.menu.messages") } }
+                                    span { {translate!(i18, "header.menu.messages")} }
                                     IconButton {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
@@ -339,7 +339,7 @@ pub fn Header() -> Element {
                                     }
                                 }
                                 li {
-                                    span { { translate!(i18, "header.menu.profile") } }
+                                    span { {translate!(i18, "header.menu.profile")} }
                                     IconButton {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
@@ -349,7 +349,7 @@ pub fn Header() -> Element {
                                     }
                                 }
                                 li {
-                                    span { { translate!(i18, "header.menu.settings") } }
+                                    span { {translate!(i18, "header.menu.settings")} }
                                     IconButton {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,

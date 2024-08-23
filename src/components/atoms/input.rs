@@ -66,7 +66,7 @@ pub fn Input(props: InputProps) -> Element {
                 label { class: "input__label", "{value}" }
             }
             div { class: "input-wrapper {size} {input_error_container}",
-                { props.left_text },
+                {props.left_text},
                 input {
                     r#type: "{input_type}",
                     class: "input",
@@ -103,7 +103,7 @@ pub fn Input(props: InputProps) -> Element {
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)
                 }
-                { props.right_text },
+                {props.right_text},
                 if matches!(props.itype, InputType::Search) {
                     IconButton {
                         class: "button--avatar bg--transparent",

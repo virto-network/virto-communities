@@ -52,8 +52,10 @@ pub fn Dropdown(props: DropdownProps) -> Element {
                     },
                     span { class: "dropdown__content",
                         span { class: "dropdown__value {placeholder}",
-                            match props.value { Some(v) => { v.value }
-                            .to_string(), None => props.placeholder }
+                            match props.value {
+                                Some(v) => {v.value}.to_string(),
+                                None => props.placeholder
+                            }
                         }
                         Icon {
                             class: if is_active() { "rotate-180" } else { "rotate-0" },

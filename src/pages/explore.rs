@@ -4,28 +4,32 @@ use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, icon_button::Variant, input::InputType, AddPlus, ArrowLeft, ArrowRight, Avatar, Badge, Chat, Icon, IconButton, SearchInput, Suitcase, Tab, UserAdd, UserGroup, DynamicText
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
+            ArrowRight, Avatar, Badge, Icon, IconButton, SearchInput, Star, Tab, UserAdd,
+            UserGroup, DynamicText
         },
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_notification::use_notification, use_our_navigator::use_our_navigator,
-        use_tooltip::{use_tooltip, TooltipItem},
+        use_communities::{use_communities, CommunitiesError},
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_tooltip::use_tooltip,
     },
-    middlewares::is_dao_owner::is_dao_owner, pages::dashboard::Community,
-    services::kreivo::{
-        community_memberships::{collection, get_owned_memberships, item},
-        community_track::{tracks, tracksIds},
-    },
+    middlewares::is_dao_owner::is_dao_owner,
 };
-static SKIP: u8 = 7;
+
+static SKIP: usize = 7;
+
 #[component]
 pub fn Explore() -> Element {
     let i18 = use_i18();
-    let mut notification = use_notification();
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
-    let mut current_page = use_signal::<u8>(|| 1);
+    let mut communities = use_communities();
+    let mut notification = use_notification();
+
+    let mut current_page = use_signal::<usize>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
     let tab_items = vec![
         TabItem {
@@ -34,77 +38,20 @@ pub fn Explore() -> Element {
         },
     ];
     let tab_value = use_signal::<String>(|| String::from("all"));
-    let mut communities_ids = use_signal::<Vec<u16>>(|| vec![]);
-    let mut communities = use_signal::<Vec<Community>>(|| vec![]);
-    let mut filtered_communities = use_signal::<Vec<Community>>(|| vec![]);
-    let get_community_track = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
+
+    let mut filter_name = use_signal::<Option<String>>(|| None);
+    let mut filter_paginator = use_signal::<Option<(usize, usize)>>(|| None);
+
+    let on_handle_paginator = use_coroutine(move |mut rx: UnboundedReceiver<usize>| async move {
         while let Some(f) = rx.next().await {
-            communities.clear();
             let from = if f - 1 > 0 { (f - 1) * SKIP } else { 0 };
-            let to = if usize::from(f * SKIP) >= communities_ids.len() {
-                communities_ids.len() as u8
-            } else {
-                f * SKIP
-            };
-            let range = &communities_ids()[from as usize..to as usize];
-            for track in range {
-                let response_track = tracks(*track).await;
-                let response_collection = collection(*track).await;
-                let response_item = item(*track, None).await;
-                let collection_items = match response_collection {
-                    Ok(ref collection) => {
-                        let address = format!(
-                            "0x{}",
-                            hex::encode(collection.owner.clone()),
-                        );
-                        get_owned_memberships(&address).await.unwrap_or(0u16)
-                    }
-                    Err(_) => 0u16,
-                };
-                let Ok(track_info) = response_track else {
-                    continue;
-                };
-                let filtered_name = track_info
-                    .name
-                    .iter()
-                    .filter(|b| **b != 0)
-                    .cloned()
-                    .collect::<Vec<_>>();
-                let filtered_name: &[u8] = &filtered_name;
-                let item_details = match response_item {
-                    Ok(items) => items,
-                    Err(_) => 0u16,
-                };
-                let community = Community {
-                    id: *track,
-                    icon: None,
-                    name: String::from_utf8_lossy(filtered_name).to_string(),
-                    description: String::from(""),
-                    tags: vec![],
-                    memberships: collection_items,
-                    members: item_details,
-                };
-                communities.with_mut(|c| c.push(community))
-            }
-            tooltip.hide();
-            filtered_communities.set(communities())
+            let to = f * SKIP;
+
+            filter_paginator.set(Some((from, to)))
         }
     });
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        tooltip
-            .handle_tooltip(TooltipItem {
-                title: translate!(i18, "dashboard.tips.loading.title"),
-                body: translate!(i18, "dashboard.tips.loading.description"),
-                show: true,
-            });
-        let Ok(community_tracks) = tracksIds().await else {
-            notification
-                .handle_error(&translate!(i18, "errors.communities.query_failed"));
-            tooltip.hide();
-            return;
-        };
-        communities_ids.set(community_tracks.communities);
-        get_community_track.send(current_page());
+        on_handle_paginator.send(current_page());
     });
 
     let dynamic_one = translate!(i18, "dynamic_text.dynamic_one");
@@ -133,18 +80,10 @@ pub fn Explore() -> Element {
                         on_input: move |event: Event<FormData>| {
                             search_word.set(event.value());
                             if search_word().trim().is_empty() {
-                                filtered_communities.set(communities());
+                                filter_name.set(None);
                             } else {
                                 let pattern = search_word().trim().to_lowercase();
-                                filtered_communities
-                                    .set(
-                                        communities()
-                                            .into_iter()
-                                            .filter(|community| {
-                                                community.name.to_lowercase().contains(&pattern)
-                                            })
-                                            .collect::<Vec<Community>>(),
-                                    );
+                                filter_name.set(Some(pattern));
                             }
                         },
                         on_keypress: move |_| {},
@@ -165,7 +104,9 @@ pub fn Explore() -> Element {
                 }
             }
             div { class: "dashboard__communities",
-                for community in filtered_communities() {
+                for community in communities
+                    .get_communities_by_filters(None, filter_name().as_deref(), filter_paginator())
+                {
                     section { class: "card",
                         div { class: "card__container",
                             div { class: "card__head",
@@ -179,6 +120,27 @@ pub fn Explore() -> Element {
                                 h3 { class: "card__title", "{community.name}" }
                             }
                             p { class: "card__description", "{community.description}" }
+                            if !community.has_membership {
+                                div { class: "card__favorite",
+                                    IconButton {
+                                        class: "button--drop bg--transparent",
+                                        body: rsx!(
+                                            Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
+                                            "var(--state-primary-active)" } else { "var(--state-base-background)" } }
+                                        ),
+                                        on_click: move |_| {
+                                            if let Err(e) = communities.handle_favorite(community.id) {
+                                                let message = match e {
+                                                    CommunitiesError::NotFound => "Failed to update favorite",
+                                                    CommunitiesError::FailedUpdatingFavorites => "Failed to update favorite",
+                                                    CommunitiesError::NotFoundFavorite => "Failed to update favorite",
+                                                };
+                                                notification.handle_error(&message);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             div { class: "card__metrics",
                                 span { class: "card__metric",
                                     Icon {
@@ -188,7 +150,7 @@ pub fn Explore() -> Element {
                                         stroke_width: 2,
                                         stroke: "var(--text-primary)"
                                     }
-                                    small { "{community.memberships} Memberships" }
+                                    small { "{community.memberships} Free Memberships" }
                                 }
                                 span { class: "card__metric",
                                     Icon {
@@ -269,9 +231,7 @@ pub fn Explore() -> Element {
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
                     span { class: "dashboard__footer__paginator",
-                        { translate!(i18, "dashboard.footer.paginator",
-                        from : current_page(), to : (((communities_ids.len() as f64 + 1f64) / SKIP as
-                        f64) as f64).ceil()) }
+                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities.get_communities().len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
                     }
                     div { class: "dashboard__footer__paginators",
                         IconButton {
@@ -281,7 +241,7 @@ pub fn Explore() -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current - 1);
-                                get_community_track.send(current_page())
+                                on_handle_paginator.send(current_page())
                             }
                         }
                         IconButton {
@@ -291,7 +251,7 @@ pub fn Explore() -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current + 1);
-                                get_community_track.send(current_page())
+                                on_handle_paginator.send(current_page())
                             }
                         }
                     }

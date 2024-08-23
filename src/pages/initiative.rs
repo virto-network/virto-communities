@@ -1,5 +1,6 @@
 use std::str::FromStr;
-use chrono::{DateTime, Duration, NaiveDate, Utc};
+
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::TryFutureExt;
@@ -17,7 +18,6 @@ use crate::{
         use_initiative::{
             use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
             InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov,
-            VotingOpenGovAction,
         },
         use_notification::use_notification, use_our_navigator::use_our_navigator,
         use_session::use_session, use_spaces_client::use_spaces_client,
@@ -97,10 +97,7 @@ pub fn Initiative(id: u16) -> Element {
             }
             div { class: "initiative__form",
                 div { class: "form__wrapper form__wrapper--initiative",
-                    h2 { class: "form__title",
-                        {
-                        translate!(i18, "initiative.title") }
-                    }
+                    h2 { class: "form__title", {translate!(i18, "initiative.title")} }
                     div { class: "steps__wrapper",
                         StepCard {
                             name: translate!(i18, "initiative.steps.info.label"),
@@ -342,7 +339,7 @@ pub fn Initiative(id: u16) -> Element {
                                         log::warn!("Malformed remark");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
-                                let response = topup_then_initiative_setup(
+                                topup_then_initiative_setup(
                                         id,
                                         last_initiative,
                                         room_id,
@@ -352,7 +349,11 @@ pub fn Initiative(id: u16) -> Element {
                                         treasury_action,
                                         votiong_open_gov_action,
                                     )
-                                    .await;
+                                    .await
+                                    .map_err(|e| {
+                                        log::warn!("Failed to create initiative {:?}", e);
+                                        String::from("Failed to create initiative")
+                                    })?;
                                 tooltip.hide();
                                 let path = format!("/dao/{id}/initiatives");
                                 nav.push(vec![], &path);
@@ -375,39 +376,24 @@ fn calculate_future_block(
     current_date_millis: u64,
     future_date_str: &str,
 ) -> u32 {
-    let future_date_naive = NaiveDate::from_str(future_date_str)
-        .expect("Fecha futura no válida");
-    let future_date = DateTime::<Utc>::from_utc(future_date_naive.and_hms(0, 0, 0), Utc);
-    let current_date = DateTime::<
-        Utc,
-    >::from_utc(
-        chrono::NaiveDateTime::from_timestamp(
-            (current_date_millis / 1000).try_into().unwrap(),
-            ((current_date_millis % 1000) * 1_000_000) as u32,
-        ),
-        Utc,
-    );
+    let future_date_naive = NaiveDate::from_str(future_date_str).expect("Invalid future date");
+    let future = future_date_naive
+        .and_hms_opt(0, 0, 0)
+        .expect("Invalid future date");
+    let future_date = DateTime::<Utc>::from_naive_utc_and_offset(future, Utc);
+
+    let x = DateTime::from_timestamp(
+        (current_date_millis / 1000).try_into().unwrap(),
+        ((current_date_millis % 1000) * 1_000_000) as u32,
+    )
+    .expect("");
+
+    let x = NaiveDateTime::from_str(&x.date_naive().to_string()).expect("Invalid calculated date");
+    let current_date = DateTime::from_naive_utc_and_offset(x, Utc);
+
     let elapsed_time_in_seconds = (future_date - current_date).num_seconds();
     let blocks_to_add = elapsed_time_in_seconds / BLOCK_TIME_IN_SECONDS;
     (current_block + blocks_to_add as u32).into()
-}
-fn calculate_date_from_block(
-    current_block: u32,
-    current_date_millis: u64,
-    target_block: u32,
-) -> DateTime<Utc> {
-    let current_date = DateTime::<
-        Utc,
-    >::from_utc(
-        chrono::NaiveDateTime::from_timestamp(
-            (current_date_millis / 1000).try_into().unwrap(),
-            ((current_date_millis % 1000) * 1_000_000) as u32,
-        ),
-        Utc,
-    );
-    let blocks_to_add = target_block as i64 - current_block as i64;
-    let elapsed_time_in_seconds = blocks_to_add * BLOCK_TIME_IN_SECONDS;
-    current_date + Duration::seconds(elapsed_time_in_seconds)
 }
 fn convert_treasury_to_period(
     treasury: KusamaTreasury,

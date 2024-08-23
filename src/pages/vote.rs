@@ -22,7 +22,7 @@ use crate::{
     },
     pages::initiatives::InitiativeWrapper,
     services::kreivo::{
-        community_memberships::{get_communities_by_member, get_membership_id, item},
+        community_memberships::{get_membership_id, is_community_member_by_address, item},
         community_referenda::{metadata_of, referendum_info_for, Deciding},
         community_track::{tracks, TrackInfo},
         preimage::{preimage_for, request_status_for},
@@ -77,13 +77,16 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .handle_error(&translate!(i18, "errors.wallet.account_address"));
                 return;
             };
-            let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
+
+            let Ok(is_member) = is_community_member_by_address(&address.0, id).await else {
                 log::info!("error here by memeber");
                 notification
                     .handle_error(&translate!(i18, "errors.communities.query_failed"));
                 return;
             };
-            let response_item = item(id, None).await;
+
+            // get community members
+            let response_item = item(id).await;
             let item_details = match response_item {
                 Ok(items) => items,
                 Err(_) => 0u16,
@@ -130,9 +133,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                 current_block(),
             );
             participation_threshold.set(threshold);
-            if community_tracks.iter().any(|community| community.id == id) {
-                can_vote.set(true);
-            }
+
+            can_vote.set(is_member);
+
             if let Some(wrapper) = initiative_wrapper() {
                 votes_statistics.set(VoteDigest::default());
                 votes_statistics
@@ -292,8 +295,27 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                         div { class: "details__statistics",
                                             div { class: "details__head",
                                                 h2 { class: "vote-card__title statistics__title",
-                                                    { translate!(i18,
-                                                    "governance.description.details.status.title") }
+                                                    {translate!(i18, "governance.description.details.status.title")}
+                                                }
+                                                {
+                                                    let status = if initiative_wrapper.ongoing.in_queue | initiative_wrapper.ongoing.deciding.is_none() {
+                                                        ProposalStatus::QUEUE
+                                                    } else {
+                                                        ProposalStatus::VOTING
+                                                    };
+                                                    let (badge_title, badge_color) = match status {
+                                                        ProposalStatus::APPROVED => (translate!(i18, "governance.description.details.status.options.approved"), "badge--green-dark"),
+                                                        ProposalStatus::REJECTED => (translate!(i18, "governance.description.details.status.options.rejected"), "badge--red-dark"),
+                                                        ProposalStatus::VOTING => (translate!(i18, "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
+                                                        ProposalStatus::QUEUE => (translate!(i18, "governance.description.details.status.options.queue"), "badge--blue-light"),
+                                                    };
+                                                
+                                                    rsx!(
+                                                        Badge {
+                                                            text: badge_title,
+                                                            class: badge_color.to_string()
+                                                        }
+                                                    )
                                                 }
                                                 { let status = if
                                                 initiative_wrapper.ongoing.in_queue | initiative_wrapper.ongoing.deciding
@@ -310,17 +332,39 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                             }
                                             div {
                                                 {
-                                                let mut consumed = 0; if let Some(deciding) = & initiative_wrapper.ongoing
-                                                .deciding { if current_block() > 0 { consumed = current_block() - deciding.since;
-                                                } } let decision = match &* track_info.read() { Some(info) => info
-                                                .decision_period, None => 36000 }; let consumed_percent = 100.0 / decision as f64
-                                                * consumed as f64; rsx!(Bar { left_value : consumed_percent, right_value : 100.0
-                                                - consumed_percent, right_helper : if blocks_to_days(decision - consumed) == 0 {
-                                                format!("{}", blocks_to_days(decision - consumed) + 1) } else { format!("{}",
-                                                blocks_to_days(decision - consumed)) }, left_title : "Decision", right_title :
-                                                match blocks_to_times(decision) { Times::Minutes(time) => { format!("{} Minutes",
-                                                time) }, Times::Hours(time) => { format!("{} Hours", time) }, Times::Days(time)
-                                                => { format!("{} Days", time) }, }, }) }
+                                                    let mut consumed = 0;
+                                                
+                                                    if let Some(deciding) = &initiative_wrapper.ongoing.deciding {
+                                                        if  current_block() > 0 {
+                                                            consumed = current_block() - deciding.since;
+                                                        }
+                                                    }
+                                                
+                                                    let decision = match &*track_info.read() {
+                                                        Some(info) => info.decision_period,
+                                                        None => 36000
+                                                    };
+                                                
+                                                    let consumed_percent = 100.0 / decision as f64 * consumed as f64;
+                                                
+                                                    rsx!(
+                                                        Bar {
+                                                            left_value: consumed_percent,
+                                                            right_value: 100.0 - consumed_percent,
+                                                            right_helper: if blocks_to_days(decision - consumed) == 0 {
+                                                                format!("{}", blocks_to_days(decision - consumed) + 1)
+                                                            } else {
+                                                                format!("{}", blocks_to_days(decision - consumed))
+                                                            },
+                                                            left_title: "Decision",
+                                                            right_title: match blocks_to_times(decision) {
+                                                                Times::Minutes(time) => {format!("{} Minutes", time)},
+                                                                Times::Hours(time) => {format!("{} Hours", time)},
+                                                                Times::Days(time) => {format!("{} Days", time)},
+                                                            },
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -348,31 +392,33 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                     "Explain that this is a dynamic voting, and thresholds might change."
                                                 }
                                             }
-                                            if show_vote() && can_vote() {
-                                                div { class: "row",
-                                                    Button {
-                                                        class: "vote-cta",
-                                                        text: translate!(i18, "governance.description.voting.cta.for"),
-                                                        size: ElementSize::Medium,
-                                                        variant: Variant::Secondary,
-                                                        on_click: move |_| { handle_vote(true) },
-                                                        status: None,
-                                                        left_icon: rsx!(
-                                                            Icon { icon : CircleCheck, height : 16, width : 16, stroke_width : 2, stroke :
-                                                            "#56C95F" }
-                                                        )
-                                                    }
-                                                    Button {
-                                                        class: "vote-cta",
-                                                        text: translate!(i18, "governance.description.voting.cta.against"),
-                                                        size: ElementSize::Medium,
-                                                        variant: Variant::Secondary,
-                                                        on_click: move |_| { handle_vote(false) },
-                                                        status: None,
-                                                        left_icon: rsx!(
-                                                            Icon { icon : StopSign, height : 16, width : 16, stroke_width : 2, stroke :
-                                                            "#f44336bd" }
-                                                        )
+                                            if show_vote() {
+                                                if can_vote() {
+                                                    div { class: "row",
+                                                        Button {
+                                                            class: "vote-cta",
+                                                            text: translate!(i18, "governance.description.voting.cta.for"),
+                                                            size: ElementSize::Medium,
+                                                            variant: Variant::Secondary,
+                                                            on_click: move |_| { handle_vote(true) },
+                                                            status: None,
+                                                            left_icon: rsx!(
+                                                                Icon { icon : CircleCheck, height : 16, width : 16, stroke_width : 2, stroke :
+                                                                "#56C95F" }
+                                                            )
+                                                        }
+                                                        Button {
+                                                            class: "vote-cta",
+                                                            text: translate!(i18, "governance.description.voting.cta.against"),
+                                                            size: ElementSize::Medium,
+                                                            variant: Variant::Secondary,
+                                                            on_click: move |_| { handle_vote(false) },
+                                                            status: None,
+                                                            left_icon: rsx!(
+                                                                Icon { icon : StopSign, height : 16, width : 16, stroke_width : 2, stroke :
+                                                                "#f44336bd" }
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }
@@ -408,16 +454,14 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         Icon { icon: CircleCheck, height: 16, width: 16, stroke_width: 2, stroke: "#56C95F" }
                                                         p { class: "votes-counter__total",
                                                             "{votes_statistics().aye} "
-                                                            { translate!(i18,
-                                                            "governance.description.voting.votes") }
+                                                            {translate!(i18, "governance.description.voting.votes")}
                                                         }
                                                     }
                                                     div { class: "votes-counter votes-counter--against",
                                                         Icon { icon: StopSign, height: 16, width: 16, stroke_width: 2, stroke: "#f44336bd" }
                                                         p { class: "votes-counter__total",
                                                             "{votes_statistics().nay} "
-                                                            { translate!(i18,
-                                                            "governance.description.voting.votes") }
+                                                            {translate!(i18, "governance.description.voting.votes")}
                                                         }
                                                     }
                                                 }

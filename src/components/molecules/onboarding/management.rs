@@ -12,10 +12,7 @@ pub fn OnboardingManagement() -> Element {
     let mut onboard = use_onboard();
     rsx!(
         div { class: "form__title",
-            span { class: "label",
-                { translate!(i18,
-                "onboard.management.label") }
-            }
+            span { class: "label", {translate!(i18, "onboard.management.label")} }
             Title { text: translate!(i18, "onboard.management.title") }
         }
         div { class: "form__inputs",

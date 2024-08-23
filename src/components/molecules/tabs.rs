@@ -11,8 +11,11 @@ pub struct TabsProps {
 pub fn Tabs(props: TabsProps) -> Element {
     rsx!(
         section { class: "tabs",
-            { props.body.into_iter().map(| item | { rsx!({ item })
-            }) }
+            {props.body.into_iter().map(|item| {
+                rsx!(
+                    {item}
+                )
+            })}
         }
     )
 }

@@ -42,45 +42,87 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
     rsx!(
         ul { class: "form__inputs form__inputs--combo",
             p { class: "form__inputs__disclaimer",
-                { translate!(i18,
-                "initiative.steps.actions.kusama_treasury.disclaimer.period_1") },
+                {translate!(i18, "initiative.steps.actions.kusama_treasury.disclaimer.period_1")},
                 if props.meta.periods.len() > 1 {
                     { translate!(i18,
                     "initiative.steps.actions.kusama_treasury.disclaimer.period_n") }
                 }
             }
-            { props
-            .meta.periods.iter().enumerate().map(| (index_meta, period) | { rsx!(li { div {
-            style :
-            "
-                                        width: 100%;
-                                        display: flex;
-                                        gap: 4px;
-                                    ",
-            Input { message : (period.amount / KUSAMA_PRECISION_DECIMALS).to_string(), size :
-            ElementSize::Small, placeholder : translate!(i18,
-            "initiative.steps.actions.kusama_treasury.placeholder"), error : None, right_text
-            : { rsx!(span { class : "input--right__text", "KSM" }) }, on_input : move | event
-            : Event < FormData >| { if let ActionItem::KusamaTreasury(ref mut meta) =
-            initiative.get_action(props.index) { let amount = event.value().parse::< f64 > ()
-            .unwrap_or(0.0); let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
-            meta.periods[index_meta].amount = scaled_amount as u64; initiative
-            .update_action(props.index, ActionItem::KusamaTreasury(meta.clone())); } },
-            on_keypress : move | _ | {}, on_click : move | _ | {}, } if index_meta > 0 {
-            Input { message : period.date.clone(), size : ElementSize::Small, itype :
-            InputType::Date, placeholder : translate!(i18,
-            "initiative.steps.actions.kusama_treasury.placeholder"), error : None, on_input :
-            move | event : Event < FormData >| { if let ActionItem::KusamaTreasury(ref mut
-            meta) = initiative.get_action(props.index) { meta.periods[index_meta].date =
-            event.value(); initiative.update_action(props.index,
-            ActionItem::KusamaTreasury(meta.clone())); } }, on_keypress : move | _ | {},
-            on_click : move | _ | {}, } } } IconButton { variant : Variant::Round, size :
-            ElementSize::Small, class : "button--avatar", body : rsx!(Icon { icon :
-            MinusCircle, height : 24, width : 24, fill : "var(--state-primary-active)" }),
-            on_click : move | _ | { if let ActionItem::KusamaTreasury(ref mut meta) =
-            initiative.get_action(props.index) { meta.periods.remove(index_meta); initiative
-            .update_action(props.index, ActionItem::KusamaTreasury(meta.clone())); } } } })
-            }) },
+            {
+                props.meta.periods.iter().enumerate().map(|(index_meta, period)| {
+                    rsx!(
+                        li {
+                            div {
+                                style: "
+                                    width: 100%;
+                                    display: flex;
+                                    gap: 4px;
+                                ",
+                                Input {
+                                    message: (period.amount / KUSAMA_PRECISION_DECIMALS).to_string(),
+                                    size: ElementSize::Small,
+                                    placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
+                                    error: None,
+                                    right_text: {
+                                        rsx!(
+                                            span { class: "input--right__text",
+                                                "KSM"
+                                            }
+                                        )
+                                    },
+                                    on_input: move |event: Event<FormData>| {
+                                        if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(props.index) {
+                                            // Scale amount
+                                            let amount = event.value().parse::<f64>().unwrap_or(0.0);
+                                            let scaled_amount = amount * KUSAMA_PRECISION_DECIMALS as f64;
+                                            meta.periods[index_meta].amount = scaled_amount as u64 ;
+                                            initiative.update_action(props.index, ActionItem::KusamaTreasury(meta.clone()));
+                                        }
+                                    },
+                                    on_keypress: move |_| {},
+                                    on_click: move |_| {},
+                                }
+                                if index_meta > 0 {
+                                    Input {
+                                        message: period.date.clone(),
+                                        size: ElementSize::Small,
+                                        itype: InputType::Date,
+                                        placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
+                                        error: None,
+                                        on_input: move |event: Event<FormData>| {
+                                            if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(props.index) {
+                                                meta.periods[index_meta].date = event.value() ;
+                                                initiative.update_action(props.index, ActionItem::KusamaTreasury(meta.clone()));
+                                            }
+                                        },
+                                        on_keypress: move |_| {},
+                                        on_click: move |_| {},
+                                    }
+                                }
+                            }
+                            IconButton {
+                                variant: Variant::Round,
+                                size: ElementSize::Small,
+                                class: "button--avatar",
+                                body: rsx!(
+                                    Icon {
+                                        icon: MinusCircle,
+                                        height: 24,
+                                        width: 24,
+                                        fill: "var(--state-primary-active)"
+                                    }
+                                ),
+                                on_click: move |_| {
+                                    if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(props.index) {
+                                        meta.periods.remove(index_meta);
+                                        initiative.update_action(props.index, ActionItem::KusamaTreasury(meta.clone()));
+                                    }
+                                }
+                            }
+                        }
+                    )
+                })
+            },
             IconButton {
                 variant: Variant::Round,
                 size: ElementSize::Small,

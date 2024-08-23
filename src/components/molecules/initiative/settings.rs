@@ -1,24 +1,16 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use crate::{
-    components::atoms::{
-        dropdown::{DropdownItem, ElementSize},
-        Dropdown,
-    },
-    hooks::{
-        use_notification::use_notification, use_onboard::use_onboard,
-        use_spaces_client::use_spaces_client,
-    },
+
+use crate::components::atoms::{
+    dropdown::{DropdownItem, ElementSize},
+    Dropdown,
 };
 #[component]
 pub fn InitiativeSettings() -> Element {
     let i18 = use_i18();
-    let mut onboard = use_onboard();
-    let mut notification = use_notification();
-    let spaces_client = use_spaces_client();
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
     let mut items = vec![];
-    let mut dropdown_options = vec![
+    let dropdown_options = vec![
         DropdownItem {
             key: "Admin".to_string(),
             value: "Admin".to_string(),
@@ -47,7 +39,7 @@ pub fn InitiativeSettings() -> Element {
                     size: ElementSize::Small,
                     default: None,
                     on_change: move |event: usize| {
-                        let mut dropdown_options = vec![
+                        let dropdown_options = vec![
                             DropdownItem {
                                 key: "Admin".to_string(),
                                 value: "Admin".to_string(),
