@@ -27,21 +27,18 @@ pub fn Bar(props: BarProps) -> Element {
         section {
             div { class: "bar {variant}",
                 span { class: "bar__content bar__content--left", style: format!("width: {}%", props.left_value),
-                    p { class: "votes-counter__title", { props.left_helper } }
+                    p { class: "votes-counter__title", {props.left_helper} }
                 }
                 if let Some(value) = props.center_value {
                     span { class: "bar__content__threshold", style: format!("left: {}%", value) }
                 }
                 span { class: "bar__content bar__content--right", style: format!("width: {}%", props.right_value),
-                    p { class: "votes-counter__title", { props.right_helper } }
+                    p { class: "votes-counter__title", {props.right_helper} }
                 }
             }
             div { class: "bar__percent",
-                p { class: "votes-counter__percent",
-                    { props
-                    .left_title }
-                }
-                p { class: "votes-counter__percent", { props.right_title } }
+                p { class: "votes-counter__percent", {props.left_title} }
+                p { class: "votes-counter__percent", {props.right_title} }
             }
         }
     )

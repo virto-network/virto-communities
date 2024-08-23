@@ -52,7 +52,7 @@ pub fn Button(props: ButtonProps) -> Element {
                     class: "button {props.class} {variant} {size} {disabled}",
                     disabled: props.disabled,
                     onclick: move |event| props.on_click.call(event),
-                    { props.left_icon },
+                    {props.left_icon},
                     "{props.text}"
                     { props.right_icon }
                 }

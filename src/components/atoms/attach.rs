@@ -57,7 +57,6 @@ pub fn Attach(props: AttachProps) -> Element {
                 let files = &event.files().ok_or(AttachError::NotFound)?;
                 let fs = files.files();
                 let existing_file = fs.get(0).ok_or(AttachError::NotFound)?;
-                let name = existing_file.clone();
                 let content = files
                     .read_file(existing_file)
                     .await
@@ -156,8 +155,17 @@ pub fn Attach(props: AttachProps) -> Element {
                 }
             } else {
                 div { class: "attach__wrapper",
-                    { attach.get_file().ok().map(| url | { rsx!(img { class :
-                    "attach__preview", src : "{url}" }) }) },
+                    {
+                        attach.get_file().ok().map(|url| {
+                            rsx!(
+                                img {
+                                    class: "attach__preview",
+                                    src: "{url}"
+                                }
+                            )
+                        })
+                    },
+
                     div { class: "attach__cta",
                         Button {
                             text: "{props.cta_text}",

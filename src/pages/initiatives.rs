@@ -256,20 +256,14 @@ pub fn Initiatives(id: u16) -> Element {
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
-                            h3 { class: "card__title",
-                                { translate!(i18,
-                                "dao.cta_cards.create.title") }
-                            }
+                            h3 { class: "card__title", {translate!(i18, "dao.cta_cards.create.title")} }
                         }
                         p { class: "card__description",
                             {
                             translate!(i18, "dao.cta_cards.create.description") }
                         }
                         div { class: "card__head",
-                            a { class: "card__learn",
-                                { translate!(i18,
-                                "dao.cta_cards.create.cta") }
-                            }
+                            a { class: "card__learn", {translate!(i18, "dao.cta_cards.create.cta")} }
                             Icon {
                                 icon: ArrowRight,
                                 height: 20,

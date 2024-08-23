@@ -22,10 +22,8 @@ pub fn Sidebar() -> Element {
     let mut is_active = use_signal(|| false);
 
     rsx!(
-       section {
-           class: "sidebar",
-           class: if is_active() { "sidebar--active" },
-           IconButton {
+        section { class: "sidebar", class: if is_active() { "sidebar--active" },
+            IconButton {
                 class: "button--hamburguer",
                 body: rsx!(
                     Icon { icon : Hamburguer, height : 30, width : 30, stroke_width : 2, stroke :
@@ -43,8 +41,7 @@ pub fn Sidebar() -> Element {
                     }
                 }
                 ul { class: "sidebar__list",
-                    li { class: "sidebar__item",
-                        onclick: move |_|{},
+                    li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
                             class: "button--icon bg--state-primary-active",
                             size: ElementSize::Big,
@@ -57,7 +54,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/");
                             }
                         }
-                        span { { translate!(i18, "sidebar.cta") } }
+                        span { {translate!(i18, "sidebar.cta")} }
                     }
                     li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
@@ -73,7 +70,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![Box::new(is_dao_owner())], "/explore");
                             }
                         }
-                        span { { translate!(i18, "sidebar.cta") } }
+                        span { {translate!(i18, "sidebar.cta")} }
                     }
                     li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
@@ -89,10 +86,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
                             }
                         }
-                        span {
-                            {
-                            translate!(i18, "sidebar.cta") }
-                        }
+                        span { {translate!(i18, "sidebar.cta")} }
                     }
                     hr { class: "sidebar__divider" }
 

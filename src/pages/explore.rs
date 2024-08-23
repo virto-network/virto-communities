@@ -97,7 +97,9 @@ pub fn Explore() -> Element {
                 }
             }
             div { class: "dashboard__communities",
-                for community in communities.get_communities_by_filters(None, filter_name().as_deref(), filter_paginator()) {
+                for community in communities
+                    .get_communities_by_filters(None, filter_name().as_deref(), filter_paginator())
+                {
                     section { class: "card",
                         div { class: "card__container",
                             div { class: "card__head",
@@ -110,20 +112,14 @@ pub fn Explore() -> Element {
                                 }
                                 h3 { class: "card__title", "{community.name}" }
                             }
-                            p { class: "card__description",
-                                "{community.description}"
-                            }
+                            p { class: "card__description", "{community.description}" }
                             if !community.has_membership {
                                 div { class: "card__favorite",
                                     IconButton {
                                         class: "button--drop bg--transparent",
                                         body: rsx!(
-                                            Icon {
-                                                icon: Star,
-                                                height: 24,
-                                                width: 24,
-                                                fill: if community.favorite { "var(--state-primary-active)" } else { "var(--state-base-background)" }
-                                            }
+                                            Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
+                                            "var(--state-primary-active)" } else { "var(--state-base-background)" } }
                                         ),
                                         on_click: move |_| {
                                             if let Err(e) = communities.handle_favorite(community.id) {
@@ -132,9 +128,8 @@ pub fn Explore() -> Element {
                                                     CommunitiesError::FailedUpdatingFavorites => "Failed to update favorite",
                                                     CommunitiesError::NotFoundFavorite => "Failed to update favorite",
                                                 };
-
                                                 notification.handle_error(&message);
-                                            };
+                                            }
                                         }
                                     }
                                 }
@@ -235,7 +230,6 @@ pub fn Explore() -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current - 1);
-
                                 on_handle_paginator.send(current_page())
                             }
                         }
@@ -246,7 +240,6 @@ pub fn Explore() -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current + 1);
-
                                 on_handle_paginator.send(current_page())
                             }
                         }

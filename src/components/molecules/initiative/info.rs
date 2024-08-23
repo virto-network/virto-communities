@@ -87,8 +87,7 @@ pub fn InitiativeInfo(error: bool) -> Element {
                         "initiative.steps.info.categories.label") }
                     }
                     p { class: "form__input__info__description",
-                        { translate!(i18,
-                        "initiative.steps.info.categories.description") }
+                        {translate!(i18, "initiative.steps.info.categories.description")}
                     }
                 }
                 InputTags {

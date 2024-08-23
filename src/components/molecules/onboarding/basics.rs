@@ -16,10 +16,7 @@ pub fn OnboardingBasics(error: bool) -> Element {
     let mut name_maxlength = use_signal(|| 24);
     rsx!(
         div { class: "form__title",
-            span { class: "label",
-                { translate!(i18,
-                "onboard.basics.label") }
-            }
+            span { class: "label", {translate!(i18, "onboard.basics.label")} }
             Title { text: translate!(i18, "onboard.basics.title") }
         }
         div { class: "form__inputs",

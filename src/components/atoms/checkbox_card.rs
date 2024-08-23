@@ -16,10 +16,7 @@ pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
         label {
             class: "checkbox-card",
             class: if props.soon { "checkbox-card--comming-soon" },
-            div { class: "checkbox-card__media",
-                { props
-                .icon }
-            }
+            div { class: "checkbox-card__media", {props.icon} }
             div {
                 span { class: "checkbox-card__title", "{props.title}" }
                 p { class: "checkbox-card__description", "{props.description}" }

@@ -118,7 +118,13 @@ pub fn Dashboard() -> Element {
                 }
             }
             div { class: "dashboard__communities",
-            for community in communities.get_communities_by_filters(Some(()), filter_name().as_deref(), filter_paginator()) {
+                for community in communities
+                    .get_communities_by_filters(
+                        Some(()),
+                        filter_name().as_deref(),
+                        filter_paginator(),
+                    )
+                {
                     section { class: "card",
                         div { class: "card__container",
                             div { class: "card__head",
@@ -131,17 +137,10 @@ pub fn Dashboard() -> Element {
                                 }
                                 h3 { class: "card__title", "{community.name}" }
                             }
-                            p { class: "card__description",
-                                "{community.description}"
-                            }
+                            p { class: "card__description", "{community.description}" }
                             if !community.has_membership {
                                 div { class: "card__favorite",
-                                    Icon {
-                                        icon: Star,
-                                        height: 24,
-                                        width: 24,
-                                        fill: "var(--state-primary-active)"
-                                    }
+                                    Icon { icon: Star, height: 24, width: 24, fill: "var(--state-primary-active)" }
                                 }
                             }
                             div { class: "card__metrics",
@@ -267,7 +266,6 @@ pub fn Dashboard() -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current - 1);
-
                                 on_handle_paginator.send(current_page())
                             }
                         }
@@ -278,7 +276,6 @@ pub fn Dashboard() -> Element {
                             on_click: move |_| {
                                 let current = current_page();
                                 current_page.set(current + 1);
-
                                 on_handle_paginator.send(current_page())
                             }
                         }
@@ -287,14 +284,4 @@ pub fn Dashboard() -> Element {
             }
         }
     }
-}
-fn nice_money(value: u64) -> String {
-    let units = vec!["", "K", "M", "B"];
-    let mut l = 0;
-    let mut n = value as f64;
-    while n >= 1000.0 && l < units.len() - 1 {
-        n /= 1000.0;
-        l += 1;
-    }
-    format!("${:.2}{}", n, if n < 10.0 && l > 0 { units[l] } else { units[l] })
 }
