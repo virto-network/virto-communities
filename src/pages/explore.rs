@@ -143,7 +143,7 @@ pub fn Explore() -> Element {
                                         stroke_width: 2,
                                         stroke: "var(--text-primary)"
                                     }
-                                    small { "{community.memberships} Memberships" }
+                                    small { "{community.memberships} Free Memberships" }
                                 }
                                 span { class: "card__metric",
                                     Icon {

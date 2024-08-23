@@ -27,8 +27,8 @@ pub fn use_communities() -> UseCommunitiesState {
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         tooltip.handle_tooltip(TooltipItem {
-            title: translate!(i18, "dao.tips.loading.title"),
-            body: translate!(i18, "dao.tips.loading.description"),
+            title: translate!(i18, "dashboard.tips.loading.title"),
+            body: translate!(i18, "dashboard.tips.loading.description"),
             show: true,
         });
 
