@@ -29,10 +29,7 @@ pub fn KeyValue(props: KeyValueProps) -> Element {
     rsx!(
         span { class: "key-value {props.class} {size} {variant}",
             h4 { class: "key-value__key", "{props.text}" }
-            div { class: "key-value__value",
-                { props
-                .body }
-            }
+            div { class: "key-value__value", {props.body} }
         }
     )
 }

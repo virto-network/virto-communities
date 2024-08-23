@@ -34,7 +34,8 @@ pub fn InputTags(props: InputTagsProps) -> Element {
         ElementSize::Medium => "input-wrapper__container--medium",
         ElementSize::Small => "input-wrapper__container--small",
     };
-    let mut is_active = use_signal::<bool>(|| false);
+
+    let is_active = use_signal::<bool>(|| false);
     let mut tags = use_signal::<Vec<String>>(|| vec![]);
     let mut complete_value = use_signal(|| String::new());
     let mut new_value = use_signal(|| String::new());
@@ -48,19 +49,56 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                 label { class: "input__label", "{value}" }
             }
             div { class: "input-wrapper {size} {input_error_container}",
-                { tags().iter().enumerate().map(|
-                (index, tag) | { rsx!(div { class : "tag", class : if let Some(i) =
-                is_editing_tag() { if i != index { "tag--editing" } else { "" } }, button { class
-                : "tag__text", onclick : move | _ | { if let Some(i) = is_editing_tag() { if i ==
-                index { new_value.set(temporal_value()); is_editing_tag.set(None); } else {
-                is_editing_tag.set(Some(index)); new_value.set(tags() [index].clone()); } } else
-                { is_editing_tag.set(Some(index)); temporal_value.set(new_value()); new_value
-                .set(tags() [index].clone()); } }, "{tag}" } IconButton { class :
-                "button--drop bg--transparent", body : rsx!(Icon { icon : Close, height : 20,
-                width : 20, fill : "var(--fill-400)" }), on_click : move | _ | { if let Some(i) =
-                is_editing_tag() { if i == index { new_value.set(temporal_value());
-                is_editing_tag.set(None); } } tags.with_mut(| t | t.remove(index));
-                complete_value.set(tags().join(",")); } } }) }) },
+                {
+                    tags().iter().enumerate().map(|(index, tag)| {
+                        rsx!(
+                            div {
+                                class: "tag",
+                                class: if let Some(i) = is_editing_tag() { if i != index { "tag--editing" } else {""} },
+                                button {
+                                    class: "tag__text",
+                                    onclick: move |_| {
+                                        if let Some(i) = is_editing_tag() {
+                                            if i == index {
+                                                new_value.set(temporal_value());
+                                                is_editing_tag.set(None);
+                                            } else {
+                                                is_editing_tag.set(Some(index));
+                                                new_value.set(tags()[index].clone());
+                                            }
+                                        } else {
+                                            is_editing_tag.set(Some(index));
+                                            temporal_value.set(new_value());
+                                            new_value.set(tags()[index].clone());
+                                        }
+                                    },
+                                    "{tag}"
+                                }
+                                IconButton {
+                                    class: "button--drop bg--transparent",
+                                    body: rsx!(
+                                        Icon {
+                                            icon: Close,
+                                            height: 20,
+                                            width: 20,
+                                            fill: "var(--fill-400)"
+                                        }
+                                    ),
+                                    on_click: move |_| {
+                                        if let Some(i) = is_editing_tag() {
+                                            if i == index {
+                                                new_value.set(temporal_value());
+                                                is_editing_tag.set(None);
+                                            }
+                                        }
+                                        tags.with_mut(|t|t.remove(index));
+                                        complete_value.set(tags().join(","));
+                                    }
+                                }
+                            }
+                        )
+                    })
+                },
                 if new_value().trim().len() > 0 {
                     div {
                         class: "tag",

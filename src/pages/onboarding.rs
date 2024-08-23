@@ -1,4 +1,3 @@
-use std::vec;
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::TryFutureExt;
@@ -13,13 +12,14 @@ use crate::{
         molecules::{OnboardingBasics, OnboardingInvite, OnboardingManagement},
     },
     hooks::{
-        use_accounts::use_accounts, use_attach::use_attach,
+        use_attach::use_attach,
         use_notification::{
             use_notification, NotificationHandle, NotificationHandler, NotificationItem,
             NotificationVariant,
         },
-        use_onboard::use_onboard, use_our_navigator::use_our_navigator,
-        use_session::use_session, use_spaces_client::use_spaces_client,
+        use_onboard::use_onboard,
+        use_our_navigator::use_our_navigator,
+        use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
@@ -33,13 +33,6 @@ pub enum OnboardingStep {
     Invite,
 }
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct TopupDetails {
-    pub signer_in_kreivo: u32,
-    pub community_account_in_kreivo: u32,
-    pub community_account_in_people: u32,
-}
-#[derive(Serialize)]
 struct Identity {
     pub display: String,
     pub matrix: Option<String>,
@@ -48,21 +41,14 @@ struct Identity {
 #[serde(tag = "type", rename_all = "camelCase")]
 enum DecisionMethod {
     Membership,
-    Rank,
-    NativeToken,
-    CommunityAsset { id: String, min_vote: i32 },
-}
-#[derive(Serialize)]
-struct CommunityData {
-    signer: String,
-    community_id: i32,
-    decision_method: DecisionMethod,
-    identity: Identity,
+    _Rank,
+    _NativeToken,
+    _CommunityAsset { id: String, min_vote: i32 },
 }
 pub fn convert_to_jsvalue<T: Serialize>(value: &T) -> Result<JsValue, Error> {
     to_value(value)
         .map(|t: serde_json::Value| JsValue::from_serde(&t))
-        .unwrap_or_else(|e| Ok(JsValue::from_str("Error creating JsValue")))
+        .unwrap_or_else(|_| Ok(JsValue::from_str("Error creating JsValue")))
 }
 #[wasm_bindgen]
 extern "C" {
@@ -80,32 +66,22 @@ extern "C" {
 pub fn Onboarding() -> Element {
     let i18 = use_i18();
     let mut onboard = use_onboard();
-    let mut accounts = use_accounts();
-    let mut session = use_session();
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
     let spaces_client = use_spaces_client();
-    let mut nav = use_our_navigator();
-    let mut to_pay = consume_context::<Signal<f64>>();
+    let nav = use_our_navigator();
+
+    let to_pay = consume_context::<Signal<f64>>();
+
     let mut id_number = use_signal::<String>(|| String::new());
     let mut onboarding_step = use_signal::<OnboardingStep>(|| OnboardingStep::Basics);
-    let mut onboarding_steps = use_signal::<
-        Vec<OnboardingStep>,
-    >(|| {
-        vec![OnboardingStep::Basics, OnboardingStep::Management, OnboardingStep::Invite]
-    });
+
     let mut handle_required_inputs = use_signal::<bool>(|| false);
     use_before_render(move || {
         onboard.default();
     });
     use_drop(move || attach.reset());
-    let get_account = move || {
-        let Some(user_session) = session.get() else {
-            return None;
-        };
-        accounts.get_one(user_session.account_id)
-    };
     rsx! {
         div { class: "page page--onboarding",
             div { class: "row",
@@ -159,11 +135,13 @@ pub fn Onboarding() -> Element {
                                 }
                             }
                         }
-                        match *
-                        onboarding_step.read() { OnboardingStep::Basics => rsx!(OnboardingBasics { error
-                        : handle_required_inputs() }), OnboardingStep::Management =>
-                        rsx!(OnboardingManagement {}), OnboardingStep::Invite => rsx!(OnboardingInvite
-                        {}), }
+                        match *onboarding_step.read() {
+                            OnboardingStep::Basics => rsx!(OnboardingBasics {
+                                error: handle_required_inputs()
+                            }),
+                            OnboardingStep::Management => rsx!(OnboardingManagement {}),
+                            OnboardingStep::Invite => rsx!(OnboardingInvite {}),
+                        }
                     }
                     div { class: "form__cta",
                         if !matches!(*onboarding_step.read(), OnboardingStep::Basics) {
@@ -314,7 +292,7 @@ pub fn Onboarding() -> Element {
                                                             log::warn!("Malformed membership accounts");
                                                             translate!(i18, "errors.form.community_creation")
                                                         })?;
-                                                    let response = topup_then_create_community(
+                                                    topup_then_create_community(
                                                             current_id,
                                                             identity.display.clone(),
                                                             decision_method,

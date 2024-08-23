@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
+use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 use crate::{
     components::{
@@ -10,10 +11,11 @@ use crate::{
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_accounts::use_accounts,
-        use_initiative::{use_initiative, InitiativeInfoContent},
-        use_notification::use_notification, use_our_navigator::use_our_navigator,
-        use_spaces_client::use_spaces_client, use_tooltip::{use_tooltip, TooltipItem},
+        use_communities::use_communities,
+        use_initiative::InitiativeInfoContent,
+        use_our_navigator::use_our_navigator,
+        use_spaces_client::use_spaces_client,
+        use_tooltip::{use_tooltip, TooltipItem},
     },
     services::kreivo::{
         community_referenda::{
@@ -35,6 +37,8 @@ pub fn Initiatives(id: u16) -> Element {
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
     let spaces_client = use_spaces_client();
+    let mut communities = use_communities();
+
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -48,67 +52,101 @@ pub fn Initiatives(id: u16) -> Element {
     let initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
     let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
     let mut filtered_initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
-    use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        tooltip
-            .handle_tooltip(TooltipItem {
+
+    use_effect(use_reactive(
+        (&communities.get_communities().len(),),
+        move |(len,)| {
+            if len > 0 {
+                if let Err(_) = communities.set_community(id) {
+                    let path = format!("/");
+                    nav.push(vec![], &path);
+                };
+            }
+        },
+    ));
+
+    let handle_initiatives = use_coroutine(move |mut rx: UnboundedReceiver<u16>| async move {
+        while let Some(id) = rx.next().await {
+            initiatives.set(vec![]);
+            filtered_initiatives.set(vec![]);
+            
+            tooltip.handle_tooltip(TooltipItem {
                 title: translate!(i18, "dao.tips.loading.title"),
                 body: translate!(i18, "dao.tips.loading.description"),
                 show: true,
             });
-        let from = 29;
-        let count = referendum_count().await.expect("Should get referendum count");
-        for track in from..count {
-            let Ok(response) = referendum_info_for(track).await else {
-                continue;
-            };
-            if response.ongoing.origin.communities.community_id == id {
-                let name = format!("Ref: {:?}", track);
-                let mut init = InitiativeWrapper {
-                    id: track,
-                    info: InitiativeInfoContent {
-                        name,
-                        description: String::new(),
-                        tags: vec![],
-                        actions: vec![],
-                    },
-                    ongoing: response.ongoing,
+            // Temporal value for FIFO ongoing initiative
+            let from = 29;
+
+            let count = referendum_count()
+                .await
+                .expect("Should get referendum count");
+
+            for track in from..count {
+                let Ok(response) = referendum_info_for(track).await else {
+                    continue;
                 };
-                log::info!("{:?}", metadata_of(track). await);
-                let Ok(initiative_metadata) = metadata_of(track).await else {
+
+                if response.ongoing.origin.communities.community_id == id {
+                    let name = format!("Ref: {:?}", track);
+                    let mut init = InitiativeWrapper {
+                        id: track,
+                        info: InitiativeInfoContent {
+                            name,
+                            description: String::new(),
+                            tags: vec![],
+                            actions: vec![],
+                        },
+                        ongoing: response.ongoing,
+                    };
+
+                    log::info!("{:?}", metadata_of(track).await);
+                    let Ok(initiative_metadata) = metadata_of(track).await else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    let initiative_metadata = format!("0x{}", hex::encode(initiative_metadata));
+
+                    let Ok(preimage_len) = request_status_for(&initiative_metadata).await else {
+                        continue;
+                    };
+
+                    let Ok(room_id_metadata) =
+                        preimage_for(&initiative_metadata, preimage_len).await
+                    else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    let Ok(response) = spaces_client
+                        .get()
+                        .get_initiative_by_id(&room_id_metadata)
+                        .await
+                    else {
+                        initiatives.with_mut(|c| c.push(init));
+                        continue;
+                    };
+
+                    log::info!("{:?}", response.info);
+
+                    init.info = response.info;
+
                     initiatives.with_mut(|c| c.push(init));
-                    continue;
-                };
-                let initiative_metadata = format!(
-                    "0x{}",
-                    hex::encode(initiative_metadata),
-                );
-                let Ok(preimage_len) = request_status_for(&initiative_metadata).await
-                else {
-                    continue;
-                };
-                let Ok(room_id_metadata) = preimage_for(
-                        &initiative_metadata,
-                        preimage_len,
-                    )
-                    .await else {
-                    initiatives.with_mut(|c| c.push(init));
-                    continue;
-                };
-                let Ok(response) = spaces_client
-                    .get()
-                    .get_initiative_by_id(&room_id_metadata)
-                    .await else {
-                    initiatives.with_mut(|c| c.push(init));
-                    continue;
-                };
-                log::info!("{:?}", response.info);
-                init.info = response.info;
-                initiatives.with_mut(|c| c.push(init));
+                }
             }
+
+            tooltip.hide();
+            filtered_initiatives.set(initiatives());
         }
-        tooltip.hide();
-        filtered_initiatives.set(initiatives());
     });
+
+    use_effect(use_reactive(&id, move |_| {
+        handle_initiatives.send(id)
+    }));
+
+    use_drop(move || communities.remove_community());
+
     rsx! {
         div { class: "dashboard grid-main",
             div { class: "dashboard__head",
@@ -218,20 +256,14 @@ pub fn Initiatives(id: u16) -> Element {
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
-                            h3 { class: "card__title",
-                                { translate!(i18,
-                                "dao.cta_cards.create.title") }
-                            }
+                            h3 { class: "card__title", {translate!(i18, "dao.cta_cards.create.title")} }
                         }
                         p { class: "card__description",
                             {
                             translate!(i18, "dao.cta_cards.create.description") }
                         }
                         div { class: "card__head",
-                            a { class: "card__learn",
-                                { translate!(i18,
-                                "dao.cta_cards.create.cta") }
-                            }
+                            a { class: "card__learn", {translate!(i18, "dao.cta_cards.create.cta")} }
                             Icon {
                                 icon: ArrowRight,
                                 height: 20,

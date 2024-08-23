@@ -36,7 +36,7 @@ pub fn Step(props: StepProps) -> Element {
                 }
             }
             if let Some(name) = props.name {
-                span { class: "step__name", { name } }
+                span { class: "step__name", {name} }
             }
             div { class: "step__line" }
         }

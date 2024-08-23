@@ -7,6 +7,6 @@ pub struct BadgeProps {
 }
 pub fn Badge(props: BadgeProps) -> Element {
     rsx!(
-        span { class: "badge {props.class}", { props.text } }
+        span { class: "badge {props.class}", {props.text} }
     )
 }

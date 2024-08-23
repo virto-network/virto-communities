@@ -19,7 +19,7 @@ pub fn RadioButton(props: RadioButtonProps) -> Element {
             }
             div { class: "radio-button__header",
                 div { class: "radio-custom" }
-                span { { props.title } }
+                span { {props.title} }
             }
         }
     )

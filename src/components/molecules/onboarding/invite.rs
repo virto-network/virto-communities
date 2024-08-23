@@ -35,30 +35,63 @@ pub fn OnboardingInvite() -> Element {
     );
     rsx!(
         div { class: "form__title",
-            span { class: "label",
-                { translate!(i18,
-                "onboard.invite.label") }
-            }
+            span { class: "label", {translate!(i18, "onboard.invite.label")} }
             Title { text: translate!(i18, "onboard.invite.title") }
         }
         ul { class: "form__inputs",
-            { members_lock.iter()
-            .enumerate().map(| (index, member) | { let x = DropdownItem { key : match member
-            .medium { MediumOptions::Wallet => translate!(i18,
-            "onboard.invite.form.wallet.label"), }, value : match member.medium.clone() {
-            MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"), }
-            }; rsx!(li { ComboInput { size : ElementSize::Big, value : ComboInputValue {
-            option : ComboInputOption::Dropdown(x), input : member.account.clone() },
-            placeholder : match member.medium { MediumOptions::Wallet => translate!(i18,
-            "onboard.invite.form.wallet.placeholder"), }, on_change : move | event :
-            ComboInputValue | { let medium = match event.option {
-            ComboInputOption::Dropdown(value) => { match value.key.as_str() { "Wallet" =>
-            MediumOptions::Wallet, _ => todo!() } }, _ => todo!() }; onboard
-            .update_invitation(index, InvitationItem { medium, account : event.input }); } }
-            IconButton { variant : Variant::Round, size : ElementSize::Medium, class :
-            "button--avatar", body : rsx!(Icon { icon : MinusCircle, height : 24, width : 24,
-            fill : "var(--state-primary-active)" }), on_click : move | _ | { onboard
-            .remove_invitation(index); } } }) }) },
+            {
+                members_lock.iter().enumerate().map(|(index, member)| {
+                    let x  = DropdownItem { key: match member.medium {
+                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                    }, value: match member.medium.clone() {
+                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                    } };
+            
+                    rsx!(
+                        li {
+                            ComboInput {
+                                size: ElementSize::Big,
+                                value: ComboInputValue {
+                                    option: ComboInputOption::Dropdown(x),
+                                    input: member.account.clone()
+                                },
+                                placeholder: match member.medium {
+                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
+                                },
+                                on_change: move |event: ComboInputValue| {
+                                    let medium = match event.option {
+                                        ComboInputOption::Dropdown(value) => {
+                                            match value.key.as_str() {
+                                                "Wallet" => MediumOptions::Wallet,
+                                                _ => todo!()
+                                            }
+                                        },
+                                        _ => todo!()
+                                    };
+            
+                                    onboard.update_invitation(index, InvitationItem { medium, account: event.input });
+                                }
+                            }
+                            IconButton {
+                                variant: Variant::Round,
+                                size: ElementSize::Medium,
+                                class: "button--avatar",
+                                body: rsx!(
+                                    Icon {
+                                        icon: MinusCircle,
+                                        height: 24,
+                                        width: 24,
+                                        fill: "var(--state-primary-active)"
+                                    }
+                                ),
+                                on_click: move |_| {
+                                    onboard.remove_invitation(index);
+                                }
+                            }
+                        }
+                    )
+                })
+            },
             IconButton {
                 variant: Variant::Round,
                 size: ElementSize::Medium,
