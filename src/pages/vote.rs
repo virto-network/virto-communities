@@ -22,7 +22,7 @@ use crate::{
     },
     pages::initiatives::InitiativeWrapper,
     services::kreivo::{
-        community_memberships::{get_communities_by_member, get_membership_id, item},
+        community_memberships::{get_membership_id, is_community_member_by_address, item},
         community_referenda::{metadata_of, referendum_info_for, Deciding},
         community_track::{tracks, TrackInfo},
         preimage::{preimage_for, request_status_for},
@@ -77,7 +77,8 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .handle_error(&translate!(i18, "errors.wallet.account_address"));
                 return;
             };
-            let Ok(community_tracks) = get_communities_by_member(&address.0).await else {
+
+            let Ok(is_member) = is_community_member_by_address(&address.0, id).await else {
                 log::info!("error here by memeber");
                 notification
                     .handle_error(&translate!(i18, "errors.communities.query_failed"));
@@ -130,9 +131,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                 current_block(),
             );
             participation_threshold.set(threshold);
-            if community_tracks.iter().any(|community| community.id == id) {
-                can_vote.set(true);
-            }
+
+            can_vote.set(is_member);
+
             if let Some(wrapper) = initiative_wrapper() {
                 votes_statistics.set(VoteDigest::default());
                 votes_statistics

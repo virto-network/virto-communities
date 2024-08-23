@@ -1,9 +1,12 @@
 use dioxus::{hooks::use_context_provider, signals::Signal};
 use pjs::PjsExtension;
-use crate::{pages::initiatives::InitiativeWrapper, services::bot::client::SpacesClient};
+
+use crate::{pages::{dashboard::Community, initiatives::InitiativeWrapper}, services::bot::client::SpacesClient};
+
 use super::{
     use_accounts::{Account, IsDaoOwner},
-    use_attach::AttachFile, use_communities::{Communities, Community},
+    use_attach::AttachFile,
+    use_communities::Communities,
     use_initiative::{ActionsForm, ConfirmationForm, InfoForm, SettingsForm},
     use_notification::NotificationItem,
     use_onboard::{BasicsForm, InvitationForm, ManagementForm},

@@ -1,34 +1,31 @@
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::StreamExt;
+
 use crate::{
     components::atoms::{
-        avatar::Variant, dropdown::ElementSize, icon_button, AddPlus, Avatar, Compass,
-        Hamburguer, Home, Icon, IconButton,
+        avatar::Variant, dropdown::ElementSize, icon_button, AddPlus, Avatar, Compass, Hamburguer,
+        Home, Icon, IconButton, Star,
     },
     hooks::{
-        use_accounts::use_accounts, use_communities::use_communities,
-        use_notification::use_notification, use_our_navigator::use_our_navigator,
-        use_tooltip::{use_tooltip, TooltipItem},
+        use_communities::use_communities, use_our_navigator::use_our_navigator,
+        use_tooltip::use_tooltip,
     },
-    middlewares::is_dao_owner::is_dao_owner, pages::dashboard::Community,
-    services::kreivo::community_memberships::get_communities_by_member,
+    middlewares::is_dao_owner::is_dao_owner,
 };
 #[component]
 pub fn Sidebar() -> Element {
     let i18 = use_i18();
-    let communities = use_communities();
-    let accounts = use_accounts();
+    let mut communities = use_communities();
+    let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
-    let mut nav = use_our_navigator();
-    let mut notification = use_notification();
-    let header_handled = consume_context::<Signal<bool>>();
+
     let mut is_active = use_signal(|| false);
-    let mut communities_by_address = use_signal::<Vec<Community>>(|| vec![]);
-    let active_class = if is_active() { "sidebar--active" } else { "" };
+
     rsx!(
-        section { class: "sidebar {active_class}",
-            IconButton {
+       section {
+           class: "sidebar",
+           class: if is_active() { "sidebar--active" },
+           IconButton {
                 class: "button--hamburguer",
                 body: rsx!(
                     Icon { icon : Hamburguer, height : 30, width : 30, stroke_width : 2, stroke :
@@ -46,24 +43,8 @@ pub fn Sidebar() -> Element {
                     }
                 }
                 ul { class: "sidebar__list",
-                    if !communities.get_community().name.is_empty()
-                        || communities.get_community().logo.is_some()
-                    {
-                        li {
-                            class: "sidebar__item sidebar__item--uncomplete",
-                            onclick: move |_| {},
-                            IconButton {
-                                class: "button--avatar",
-                                body: rsx!(
-                                    Avatar { name : "{communities.get_community().name}", size : 60, uri :
-                                    communities.get_community().logo, variant : Variant::SemiRound }
-                                ),
-                                on_click: move |_| {}
-                            }
-                            span { { communities.get_community().name } }
-                        }
-                    }
-                    li { class: "sidebar__item", onclick: move |_| {},
+                    li { class: "sidebar__item",
+                        onclick: move |_|{},
                         IconButton {
                             class: "button--icon bg--state-primary-active",
                             size: ElementSize::Big,
@@ -114,17 +95,48 @@ pub fn Sidebar() -> Element {
                         }
                     }
                     hr { class: "sidebar__divider" }
-                    for community in communities_by_address.read().iter() {
-                        li { class: "sidebar__item", onclick: move |_| {},
-                            IconButton {
-                                class: "button--avatar",
-                                body: rsx!(
-                                    Avatar { name : "{community.name}", size : 60, uri : None, variant :
-                                    Variant::Round }
-                                ),
-                                on_click: move |_| {}
-                            }
-                            span { "{community.name}" }
+
+                    for community in communities.get_communities_by_filters(Some(()), None, None) {
+                        {
+                            let active_community = communities.get_community();
+                            let community_id = community.id.clone();
+                            rsx!(
+                                li {
+                                    class: "sidebar__item",
+                                    class: if active_community.id == community.id { "sidebar__item--active" },
+                                    onclick: move |_| {
+                                        if let Ok(_) = communities.set_community(community_id) {
+                                            let path = format!("/dao/{}/initiatives", community_id);
+                                            nav.push(vec![], &path);
+                                        };
+                                    },
+                                    if community.favorite {
+                                        div { class: "sidebar__item--favorite",
+                                            Icon {
+                                                icon: Star,
+                                                height: 16,
+                                                width: 16,
+                                                fill: "var(--state-base-background)"
+                                            }
+                                        }
+                                    }
+                                    IconButton {
+                                        class: "button--avatar",
+                                        body: rsx!(
+                                            Avatar {
+                                                name: "{community.name}",
+                                                size: 60,
+                                                uri: None,
+                                                variant: Variant::Round
+                                            }
+                                        ),
+                                        on_click: move |_| { }
+                                    }
+                                    span {
+                                        "{community.name}"
+                                    },
+                                }
+                            )
                         }
                     }
                 }

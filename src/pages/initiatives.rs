@@ -10,10 +10,11 @@ use crate::{
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_accounts::use_accounts,
-        use_initiative::{use_initiative, InitiativeInfoContent},
-        use_notification::use_notification, use_our_navigator::use_our_navigator,
-        use_spaces_client::use_spaces_client, use_tooltip::{use_tooltip, TooltipItem},
+        use_communities::use_communities,
+        use_initiative::InitiativeInfoContent,
+        use_our_navigator::use_our_navigator,
+        use_spaces_client::use_spaces_client,
+        use_tooltip::{use_tooltip, TooltipItem},
     },
     services::kreivo::{
         community_referenda::{
@@ -35,6 +36,8 @@ pub fn Initiatives(id: u16) -> Element {
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
     let spaces_client = use_spaces_client();
+    let mut communities = use_communities();
+
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
     let mut current_page = use_signal::<u8>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -48,6 +51,19 @@ pub fn Initiatives(id: u16) -> Element {
     let initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
     let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
     let mut filtered_initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
+
+    use_effect(use_reactive(
+        (&communities.get_communities().len(),),
+        move |(len,)| {
+            if len > 0 {
+                if let Err(_) = communities.set_community(id) {
+                    let path = format!("/");
+                    nav.push(vec![], &path);
+                };
+            }
+        },
+    ));
+
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         tooltip
             .handle_tooltip(TooltipItem {
@@ -109,6 +125,9 @@ pub fn Initiatives(id: u16) -> Element {
         tooltip.hide();
         filtered_initiatives.set(initiatives());
     });
+
+    use_drop(move || communities.remove_community());
+
     rsx! {
         div { class: "dashboard grid-main",
             div { class: "dashboard__head",
