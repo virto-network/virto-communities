@@ -15,7 +15,7 @@ use super::{
     use_onboard::{BasicsForm, InvitationForm, ManagementForm},
     use_paginator::Paginator, use_session::UserSession, use_theme::Theme,
     use_timestamp::{IsTimestampHandled, TimestampValue},
-    use_tooltip::TooltipItem,
+    use_tooltip::TooltipItem, use_withdraw::WithdrawForm,
 };
 const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
 const MARKET_CLIENT_URL: &str = "https://sapi.coincarp.com/api/v1";
@@ -56,6 +56,8 @@ pub fn use_startup() {
     >(|| Signal::new(ConfirmationForm::default()));
     use_context_provider::<Signal<TimestampValue>>(|| Signal::new(TimestampValue(0)));
     use_context_provider::<Signal<IsTimestampHandled>>(|| Signal::new(IsTimestampHandled(false)));
+
+    use_context_provider::<Signal<WithdrawForm>>(|| Signal::new(WithdrawForm::default()));
 
     // Clients
 

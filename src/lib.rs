@@ -10,6 +10,7 @@ pub mod pages {
     pub mod onboarding;
     pub mod route;
     pub mod vote;
+    pub mod withdraw;
 }
 pub mod middlewares {
     pub mod is_chain_available;
@@ -38,6 +39,7 @@ pub mod hooks {
     pub mod use_timestamp;
     pub mod use_tooltip;
     pub mod use_vote;
+    pub mod use_withdraw;
 }
 pub mod components {
     pub mod atoms;
