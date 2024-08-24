@@ -219,6 +219,9 @@ $fw-bold: 700;
 
 .bg--state-primary-active {
     background: var(--state-primary-active) !important;
+    &:hover {
+        background-color: var(--fill-400) !important;
+    }
 }
 
 .bg--fill-600 {
@@ -352,6 +355,7 @@ $fw-bold: 700;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    height: 100%;
 }
 
 .steps__wrapper {
@@ -634,7 +638,8 @@ $fw-bold: 700;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     min-height: 60px;
     border-radius: 8px;
-    left: 0;
+    left: 16px;
+    bottom: 16px;
 }
 
 .notification__title {
@@ -681,8 +686,8 @@ $fw-bold: 700;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
     min-height: 60px;
     border-radius: 8px;
-    bottom: 20px;
-    right: 16px;
+    bottom: 16px;
+    left: 16px;
     background: var(--fill-50);
 }
 
@@ -732,12 +737,18 @@ $fw-bold: 700;
     border: none;
     color: var(--fill-00);
     background: var(--state-primary-active);
+    &:hover {
+        background-color: var(--fill-400);
+    }
 }
 
 .button--secondary {
     border: none;
     color: var(--text-loud);
     background: var(--fill-100);
+    &:hover {
+        background-color: var(--fill-200);
+    }
 }
 
 .button--tertiary {
@@ -774,7 +785,6 @@ $fw-bold: 700;
     width: 60px;
     padding: 0;
     transition: background-color 0.2s ease-in;
-
     &:hover {
         background-color: var(--fill-600);
     }
@@ -1222,6 +1232,9 @@ $fw-bold: 700;
     background: var(--fill-00);
     border: none;
     box-shadow: 0px 0.5px 0px 0px rgba(26, 26, 26, .08), 0px 1px 3px 0px rgba(26, 26, 26, .08);
+    &:focus-within {
+        outline: 3px solid var(--state-primary-active);
+    }
 }
 
 .markdown__wrapper--editor .TinyMDE {
@@ -1523,6 +1536,9 @@ textarea::placeholder {
     background: var(--fill-00);
     border: none;
     box-shadow: 0px 0.5px var(--Blur-blur-0, 0px) 0px var(--Colors-alpha-dark-50, rgba(26, 26, 26, 0.08)), 0px 1px var(--Blur-blur-2, 3px) 0px rgba(26, 26, 26, 0.08);
+    &:focus-within {
+        border: 3px solid var(--state-primary-active);
+    }
 }
 
 .button--primary,
@@ -1675,6 +1691,10 @@ textarea::placeholder {
     flex-direction: column;
     gap: 4px;
     width: 100%;
+    border-radius: 12px;
+    &:focus-within {
+        outline: 3px solid var(--state-primary-active);
+    }
 }
 
 .textarea__wrapper {
@@ -1847,8 +1867,6 @@ textarea::placeholder {
     cursor: pointer;
     position: relative;
     width: 100%;
-    height: fit-content;
-
     box-shadow: 0px 1px 2px 0px rgba(26, 26, 26, 0.08);
     flex-direction: column;
     align-items: flex-start;
@@ -2408,7 +2426,7 @@ textarea::placeholder {
 .card__title {
     @extend %text-3xl-font-bold;
     color: var(--text-primary);
-    text-align: left
+    text-align: left;
 }
 
 .card__description {
@@ -2937,5 +2955,50 @@ textarea::placeholder {
     .dashboard__footer {
         flex-direction: column;
         gap: 10px;
+    }
+}
+
+.animated-text {
+    display: inline-flex;
+    flex-direction: column;
+    position: relative;
+    width: auto;
+    min-width: 150px;
+    height: 1.62em;
+    vertical-align:bottom;
+    overflow: hidden;
+    text-align: start;
+}
+
+.animated-text span {
+    @extend %text-2xl-font-semibold;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: roll 6s ease-in-out infinite;
+}
+
+.animated-text span:nth-child(1) {
+    animation-delay: 0s;
+}
+.animated-text span:nth-child(2) {
+    animation-delay: 2s;
+}
+.animated-text span:nth-child(3) {
+    animation-delay: 4s;
+}
+
+@keyframes roll {
+    0%, 33.33% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    5%, 28.33% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

@@ -6,7 +6,7 @@ use crate::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
             ArrowRight, Avatar, Badge, Icon, IconButton, SearchInput, Star, Tab, UserAdd,
-            UserGroup,
+            UserGroup, DynamicText
         },
         molecules::tabs::TabItem,
     },
@@ -53,6 +53,13 @@ pub fn Explore() -> Element {
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         on_handle_paginator.send(current_page());
     });
+
+    let dynamic_one = translate!(i18, "dynamic_text.dynamic_one");
+    let dynamic_two = translate!(i18, "dynamic_text.dynamic_two");
+    let dynamic_three = translate!(i18, "dynamic_text.dynamic_three");
+
+    let words = vec!(dynamic_one, dynamic_two, dynamic_three);
+
     rsx! {
         div { class: "dashboard grid-main",
             div { class: "dashboard__head",
@@ -181,8 +188,12 @@ pub fn Explore() -> Element {
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
-                                { translate!(i18, "dashboard.cta_cards.create.title") }
-                            }
+                                {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
+                                span {
+                                    DynamicText { words },
+                                },
+                                {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
+                                },
                         }
                         p { class: "card__description",
                             { translate!(i18,
