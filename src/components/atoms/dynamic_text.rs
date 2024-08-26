@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use std::collections::HashMap;
 
 #[derive(Clone, Props, PartialEq)]
 pub struct DynamicTextProps {
