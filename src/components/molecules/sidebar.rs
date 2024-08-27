@@ -4,11 +4,12 @@ use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::atoms::{
         avatar::Variant, dropdown::ElementSize, icon_button, AddPlus, Avatar, Compass, Hamburguer,
-        Home, Icon, IconButton, Star,
+        Home, Icon, IconButton, OnOff, Star,
     },
     hooks::{
         use_accounts::use_accounts, use_communities::use_communities,
-        use_our_navigator::use_our_navigator, use_tooltip::use_tooltip,
+        use_notification::use_notification, use_our_navigator::use_our_navigator,
+        use_tooltip::use_tooltip,
     },
     middlewares::is_dao_owner::is_dao_owner,
 };
@@ -19,6 +20,7 @@ pub fn Sidebar() -> Element {
     let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
     let accounts = use_accounts();
+    let notification = use_notification();
 
     let mut is_active = use_signal(|| false);
 
@@ -74,15 +76,15 @@ pub fn Sidebar() -> Element {
                                     variant: icon_button::Variant::Round,
                                     body: rsx!(
                                         Icon {
-                                            icon: Home,
+                                            icon: OnOff,
                                             height: 32,
                                             width: 32,
-                                            stroke_width: 1,
-                                            fill: "var(--fill-00)"
+                                            stroke_width: 2,
+                                            stroke: "var(--fill-00)"
                                         }
                                     ),
                                     on_click: move |_| {
-                                        nav.push(vec![], "/");
+                                        nav.push(vec![], "/login");
                                     }
                                 }
                                 span {
@@ -118,7 +120,7 @@ pub fn Sidebar() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/explore");
+                                nav.push(vec![Box::new(is_dao_owner(i18, accounts, notification))], "/explore");
                             }
                         }
                         span { {translate!(i18, "sidebar.cta")} }
@@ -134,7 +136,7 @@ pub fn Sidebar() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                                nav.push(vec![Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
                             }
                         }
                         span { {translate!(i18, "sidebar.cta")} }
