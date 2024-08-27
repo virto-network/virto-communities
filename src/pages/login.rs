@@ -97,7 +97,7 @@ pub fn Login() -> Element {
                             placeholder: "Enter your email or username",
                             error: None,
                             required: true,
-                            on_input: move |event: Event<FormData>| {
+                            on_input: move |_: Event<FormData>| {
 
                             },
                             on_keypress: move |_| {},
@@ -111,7 +111,7 @@ pub fn Login() -> Element {
                             placeholder: "Enter your password",
                             error: None,
                             required: true,
-                            on_input: move |event: Event<FormData>| {
+                            on_input: move |_: Event<FormData>| {
 
                             },
                             on_keypress: move |_| {},
