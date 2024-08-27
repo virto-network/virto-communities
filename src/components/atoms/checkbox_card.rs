@@ -37,7 +37,6 @@ pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
                     {editable}
                 }
             }
-            div { class: "checkbox-custom" }
         }
     )
 }

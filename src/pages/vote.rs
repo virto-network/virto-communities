@@ -317,18 +317,6 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         }
                                                     )
                                                 }
-                                                { let status = if
-                                                initiative_wrapper.ongoing.in_queue | initiative_wrapper.ongoing.deciding
-                                                .is_none() { ProposalStatus::QUEUE } else { ProposalStatus::VOTING }; let
-                                                (badge_title, badge_color) = match status { ProposalStatus::APPROVED =>
-                                                (translate!(i18, "governance.description.details.status.options.approved"),
-                                                "badge--green-dark"), ProposalStatus::REJECTED => (translate!(i18,
-                                                "governance.description.details.status.options.rejected"), "badge--red-dark"),
-                                                ProposalStatus::VOTING => (translate!(i18,
-                                                "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
-                                                ProposalStatus::QUEUE => (translate!(i18,
-                                                "governance.description.details.status.options.queue"), "badge--blue-light"), };
-                                                rsx!(Badge { text : badge_title, class : badge_color.to_string() }) }
                                             }
                                             div {
                                                 {
