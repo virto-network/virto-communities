@@ -1,16 +1,14 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
-use futures_util::StreamExt;
 use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
-            ArrowRight, Avatar, Badge, Icon, IconButton, SearchInput, Star, Tab, UserAdd,
-            UserGroup, DynamicText
+            ArrowRight, Avatar, Badge, DynamicText, Icon, IconButton, SearchInput, Star, Tab,
+            UserAdd, UserGroup,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
+        use_accounts::use_accounts,
         use_communities::{use_communities, CommunitiesError},
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
@@ -18,6 +16,9 @@ use crate::{
     },
     middlewares::is_dao_owner::is_dao_owner,
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
+use futures_util::StreamExt;
 
 static SKIP: usize = 7;
 
@@ -28,15 +29,14 @@ pub fn Explore() -> Element {
     let nav = use_our_navigator();
     let mut communities = use_communities();
     let mut notification = use_notification();
+    let accounts = use_accounts();
 
     let mut current_page = use_signal::<usize>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
-    let tab_items = vec![
-        TabItem {
-            k: String::from("all"),
-            value: translate!(i18, "dashboard.tabs.all"),
-        },
-    ];
+    let tab_items = vec![TabItem {
+        k: String::from("all"),
+        value: translate!(i18, "dashboard.tabs.all"),
+    }];
     let tab_value = use_signal::<String>(|| String::from("all"));
 
     let mut filter_name = use_signal::<Option<String>>(|| None);
@@ -58,7 +58,7 @@ pub fn Explore() -> Element {
     let dynamic_two = translate!(i18, "dynamic_text.dynamic_two");
     let dynamic_three = translate!(i18, "dynamic_text.dynamic_three");
 
-    let words = vec!(dynamic_one, dynamic_two, dynamic_three);
+    let words = vec![dynamic_one, dynamic_two, dynamic_three];
 
     rsx! {
         div { class: "dashboard grid-main",
@@ -98,7 +98,7 @@ pub fn Explore() -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                            nav.push(vec![Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
                         }
                     }
                 }
@@ -222,7 +222,7 @@ pub fn Explore() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                                nav.push(vec![Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
                             }
                         }
                     }
