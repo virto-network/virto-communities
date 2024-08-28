@@ -39,7 +39,7 @@ pub fn use_startup() {
     use_context_provider::<Signal<Option<UserSession>>>(|| Signal::new(None));
     use_context_provider::<Signal<Vec<Account>>>(|| Signal::new(vec![]));
     use_context_provider::<Signal<Option<Account>>>(|| Signal::new(None));
-    use_context_provider::<Signal<IsDaoOwner>>(|| Signal::new(IsDaoOwner(false)));
+    use_context_provider::<Signal<Option<IsDaoOwner>>>(|| Signal::new(None));
     use_context_provider::<Signal<Option<PjsExtension>>>(|| Signal::new(None));
     use_context_provider::<Signal<bool>>(|| Signal::new(false));
     use_context_provider::<Signal<String>>(|| Signal::new(String::new()));

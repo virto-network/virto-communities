@@ -12,9 +12,10 @@ use crate::{
         use_communities::{use_communities, CommunitiesError},
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
+        use_timestamp::use_timestamp,
         use_tooltip::use_tooltip,
     },
-    middlewares::is_dao_owner::is_dao_owner,
+    middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
 };
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -30,6 +31,7 @@ pub fn Explore() -> Element {
     let mut communities = use_communities();
     let mut notification = use_notification();
     let accounts = use_accounts();
+    let timestamp = use_timestamp();
 
     let mut current_page = use_signal::<usize>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -98,7 +100,7 @@ pub fn Explore() -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
+                            nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification)), Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
                         }
                     }
                 }
@@ -222,7 +224,7 @@ pub fn Explore() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
+                                nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification)), Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
                             }
                         }
                     }

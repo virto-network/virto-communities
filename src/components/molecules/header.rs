@@ -1,7 +1,7 @@
-use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::{StreamExt, TryFutureExt};
+use std::str::FromStr;
 
 use crate::{
     components::atoms::{
@@ -26,7 +26,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = globalThis, js_name = setSigner)]
-    fn set_signer(address: String);
+    pub fn set_signer(address: String);
 }
 #[component]
 pub fn Header() -> Element {
@@ -50,11 +50,11 @@ pub fn Header() -> Element {
         spawn({
             let market_client = market_client.to_owned();
             async move {
-                let pjs_account = get_account()
-                    .ok_or(translate!(i18, "errors.wallet.accounts_not_found"))?;
+                let pjs_account =
+                    get_account().ok_or(translate!(i18, "errors.wallet.accounts_not_found"))?;
                 let account_address = pjs_account.address();
-                let address = sp_core::sr25519::Public::from_str(&account_address)
-                    .map_err(|e| {
+                let address =
+                    sp_core::sr25519::Public::from_str(&account_address).map_err(|e| {
                         log::warn!("Not found public address: {}", e);
                         translate!(i18, "errors.wallet.account_address")
                     })?;
@@ -64,13 +64,11 @@ pub fn Header() -> Element {
                     usdt_balance.set(('0'.to_string(), "00".to_string()));
                     return Ok(());
                 };
-                let is_dao_owner = is_admin(&address.0)
-                    .await
-                    .map_err(|_| {
-                        log::warn!("Failed to get is admin");
-                        translate!(i18, "errors.wallet.account_address")
-                    })?;
-                accounts.set_is_active_account_an_admin(IsDaoOwner(is_dao_owner));
+                let is_dao_owner = is_admin(&address.0).await.map_err(|_| {
+                    log::warn!("Failed to get is admin");
+                    translate!(i18, "errors.wallet.account_address")
+                })?;
+                accounts.set_is_active_account_an_admin(Some(IsDaoOwner(is_dao_owner)));
                 let unscaled_value = account.data.free as f64 / 10_f64.powf(12f64);
 
                 let KSM_PRICE = market_client
@@ -95,28 +93,27 @@ pub fn Header() -> Element {
 
                 Ok::<(), String>(())
             }
-                .unwrap_or_else(move |e: String| notification.handle_warning(&e))
+            .unwrap_or_else(move |e: String| notification.handle_warning(&e))
         });
     };
-    let mut dropdown_value = use_signal::<
-        Option<DropdownItem>,
-    >(|| {
-        let account = get_account()
-            .and_then(|account| {
-                Some(DropdownItem {
-                    key: account.address().clone(),
-                    value: account.name(),
-                })
-            });
+    let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| {
+        let account = get_account().and_then(|account| {
+            Some(DropdownItem {
+                key: account.address().clone(),
+                value: account.name(),
+            })
+        });
         account
     });
     let mut items = vec![];
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(
-            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
-        ))
+        items.push(rsx!(AccountButton {
+            title: account.name(),
+            description: address.clone(),
+            on_click: move |_| {}
+        }))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {

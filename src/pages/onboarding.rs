@@ -1,17 +1,12 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
-use gloo::utils::format::JsValueSerdeExt;
-use serde::Serialize;
 use crate::{
     components::{
         atoms::{
-            button::Variant, dropdown::ElementSize, ArrowLeft, ArrowRight, Button, Icon,
-            VirtoLogo,
+            button::Variant, dropdown::ElementSize, ArrowLeft, ArrowRight, Button, Icon, VirtoLogo,
         },
         molecules::{OnboardingBasics, OnboardingInvite, OnboardingManagement},
     },
     hooks::{
+        use_accounts::use_accounts,
         use_attach::use_attach,
         use_notification::{
             use_notification, NotificationHandle, NotificationHandler, NotificationItem,
@@ -20,10 +15,17 @@ use crate::{
         use_onboard::use_onboard,
         use_our_navigator::use_our_navigator,
         use_spaces_client::use_spaces_client,
+        use_timestamp::use_timestamp,
         use_tooltip::{use_tooltip, TooltipItem},
     },
+    middlewares::is_chain_available::is_chain_available,
     services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
+use futures_util::TryFutureExt;
+use gloo::utils::format::JsValueSerdeExt;
+use serde::Serialize;
 use serde_json::{to_value, Error};
 use wasm_bindgen::prelude::*;
 #[derive(Clone, Debug)]
@@ -65,12 +67,14 @@ extern "C" {
 #[component]
 pub fn Onboarding() -> Element {
     let i18 = use_i18();
+    let accounts = use_accounts();
     let mut onboard = use_onboard();
     let mut attach = use_attach();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
     let spaces_client = use_spaces_client();
     let nav = use_our_navigator();
+    let timestamp = use_timestamp();
 
     let to_pay = consume_context::<Signal<f64>>();
 
@@ -82,6 +86,15 @@ pub fn Onboarding() -> Element {
         onboard.default();
     });
     use_drop(move || attach.reset());
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        if accounts.is_active_account_an_admin() {
+            nav.push(vec![], "/");
+        };
+
+        if let Err(_) = is_chain_available(i18, timestamp, notification)() {
+            nav.push(vec![], "/");
+        };
+    });
     rsx! {
         div { class: "page page--onboarding",
             div { class: "row",

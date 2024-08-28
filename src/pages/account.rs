@@ -7,8 +7,11 @@ use futures_util::TryFutureExt;
 use crate::{
     components::atoms::{button::Variant as ButtonVariant, dropdown::ElementSize, Button, Tab},
     hooks::{
-        use_market_client::use_market_client, use_notification::use_notification, use_our_navigator::use_our_navigator, use_session::use_session
+        use_market_client::use_market_client, use_notification::use_notification,
+        use_our_navigator::use_our_navigator, use_session::use_session,
+        use_timestamp::use_timestamp,
     },
+    middlewares::is_chain_available::is_chain_available,
     services::{kreivo, kusama, market::types::Tokens},
 };
 use wasm_bindgen::prelude::*;
@@ -37,6 +40,7 @@ pub fn Account() -> Element {
     let mut notification = use_notification();
     let nav = use_our_navigator();
     let session = use_session();
+    let timestamp = use_timestamp();
     let market_client = use_market_client().get();
     let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
     let mut usdt_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
@@ -173,7 +177,7 @@ pub fn Account() -> Element {
                                                 on_click: move |_| {
                                                     spawn(
                                                         async move {
-                                                            nav.push(vec![], "/withdraw");
+                                                            nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification))], "/withdraw");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
 
