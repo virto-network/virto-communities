@@ -6,12 +6,12 @@ use crate::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
             ArrowRight, Avatar, Badge, Icon, IconButton, SearchInput, Star, Tab, UserAdd,
-            UserGroup, DynamicText
+            UserGroup, DynamicText, CardSkeleton
         },
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_communities::{use_communities, CommunitiesError},
+        use_communities::{use_communities, CommunitiesError, get_cached_communities},
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
         use_tooltip::use_tooltip,
@@ -53,6 +53,8 @@ pub fn Explore() -> Element {
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         on_handle_paginator.send(current_page());
     });
+
+    let storage_is_empty = get_cached_communities().len();
 
     let dynamic_one = translate!(i18, "dynamic_text.dynamic_one");
     let dynamic_two = translate!(i18, "dynamic_text.dynamic_two");
@@ -104,129 +106,140 @@ pub fn Explore() -> Element {
                 }
             }
             div { class: "dashboard__communities",
-                for community in communities
-                    .get_communities_by_filters(None, filter_name().as_deref(), filter_paginator())
-                {
-                    section { class: "card",
-                        div { class: "card__container",
-                            div { class: "card__head",
-                                IconButton {
-                                    body: rsx!(
-                                        Avatar { name : "{community.name}", size : 48, uri : community.icon, variant :
-                                        AvatarVariant::SemiRound }
-                                    ),
-                                    on_click: move |_| {}
+                {if (communities.is_loading)() {
+                    rsx! {
+                        for _ in 0..storage_is_empty / 2 {
+                            CardSkeleton {}
+                        }
+                        CardSkeleton {}
+                    }
+                } else {
+                    rsx! {
+                        for community in communities
+                            .get_communities_by_filters(None, filter_name().as_deref(), filter_paginator())
+                        {
+                            section { class: "card",
+                                div { class: "card__container",
+                                    div { class: "card__head",
+                                        IconButton {
+                                            body: rsx!(
+                                                Avatar { name : "{community.name}", size : 48, uri : community.icon, variant :
+                                                AvatarVariant::SemiRound }
+                                            ),
+                                            on_click: move |_| {}
+                                        }
+                                        h3 { class: "card__title", "{community.name}" }
+                                    }
+                                    p { class: "card__description", "{community.description}" }
+                                    if !community.has_membership {
+                                        div { class: "card__favorite",
+                                            IconButton {
+                                                class: "button--drop bg--transparent",
+                                                body: rsx!(
+                                                    Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
+                                                    "var(--state-primary-active)" } else { "var(--state-base-background)" } }
+                                                ),
+                                                on_click: move |_| {
+                                                    if let Err(e) = communities.handle_favorite(community.id) {
+                                                        let message = match e {
+                                                            CommunitiesError::NotFound => "Failed to update favorite",
+                                                            CommunitiesError::FailedUpdatingFavorites => "Failed to update favorite",
+                                                            CommunitiesError::NotFoundFavorite => "Failed to update favorite",
+                                                        };
+                                                        notification.handle_error(&message);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    div { class: "card__metrics",
+                                        span { class: "card__metric",
+                                            Icon {
+                                                icon: UserAdd,
+                                                height: 16,
+                                                width: 16,
+                                                stroke_width: 2,
+                                                stroke: "var(--text-primary)"
+                                            }
+                                            small { "{community.memberships} Free Memberships" }
+                                        }
+                                        span { class: "card__metric",
+                                            Icon {
+                                                icon: UserGroup,
+                                                height: 16,
+                                                width: 16,
+                                                stroke_width: 1,
+                                                fill: "var(--text-primary)"
+                                            }
+                                            small { "{community.members} Members" }
+                                        }
+                                    }
+                                    div { class: "card__tags",
+                                        for tag in community.tags {
+                                            Badge { class: "badge--lavanda-dark", text: tag }
+                                        }
+                                    }
                                 }
-                                h3 { class: "card__title", "{community.name}" }
-                            }
-                            p { class: "card__description", "{community.description}" }
-                            if !community.has_membership {
-                                div { class: "card__favorite",
+                                div { class: "card__cta",
                                     IconButton {
-                                        class: "button--drop bg--transparent",
+                                        class: "button--avatar buttom--comming-soon",
                                         body: rsx!(
-                                            Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
-                                            "var(--state-primary-active)" } else { "var(--state-base-background)" } }
+                                            Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
+                                            "var(--fill-00)" }
                                         ),
                                         on_click: move |_| {
-                                            if let Err(e) = communities.handle_favorite(community.id) {
-                                                let message = match e {
-                                                    CommunitiesError::NotFound => "Failed to update favorite",
-                                                    CommunitiesError::FailedUpdatingFavorites => "Failed to update favorite",
-                                                    CommunitiesError::NotFoundFavorite => "Failed to update favorite",
-                                                };
-                                                notification.handle_error(&message);
-                                            }
+                                            let path = format!("/dao/{}/initiatives", community.id);
+                                            nav.push(vec![], &path);
                                         }
                                     }
                                 }
                             }
-                            div { class: "card__metrics",
-                                span { class: "card__metric",
-                                    Icon {
-                                        icon: UserAdd,
-                                        height: 16,
-                                        width: 16,
-                                        stroke_width: 2,
-                                        stroke: "var(--text-primary)"
+                        }
+                        section { class: "card card--reverse",
+                            div { class: "card__container",
+                                div { class: "card__head",
+                                    h3 { class: "card__title",
+                                        {translate!(i18, "dashboard.cta_cards.create.title_part_one")}
+                                        span {
+                                            DynamicText { words: words }
+                                        }
+                                        {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
                                     }
-                                    small { "{community.memberships} Free Memberships" }
                                 }
-                                span { class: "card__metric",
+                                p { class: "card__description",
+                                    { translate!(i18,
+                                    "dashboard.cta_cards.create.description") }
+                                }
+                                div { class: "card__head",
+                                    a { class: "card__learn",
+                                        { translate!(i18, "dashboard.cta_cards.create.cta") }
+                                    }
                                     Icon {
-                                        icon: UserGroup,
-                                        height: 16,
-                                        width: 16,
+                                        icon: ArrowRight,
+                                        height: 20,
+                                        width: 20,
                                         stroke_width: 1,
-                                        fill: "var(--text-primary)"
+                                        fill: "var(--text-tertiary)"
                                     }
-                                    small { "{community.members} Members" }
                                 }
                             }
-                            div { class: "card__tags",
-                                for tag in community.tags {
-                                    { rsx!(Badge { class : "badge--lavanda-dark", text : tag }) }
-                                }
-                            }
-                        }
-                        div { class: "card__cta",
-                            IconButton {
-                                class: "button--avatar buttom--comming-soon",
-                                body: rsx!(
-                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
-                                    "var(--fill-00)" }
-                                ),
-                                on_click: move |_| {
-                                    let path = format!("/dao/{}/initiatives", community.id);
-                                    nav.push(vec![], &path);
+                            div { class: "card__cta",
+                                IconButton {
+                                    class: "button--avatar",
+                                    size: ElementSize::Big,
+                                    body: rsx!(
+                                        Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
+                                        "var(--fill-00)" }
+                                    ),
+                                    on_click: move |_| {
+                                        tooltip.hide();
+                                        nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                section { class: "card card--reverse",
-                    div { class: "card__container",
-                        div { class: "card__head",
-                            h3 { class: "card__title",
-                                {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
-                                span {
-                                    DynamicText { words },
-                                },
-                                {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
-                                },
-                        }
-                        p { class: "card__description",
-                            { translate!(i18,
-                            "dashboard.cta_cards.create.description") }
-                        }
-                        div { class: "card__head",
-                            a { class: "card__learn",
-                                { translate!(i18, "dashboard.cta_cards.create.cta") }
-                            }
-                            Icon {
-                                icon: ArrowRight,
-                                height: 20,
-                                width: 20,
-                                stroke_width: 1,
-                                fill: "var(--text-tertiary)"
-                            }
-                        }
-                    }
-                    div { class: "card__cta",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Big,
-                            body: rsx!(
-                                Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                "var(--fill-00)" }
-                            ),
-                            on_click: move |_| {
-                                tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
-                            }
-                        }
-                    }
-                }
+                }}
             }
             div { class: "dashboard__footer grid-footer",
                 div { class: "dashboard__footer__pagination",
