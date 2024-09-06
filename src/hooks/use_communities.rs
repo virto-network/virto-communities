@@ -24,10 +24,9 @@ pub fn use_communities() -> UseCommunitiesState {
 
     let mut communities = consume_context::<Signal<Communities>>();
     let community = consume_context::<Signal<Community>>();
-    let mut is_loading = use_signal(|| true);
+    let mut is_loading = use_signal(|| false);
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        is_loading.set(true);
         tooltip.handle_tooltip(TooltipItem {
             title: translate!(i18, "dashboard.tips.loading.title"),
             body: translate!(i18, "dashboard.tips.loading.description"),
@@ -36,6 +35,10 @@ pub fn use_communities() -> UseCommunitiesState {
 
         let cached_communities = get_cached_communities();
         communities.set(cached_communities.clone());
+
+        if cached_communities.len() == 0 {
+            is_loading.set(true);
+        }
 
         let session = match session.get() {
             Some(s) => s,
@@ -103,7 +106,9 @@ pub fn use_communities() -> UseCommunitiesState {
         communities.set(community_tracks.clone());
 
         if let Ok(cached_communities) = serde_json::to_string(&community_tracks) {
-            if let Err(e) = <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities) {
+            if let Err(e) =
+                <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities)
+            {
                 log::warn!("Failed to persist communities: {:?}", e);
             }
         }
@@ -242,7 +247,6 @@ impl UseCommunitiesState {
         {
             log::warn!("Failed to persist communities");
         };
-
 
         Ok(())
     }
