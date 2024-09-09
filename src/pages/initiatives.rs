@@ -6,13 +6,13 @@ use crate::{
     components::{
         atoms::{
             dropdown::ElementSize, AddPlus, ArrowLeft, ArrowRight, Badge, CircleCheck,
-            Icon, IconButton, SearchInput, StopSign, Tab,
+            Icon, IconButton, SearchInput, StopSign, Tab, CardSkeleton,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
         use_communities::use_communities,
-        use_initiative::InitiativeInfoContent,
+        use_initiative::{use_initiative, InitiativeInfoContent},
         use_our_navigator::use_our_navigator,
         use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
@@ -38,6 +38,7 @@ pub fn Initiatives(id: u16) -> Element {
     let nav = use_our_navigator();
     let spaces_client = use_spaces_client();
     let mut communities = use_communities();
+    let mut initiative_state = use_initiative();
 
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
     let mut current_page = use_signal::<u8>(|| 1);
@@ -67,6 +68,7 @@ pub fn Initiatives(id: u16) -> Element {
 
     let handle_initiatives = use_coroutine(move |mut rx: UnboundedReceiver<u16>| async move {
         while let Some(id) = rx.next().await {
+            initiative_state.set_loading(true);
             initiatives.set(vec![]);
             filtered_initiatives.set(vec![]);
             
@@ -136,6 +138,7 @@ pub fn Initiatives(id: u16) -> Element {
                 }
             }
 
+            initiative_state.set_loading(false);
             tooltip.hide();
             filtered_initiatives.set(initiatives());
         }
@@ -200,59 +203,69 @@ pub fn Initiatives(id: u16) -> Element {
                 }
             }
             div { class: "dashboard__communities",
-                for initiative in filtered_initiatives() {
-                    section { class: "card",
-                        div { class: "card__container",
-                            div { class: "card__head",
-                                h3 { class: "card__title", "{initiative.info.name}" }
-                            }
-                            p { class: "card__description", "" }
-                            div { class: "card__metrics",
-                                span { class: "card__metric",
-                                    Icon {
-                                        icon: CircleCheck,
-                                        height: 16,
-                                        width: 16,
-                                        stroke_width: 2,
-                                        stroke: "var(--text-primary)"
-                                    }
-                                    small { "{initiative.ongoing.tally.ayes} Aye" }
-                                }
-                                span { class: "card__metric",
-                                    Icon {
-                                        icon: StopSign,
-                                        height: 16,
-                                        width: 16,
-                                        stroke_width: 2,
-                                        stroke: "var(--text-primary)"
-                                    }
-                                    small { "{initiative.ongoing.tally.nays} Nay" }
-                                }
-                            }
-                            div { class: "card__tags",
-                                for tag in initiative.clone().info.tags {
-                                    { rsx!(Badge {
-                                    class : "badge--lavanda-dark", text : tag }) }
-                                }
-                            }
-                        }
-                        div { class: "card__cta",
-                            IconButton {
-                                class: "button--avatar buttom--comming-soon",
-                                body: rsx!(
-                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
-                                    "var(--fill-00)" }
-                                ),
-                                on_click: move |_| {
-                                    tooltip.hide();
-                                    initiative_wrapper.set(Some(initiative.clone()));
-                                    let path = format!("/dao/{}/vote/{}", id, initiative.id);
-                                    nav.push(vec![], &path);
-                                }
-                            }
-                        }
+            { if initiative_state.is_loading() {
+                    rsx! {
+                        CardSkeleton {}
                     }
-                }
+                    } else {
+                        rsx! {
+                            for initiative in filtered_initiatives() {
+                                section { class: "card",
+                                    div { class: "card__container",
+                                        div { class: "card__head",
+                                            h3 { class: "card__title", "{initiative.info.name}" }
+                                        }
+                                        p { class: "card__description", "" }
+                                        div { class: "card__metrics",
+                                            span { class: "card__metric",
+                                                Icon {
+                                                    icon: CircleCheck,
+                                                    height: 16,
+                                                    width: 16,
+                                                    stroke_width: 2,
+                                                    stroke: "var(--text-primary)"
+                                                }
+                                                small { "{initiative.ongoing.tally.ayes} Aye" }
+                                            }
+                                            span { class: "card__metric",
+                                                Icon {
+                                                    icon: StopSign,
+                                                    height: 16,
+                                                    width: 16,
+                                                    stroke_width: 2,
+                                                    stroke: "var(--text-primary)"
+                                                }
+                                                small { "{initiative.ongoing.tally.nays} Nay" }
+                                            }
+                                        }
+                                        div { class: "card__tags",
+                                            for tag in initiative.clone().info.tags {
+                                                { rsx!(Badge {
+                                                class : "badge--lavanda-dark", text : tag }) }
+                                            }
+                                        }
+                                    }
+                                    div { class: "card__cta",
+                                        IconButton {
+                                            class: "button--avatar buttom--comming-soon",
+                                            body: rsx!(
+                                                Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
+                                                "var(--fill-00)" }
+                                            ),
+                                            on_click: move |_| {
+                                                tooltip.hide();
+                                                initiative_wrapper.set(Some(initiative.clone()));
+                                                let path = format!("/dao/{}/vote/{}", id, initiative.id);
+                                                nav.push(vec![], &path);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                   
+                    }
+            }
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",

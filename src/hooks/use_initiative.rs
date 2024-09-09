@@ -262,12 +262,14 @@ pub fn use_initiative() -> UseInitiativeState {
     let actions = consume_context::<Signal<ActionsForm>>();
     let settings = consume_context::<Signal<SettingsForm>>();
     let confirmation = consume_context::<Signal<ConfirmationForm>>();
+    let mut is_loading = use_signal(|| false);
     use_hook(|| UseInitiativeState {
         inner: UseInitiativeInner {
             info,
             actions,
             settings,
             confirmation,
+            is_loading,
         },
     })
 }
@@ -281,8 +283,15 @@ pub struct UseInitiativeInner {
     actions: Signal<ActionsForm>,
     settings: Signal<SettingsForm>,
     confirmation: Signal<ConfirmationForm>,
+    is_loading: Signal<bool>,
 }
 impl UseInitiativeState {
+    pub fn is_loading(&self) -> bool {
+        self.inner.is_loading.read().clone()
+    }
+    pub fn set_loading(&mut self, loading: bool) {
+        self.inner.is_loading.set(loading);
+    }
     pub fn get(&self) -> UseInitiativeInner {
         self.inner.clone()
     }
