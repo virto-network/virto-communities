@@ -32,11 +32,9 @@ pub fn Login() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(AccountButton {
-            title: account.name(),
-            description: address.clone(),
-            on_click: move |_| {}
-        }))
+        items.push(rsx!(
+            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
+        ))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
@@ -89,12 +87,8 @@ pub fn Login() -> Element {
                                 stroke_width: 1,
                                 fill: "var(--color-lavanda-400)"
                             }
-                            div { class: "login__welcome",
-                                "Welcome to"
-                            }
-                            div { class: "login__name",
-                                "VIRTO"
-                            }
+                            div { class: "login__welcome", "Welcome to" }
+                            div { class: "login__name", "VIRTO" }
                         }
                         div { class: "login__info",
                             p { class: "login__info__description",
@@ -108,9 +102,7 @@ pub fn Login() -> Element {
                                         width: 36,
                                         fill: "var(--state-primary-active)"
                                     }
-                                    span { class: "icon-text__title",
-                                        "Connect with others around you"
-                                    }
+                                    span { class: "icon-text__title", "Connect with others around you" }
                                 }
                                 li { class: "icon-text",
                                     Icon {
@@ -141,9 +133,7 @@ pub fn Login() -> Element {
                 div { class: "login__form",
                     div { class: "login__form__wrapper",
                         div { class: "login__form__head",
-                            h3 { class: "login__form__title",
-                                "Login"
-                            },
+                            h3 { class: "login__form__title", "Login" }
                         }
                         div { class: "login__form__cta",
                             if !connect_handled() {
@@ -152,32 +142,33 @@ pub fn Login() -> Element {
                                     status: None,
                                     variant: Variant::Secondary,
                                     right_icon: rsx!(
-                                        Icon {
-                                            icon: Polkadot,
-                                            height: 20,
-                                            width: 20,
-                                            fill: "var(--text-primary)"
-                                        }
+                                        Icon { icon : Polkadot, height : 20, width : 20, fill : "var(--text-primary)" }
                                     ),
                                     on_click: move |_| {
                                         spawn(
                                             async move {
                                                 use_connect_wallet().await?;
                                                 connect_handled.toggle();
-
                                                 Ok::<(), PjsError>(())
-                                            } .unwrap_or_else(move |e: PjsError| {
-                                                match e {
-                                                    PjsError::ConnectionFailed => {
-                                                        notification.handle_error(&translate!(i18, "errors.wallet.connection_failed"))
-                                                    }
-                                                    PjsError::AccountsNotFound => {
-                                                        notification.handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
-                                                    }
-                                                };
-                                            })
+                                            }
+                                                .unwrap_or_else(move |e: PjsError| {
+                                                    match e {
+                                                        PjsError::ConnectionFailed => {
+                                                            notification
+                                                                .handle_error(
+                                                                    &translate!(i18, "errors.wallet.connection_failed"),
+                                                                )
+                                                        }
+                                                        PjsError::AccountsNotFound => {
+                                                            notification
+                                                                .handle_error(
+                                                                    &translate!(i18, "errors.wallet.accounts_not_found"),
+                                                                );
+                                                        }
+                                                    };
+                                                }),
                                         );
-                                    },
+                                    }
                                 }
                             } else {
                                 Dropdown {

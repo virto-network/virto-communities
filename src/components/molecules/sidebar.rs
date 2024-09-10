@@ -89,9 +89,8 @@ pub fn Sidebar() -> Element {
                                 }
                             }
                         ),
-                    }
-                    li { class: "sidebar__item",
-                        onclick: move |_|{},
+                    },
+                    li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
                             class: "button--icon bg--state-primary-active",
                             size: ElementSize::Big,

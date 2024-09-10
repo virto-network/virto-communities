@@ -100,7 +100,13 @@ pub fn Explore() -> Element {
                         ),
                         on_click: move |_| {
                             tooltip.hide();
-                            nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification)), Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
+                            nav.push(
+                                vec![
+                                    Box::new(is_chain_available(i18, timestamp, notification)),
+                                    Box::new(is_dao_owner(i18, accounts, notification)),
+                                ],
+                                "/onboarding",
+                            );
                         }
                     }
                 }
@@ -192,10 +198,10 @@ pub fn Explore() -> Element {
                             h3 { class: "card__title",
                                 {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
                                 span {
-                                    DynamicText { words },
-                                },
+                                    DynamicText { words }
+                                }
                                 {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
-                                },
+                            }
                         }
                         p { class: "card__description",
                             { translate!(i18,
@@ -224,7 +230,13 @@ pub fn Explore() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification)), Box::new(is_dao_owner(i18, accounts, notification))], "/onboarding");
+                                nav.push(
+                                    vec![
+                                        Box::new(is_chain_available(i18, timestamp, notification)),
+                                        Box::new(is_dao_owner(i18, accounts, notification)),
+                                    ],
+                                    "/onboarding",
+                                );
                             }
                         }
                     }

@@ -109,11 +109,9 @@ pub fn Header() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(AccountButton {
-            title: account.name(),
-            description: address.clone(),
-            on_click: move |_| {}
-        }))
+        items.push(rsx!(
+            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
+        ))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
@@ -187,32 +185,33 @@ pub fn Header() -> Element {
                                 text: translate!(i18, "header.cta.connect"),
                                 status: None,
                                 right_icon: rsx!(
-                                    Icon {
-                                        icon: Polkadot,
-                                        height: 20,
-                                        width: 20,
-                                        fill: "var(--text-primary)"
-                                    }
+                                    Icon { icon : Polkadot, height : 20, width : 20, fill : "var(--text-primary)" }
                                 ),
                                 on_click: move |_| {
                                     spawn(
                                         async move {
                                             use_connect_wallet().await?;
                                             connect_handled.toggle();
-
                                             Ok::<(), PjsError>(())
-                                        } .unwrap_or_else(move |e: PjsError| {
-                                            match e {
-                                                PjsError::ConnectionFailed => {
-                                                    notification.handle_error(&translate!(i18, "errors.wallet.connection_failed"))
-                                                }
-                                                PjsError::AccountsNotFound => {
-                                                    notification.handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
-                                                }
-                                            };
-                                        })
+                                        }
+                                            .unwrap_or_else(move |e: PjsError| {
+                                                match e {
+                                                    PjsError::ConnectionFailed => {
+                                                        notification
+                                                            .handle_error(
+                                                                &translate!(i18, "errors.wallet.connection_failed"),
+                                                            )
+                                                    }
+                                                    PjsError::AccountsNotFound => {
+                                                        notification
+                                                            .handle_error(
+                                                                &translate!(i18, "errors.wallet.accounts_not_found"),
+                                                            );
+                                                    }
+                                                };
+                                            }),
                                     );
-                                },
+                                }
                             }
                         } else {
                             Dropdown {
@@ -238,28 +237,15 @@ pub fn Header() -> Element {
                                 variant: Variant::Round,
                                 size: ElementSize::Big,
                                 class: "button--avatar button--comming-soon bg--fill-600",
-                                body: rsx!(
-                                    Icon {
-                                        icon: ArrowUpDown,
-                                        height: 32,
-                                        width: 32,
-                                        fill: "var(--fill-00)"
-                                    }
-                                ),
-                                on_click: move |_| { }
+                                body: rsx!(Icon { icon : ArrowUpDown, height : 32, width : 32, fill : "var(--fill-00)" }),
+                                on_click: move |_| {}
                             }
                         }
                         div { class: "balances",
                             span { class: "balance__title",
-                                span { class: "balance__value",
-                                    "{ksm_balance().0}"
-                                }
-                                span { class: "balance__decimals",
-                                    ".{ksm_balance().1}"
-                                }
-                                span { class: "balance__asset",
-                                    "KSM"
-                                }
+                                span { class: "balance__value", "{ksm_balance().0}" }
+                                span { class: "balance__decimals", ".{ksm_balance().1}" }
+                                span { class: "balance__asset", "KSM" }
                             }
                             span { class: "balance__subtitle",
                                 span { class: "balance__sign", "$" }

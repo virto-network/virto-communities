@@ -9,19 +9,10 @@ pub struct PaymentMethodProps {
 
 pub fn ManagementMethod(props: PaymentMethodProps) -> Element {
     rsx!(
+        div { class: "checkbox-card__media", {props.icon} }
         div {
-            class: "checkbox-card__media",
-            {props.icon}
-        }
-        div {
-            span {
-                class: "checkbox-card__title",
-                "{props.title}"
-            }
-            p {
-                class: "checkbox-card__description",
-                "{props.description}"
-            }
+            span { class: "checkbox-card__title", "{props.title}" }
+            p { class: "checkbox-card__description", "{props.description}" }
         }
     )
 }

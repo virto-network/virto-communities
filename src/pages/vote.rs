@@ -380,43 +380,27 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                     "Explain that this is a dynamic voting, and thresholds might change."
                                                 }
                                             }
-                                            if show_vote() && can_vote(){
+                                            if show_vote() && can_vote() {
                                                 div { class: "row",
                                                     Button {
                                                         class: "vote-cta",
                                                         text: translate!(i18, "governance.description.voting.cta.for"),
                                                         size: ElementSize::Medium,
                                                         variant: Variant::Secondary,
-                                                        on_click: move |_| {
-                                                            handle_vote(true)
-                                                        },
+                                                        on_click: move |_| { handle_vote(true) },
                                                         status: None,
-                                                        left_icon: rsx!(
-                                                            Icon {
-                                                                icon: CircleCheck,
-                                                                height: 16,
-                                                                width: 16,
-                                                                fill: "#56C95F"
-                                                            }
-                                                        )
+                                                        left_icon: rsx!(Icon { icon : CircleCheck, height : 16, width : 16, fill : "#56C95F" })
                                                     }
                                                     Button {
                                                         class: "vote-cta",
                                                         text: translate!(i18, "governance.description.voting.cta.against"),
                                                         size: ElementSize::Medium,
                                                         variant: Variant::Secondary,
-                                                        on_click: move |_| {
-                                                            handle_vote(false)
-                                                        },
+                                                        on_click: move |_| { handle_vote(false) },
                                                         status: None,
                                                         left_icon: rsx!(
-                                                            Icon {
-                                                                icon: StopSign,
-                                                                height: 16,
-                                                                width: 16,
-                                                                stroke_width: 2,
-                                                                stroke: "#f44336bd"
-                                                            }
+                                                            Icon { icon : StopSign, height : 16, width : 16, stroke_width : 2, stroke :
+                                                            "#f44336bd" }
                                                         )
                                                     }
                                                 }

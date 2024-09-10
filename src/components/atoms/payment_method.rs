@@ -10,19 +10,10 @@ pub struct PaymentMethodProps {
 pub fn PaymentMethod(props: PaymentMethodProps) -> Element {
     rsx!(
         section { class: "checkbox__content--payment",
-            span {
-                class: "checkbox-card__title",
-                "{props.title}"
-            }
+            span { class: "checkbox-card__title", "{props.title}" }
             div { class: "checkbox__content__left",
-                span {
-                    class: "checkbox-card__fee",
-                    "{props.fee}"
-                }
-                div {
-                    class: "checkbox-card__media",
-                    {props.icon}
-                }
+                span { class: "checkbox-card__fee", "{props.fee}" }
+                div { class: "checkbox-card__media", {props.icon} }
             }
         }
     )

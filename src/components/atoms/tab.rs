@@ -21,7 +21,7 @@ pub fn Tab(props: TabProps) -> Element {
     rsx!(
         button {
             class: "tab {size} {props.class}",
-            class: if props.is_active {"tab--active"},
+            class: if props.is_active { "tab--active" },
             onclick: move |event| props.on_click.call(event),
             {props.icon},
             "{props.text}"

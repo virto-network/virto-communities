@@ -118,16 +118,16 @@ pub fn Account() -> Element {
                 div { class: "account__options",
                     Tab {
                         text: "Wallet",
-                        is_active: if *profile_value.read() == ProfileTabs::Wallet { true } else {false},
+                        is_active: if *profile_value.read() == ProfileTabs::Wallet { true } else { false },
                         on_click: move |_| {
                             profile_value.set(ProfileTabs::Wallet);
-                        },
+                        }
                     }
                     Tab {
                         class: "tab--comming-soon",
                         text: "Transfers",
                         is_active: true,
-                        on_click: move |_| {},
+                        on_click: move |_| {}
                     }
                 }
                 match *profile_value.read() {
@@ -148,10 +148,10 @@ pub fn Account() -> Element {
                                                 on_click: move |_| {
                                                     spawn(
                                                         async move {
-
+                
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
-
+                
                                                         })
                                                     );
                                                 },
@@ -168,7 +168,7 @@ pub fn Account() -> Element {
                                                             nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification))], "/withdraw");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
-
+                
                                                         })
                                                     );
                                                 },
@@ -203,7 +203,7 @@ pub fn Account() -> Element {
                                             }
                                         }
                                     }
-
+                
                                 }
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
@@ -218,7 +218,7 @@ pub fn Account() -> Element {
                                                     th { "Cost" }
                                                     th { "Total" }
                                                 }
-
+                
                                                 match *tab_value.read() {
                                                     AccountTabs::Kreivo => rsx!(
                                                         tr {
@@ -231,14 +231,14 @@ pub fn Account() -> Element {
                                                                 { format!("${} USD", if ksm_usd() == 0.0 || kreivo_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kreivo_balance()) } )}
                                                             }
                                                         }
-
+                
                                                         tr { class: "list__asset--comming-soon",
                                                             td { class: "list__name", "USDT" }
                                                             td { "-" }
                                                             td { "-" }
                                                             td { "-" }
                                                         }
-
+                
                                                         tr { class: "list__asset--comming-soon",
                                                             td { class: "list__name", "dUSD" }
                                                             td { "-" }
@@ -268,28 +268,28 @@ pub fn Account() -> Element {
                                             th { "Quantity" }
                                             th { "Account" }
                                         }
-
+                
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-
+                
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-
+                
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-
+                
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }

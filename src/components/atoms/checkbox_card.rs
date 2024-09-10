@@ -24,9 +24,7 @@ pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
                 name: props.name,
                 disabled: props.soon,
                 checked: props.checked,
-                onchange: move |_| {
-                    props.on_change.call(())
-                }
+                onchange: move |_| { props.on_change.call(()) }
             }
             div { class: "checkbox-card__header",
                 div { class: "checkbox-custom" }

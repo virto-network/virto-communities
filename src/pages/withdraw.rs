@@ -62,11 +62,9 @@ pub fn Withdraw() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(AccountButton {
-            title: account.name(),
-            description: address.clone(),
-            on_click: move |_| {}
-        }))
+        items.push(rsx!(
+            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
+        ))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
@@ -95,12 +93,8 @@ pub fn Withdraw() -> Element {
             div { class: "payment__form",
                 div { class: "form__wrapper",
                     div { class: "form__title",
-                        span { class: "label",
-                            "Define the withdraw method"
-                        }
-                        Title {
-                            text: "Pick a Method"
-                        }
+                        span { class: "label", "Define the withdraw method" }
+                        Title { text: "Pick a Method" }
                     }
                     div { class: "row withdraw__row",
                         div { class: "summary summary--form",
@@ -108,126 +102,84 @@ pub fn Withdraw() -> Element {
                                 div { class: "summary__wrapper",
                                     h4 { class: "summary__subtitle", "Methods" }
                                     div { class: "payment__methods",
-                                    CheckboxCard {
-                                        id: "a".to_string(),
-                                        name: String::from("management"),
-                                        checked: matches!(*payment_selected.read(), PaymentMethods::KUSAMA),
-                                        class: "checkbox-card--payment",
-                                        body: rsx!(
-                                            PaymentMethod {
-                                                title: translate!(i18, "withdraw.payment.methods.kusama.title"),
-                                                fee: translate!(i18, "withdraw.payment.methods.kusama.fee"),
-                                                icon: rsx!(
-                                                    Icon {
-                                                        icon: KusamaLogo,
-                                                        height: 20,
-                                                        width: 20,
-                                                        fill: "var(--fill-600)"
-                                                    }
-                                                ),
+                                        CheckboxCard {
+                                            id: "a".to_string(),
+                                            name: String::from("management"),
+                                            checked: matches!(*payment_selected.read(), PaymentMethods::KUSAMA),
+                                            class: "checkbox-card--payment",
+                                            body: rsx!(
+                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.kusama.title"),
+                                                fee : translate!(i18, "withdraw.payment.methods.kusama.fee"), icon : rsx!(Icon {
+                                                icon : KusamaLogo, height : 20, width : 20, fill : "var(--fill-600)" }), }
+                                            ),
+                                            on_change: move |_| {
+                                                payment_selected.set(PaymentMethods::KUSAMA);
                                             }
-                                        ),
-                                        on_change: move |_| {
-                                            payment_selected.set(PaymentMethods::KUSAMA);
-                                        },
-                                    }
-                                    CheckboxCard {
-                                        id: "a".to_string(),
-                                        name: String::from("management"),
-                                        checked: matches!(*payment_selected.read(), PaymentMethods::Card),
-                                        soon: true,
-                                        class: "checkbox-card--payment",
-                                        body: rsx!(
-                                            PaymentMethod {
-                                                title: translate!(i18, "withdraw.payment.methods.card.title"),
-                                                fee: translate!(i18, "withdraw.payment.methods.card.fee", fee: 5),
-                                                icon: rsx!(
-                                                    Icon {
-                                                        icon: BankCardLine,
-                                                        height: 20,
-                                                        width: 20,
-                                                        fill: "var(--fill-600)"
-                                                    }
-                                                ),
+                                        }
+                                        CheckboxCard {
+                                            id: "a".to_string(),
+                                            name: String::from("management"),
+                                            checked: matches!(*payment_selected.read(), PaymentMethods::Card),
+                                            soon: true,
+                                            class: "checkbox-card--payment",
+                                            body: rsx!(
+                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.card.title"),
+                                                fee : translate!(i18, "withdraw.payment.methods.card.fee", fee : 5), icon :
+                                                rsx!(Icon { icon : BankCardLine, height : 20, width : 20, fill :
+                                                "var(--fill-600)" }), }
+                                            ),
+                                            on_change: move |_| {
+                                                payment_selected.set(PaymentMethods::Card);
                                             }
-                                        ),
-                                        on_change: move |_| {
-                                            payment_selected.set(PaymentMethods::Card);
-                                        },
-                                    }
-                                    CheckboxCard {
-                                        id: "a".to_string(),
-                                        name: String::from("management"),
-                                        checked: matches!(*payment_selected.read(), PaymentMethods::Paypal),
-                                        soon: true,
-                                        class: "checkbox-card--payment",
-                                        body: rsx!(
-                                            PaymentMethod {
-                                                title: translate!(i18, "withdraw.payment.methods.paypal.title"),
-                                                fee: translate!(i18, "withdraw.payment.methods.paypal.fee", fee: 5),
-                                                icon: rsx!(
-                                                    Icon {
-                                                        icon: PaypalLogo,
-                                                        height: 20,
-                                                        width: 20,
-                                                        fill: "var(--fill-600)"
-                                                    }
-                                                ),
+                                        }
+                                        CheckboxCard {
+                                            id: "a".to_string(),
+                                            name: String::from("management"),
+                                            checked: matches!(*payment_selected.read(), PaymentMethods::Paypal),
+                                            soon: true,
+                                            class: "checkbox-card--payment",
+                                            body: rsx!(
+                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.paypal.title"),
+                                                fee : translate!(i18, "withdraw.payment.methods.paypal.fee", fee : 5), icon :
+                                                rsx!(Icon { icon : PaypalLogo, height : 20, width : 20, fill : "var(--fill-600)"
+                                                }), }
+                                            ),
+                                            on_change: move |_| {
+                                                payment_selected.set(PaymentMethods::Paypal);
                                             }
-                                        ),
-                                        on_change: move |_| {
-                                            payment_selected.set(PaymentMethods::Paypal);
-                                        },
-                                    }
-                                    CheckboxCard {
-                                        id: "a".to_string(),
-                                        name: String::from("management"),
-                                        checked: matches!(*payment_selected.read(), PaymentMethods::PSE),
-                                        soon: true,
-                                        class: "checkbox-card--payment",
-                                        body: rsx!(
-                                            PaymentMethod {
-                                                title: translate!(i18, "withdraw.payment.methods.pse.title"),
-                                                fee: translate!(i18, "withdraw.payment.methods.pse.fee", fee: 3),
-                                                icon: rsx!(
-                                                    Icon {
-                                                        icon: PaypalLogo,
-                                                        height: 20,
-                                                        width: 20,
-                                                        fill: "var(--fill-600)"
-                                                    }
-                                                ),
+                                        }
+                                        CheckboxCard {
+                                            id: "a".to_string(),
+                                            name: String::from("management"),
+                                            checked: matches!(*payment_selected.read(), PaymentMethods::PSE),
+                                            soon: true,
+                                            class: "checkbox-card--payment",
+                                            body: rsx!(
+                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.pse.title"),
+                                                fee : translate!(i18, "withdraw.payment.methods.pse.fee", fee : 3), icon :
+                                                rsx!(Icon { icon : PaypalLogo, height : 20, width : 20, fill : "var(--fill-600)"
+                                                }), }
+                                            ),
+                                            on_change: move |_| {
+                                                payment_selected.set(PaymentMethods::PSE);
                                             }
-                                        ),
-                                        on_change: move |_| {
-                                            payment_selected.set(PaymentMethods::PSE);
-                                        },
-                                    }
-                                    CheckboxCard {
-                                        id: "a".to_string(),
-                                        name: String::from("management"),
-                                        checked: matches!(*payment_selected.read(), PaymentMethods::ETH),
-                                        soon: true,
-                                        class: "checkbox-card--payment",
-                                        body: rsx!(
-                                            PaymentMethod {
-                                                title: translate!(i18, "withdraw.payment.methods.eth.title"),
-                                                fee: translate!(i18, "withdraw.payment.methods.eth.fee"),
-                                                icon: rsx!(
-                                                    Icon {
-                                                        icon: PolygonLogo,
-                                                        height: 20,
-                                                        width: 20,
-                                                        fill: "var(--fill-600)"
-                                                    }
-                                                ),
+                                        }
+                                        CheckboxCard {
+                                            id: "a".to_string(),
+                                            name: String::from("management"),
+                                            checked: matches!(*payment_selected.read(), PaymentMethods::ETH),
+                                            soon: true,
+                                            class: "checkbox-card--payment",
+                                            body: rsx!(
+                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.eth.title"),
+                                                fee : translate!(i18, "withdraw.payment.methods.eth.fee"), icon : rsx!(Icon {
+                                                icon : PolygonLogo, height : 20, width : 20, fill : "var(--fill-600)" }), }
+                                            ),
+                                            on_change: move |_| {
+                                                payment_selected.set(PaymentMethods::ETH);
                                             }
-                                        ),
-                                        on_change: move |_| {
-                                            payment_selected.set(PaymentMethods::ETH);
-                                        },
+                                        }
                                     }
-                                }
                                 }
                                 if !matches!(*payment_selected.read(), PaymentMethods::None) {
                                     div { class: "summary__wrapper",
@@ -236,17 +188,17 @@ pub fn Withdraw() -> Element {
                                             div { class: "account__options",
                                                 Tab {
                                                     text: "My accounts",
-                                                    is_active: if *tab_value.read() == WithdrawKreivoTabs::Accounts { true } else {false},
+                                                    is_active: if *tab_value.read() == WithdrawKreivoTabs::Accounts { true } else { false },
                                                     on_click: move |_| {
                                                         tab_value.set(WithdrawKreivoTabs::Accounts);
-                                                    },
+                                                    }
                                                 }
                                                 Tab {
                                                     text: "Others",
-                                                    is_active: if *tab_value.read() == WithdrawKreivoTabs::Wallet { true } else {false},
+                                                    is_active: if *tab_value.read() == WithdrawKreivoTabs::Wallet { true } else { false },
                                                     on_click: move |_| {
                                                         tab_value.set(WithdrawKreivoTabs::Wallet);
-                                                    },
+                                                    }
                                                 }
                                             }
                                             div { class: "widthdraw__data",
@@ -281,26 +233,22 @@ pub fn Withdraw() -> Element {
                                                             on_click: move |_| {},
                                                         }
                                                     },
-                                                }
+                                                },
                                                 Input {
                                                     message: withdraw.get_withdraw().amount,
                                                     placeholder: "Amount",
                                                     label: "Amount",
                                                     error: None,
-                                                    right_text: {
-                                                        rsx!(
-                                                            span { class: "input--right__text",
-                                                                "KSM"
-                                                            }
-                                                        )
-                                                    },
+                                                    right_text: { rsx!(span { class : "input--right__text", "KSM" }) },
                                                     on_input: move |event: Event<FormData>| {
-                                                        withdraw.withdraw_mut().with_mut(|w| {
-                                                            w.amount = event.value();
-                                                        })
+                                                        withdraw
+                                                            .withdraw_mut()
+                                                            .with_mut(|w| {
+                                                                w.amount = event.value();
+                                                            })
                                                     },
                                                     on_keypress: move |_| {},
-                                                    on_click: move |_| {},
+                                                    on_click: move |_| {}
                                                 }
                                             }
                                         }
@@ -312,7 +260,9 @@ pub fn Withdraw() -> Element {
                             h4 { class: "summary__subtitle", "Description" }
                             hr { class: "divider" }
                             section { class: "summary__item summary__item--description",
-                                span { class: "summary__item__label--subtitle", "From Kreivo - To Kusama" }
+                                span { class: "summary__item__label--subtitle",
+                                    "From Kreivo - To Kusama"
+                                }
                                 p { class: "summary__item__description",
                                     "You are going to withdraw your KSM from Kreivo to Kusama"
                                 }
@@ -323,53 +273,56 @@ pub fn Withdraw() -> Element {
                                 disabled: !withdraw.is_form_complete(),
                                 size: ElementSize::Medium,
                                 on_click: move |_| {
-                                    spawn(async move {
-                                        tooltip.handle_tooltip(TooltipItem {
-                                            title: "Withdraw in course".to_string(),
-                                            body: "This could take a moment".to_string(),
-                                            show: true,
-                                        });
-
-                                        let address =
-                                            sp_core::sr25519::Public::from_str(&withdraw.get_withdraw().address).map_err(|e| {
-                                                log::warn!("Not found public address: {}", e);
-                                                translate!(i18, "errors.wallet.account_address")
-                                            })?;
-
-                                        let hex_address = hex::encode(address.0);
-
-                                        let destination_address = convert_to_jsvalue(&format!("0x{}", hex_address))
-                                            .map_err(|_| {
-                                                log::warn!("Malformed dest account");
-                                                String::from("Invalid address destination")
-                                            })?;
-
-                                        let amount = withdraw.get_withdraw().amount.parse::<f64>().map_err(|_| {
-                                            log::warn!("Malformed amount");
-                                            String::from("Invalid amount to withdraw")
-                                        })?;
-
-                                        let amount = (amount * 1_000_000_000_000.0) as u64;
-
-                                        topup_then_withdraw(
-                                            destination_address,
-                                            amount
-                                        ).await.map_err(|e| {
-                                            log::warn!("Withdraw failed {:?}", e);
-                                            String::from("Withdraw Failed")
-                                        })?;
-
-                                        tooltip.hide();
-                                        notification.handle_success("Your withdraw was completed");
-                                        nav.push(vec![], "/account");
-
-                                        Ok::<(), String>(())
-                                    }.unwrap_or_else(move |e: String| {
-                                        tooltip.hide();
-                                        notification.handle_error(&e);
-                                    }));
+                                    spawn(
+                                        async move {
+                                            tooltip
+                                                .handle_tooltip(TooltipItem {
+                                                    title: "Withdraw in course".to_string(),
+                                                    body: "This could take a moment".to_string(),
+                                                    show: true,
+                                                });
+                                            let address = sp_core::sr25519::Public::from_str(
+                                                    &withdraw.get_withdraw().address,
+                                                )
+                                                .map_err(|e| {
+                                                    log::warn!("Not found public address: {}", e);
+                                                    translate!(i18, "errors.wallet.account_address")
+                                                })?;
+                                            let hex_address = hex::encode(address.0);
+                                            let destination_address = convert_to_jsvalue(
+                                                    &format!("0x{}", hex_address),
+                                                )
+                                                .map_err(|_| {
+                                                    log::warn!("Malformed dest account");
+                                                    String::from("Invalid address destination")
+                                                })?;
+                                            let amount = withdraw
+                                                .get_withdraw()
+                                                .amount
+                                                .parse::<f64>()
+                                                .map_err(|_| {
+                                                    log::warn!("Malformed amount");
+                                                    String::from("Invalid amount to withdraw")
+                                                })?;
+                                            let amount = (amount * 1_000_000_000_000.0) as u64;
+                                            topup_then_withdraw(destination_address, amount)
+                                                .await
+                                                .map_err(|e| {
+                                                    log::warn!("Withdraw failed {:?}", e);
+                                                    String::from("Withdraw Failed")
+                                                })?;
+                                            tooltip.hide();
+                                            notification.handle_success("Your withdraw was completed");
+                                            nav.push(vec![], "/account");
+                                            Ok::<(), String>(())
+                                        }
+                                            .unwrap_or_else(move |e: String| {
+                                                tooltip.hide();
+                                                notification.handle_error(&e);
+                                            }),
+                                    );
                                 },
-                                status: None,
+                                status: None
                             }
                         }
                     }

@@ -119,7 +119,10 @@ pub fn Dashboard() -> Element {
                         on_click: move |_| {
                             tooltip.hide();
                             nav.push(
-                                vec![Box::new(is_chain_available(i18, timestamp, notification)), Box::new(is_dao_owner(i18, accounts, notification))],
+                                vec![
+                                    Box::new(is_chain_available(i18, timestamp, notification)),
+                                    Box::new(is_dao_owner(i18, accounts, notification)),
+                                ],
                                 "/onboarding",
                             );
                         }
@@ -223,12 +226,12 @@ pub fn Dashboard() -> Element {
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
-                            {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
-                            span {
-                                DynamicText { words },
-                            },
-                            {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
-                            },
+                                {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
+                                span {
+                                    DynamicText { words }
+                                }
+                                {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
+                            }
                         }
                         p { class: "card__description",
                             { translate!(i18,
@@ -258,7 +261,10 @@ pub fn Dashboard() -> Element {
                             on_click: move |_| {
                                 tooltip.hide();
                                 nav.push(
-                                    vec![Box::new(is_chain_available(i18, timestamp, notification)), Box::new(is_dao_owner(i18, accounts, notification))],
+                                    vec![
+                                        Box::new(is_chain_available(i18, timestamp, notification)),
+                                        Box::new(is_dao_owner(i18, accounts, notification)),
+                                    ],
                                     "/onboarding",
                                 );
                             }
