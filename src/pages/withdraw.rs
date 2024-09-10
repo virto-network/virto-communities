@@ -239,7 +239,7 @@ pub fn Withdraw() -> Element {
                                                     placeholder: "Amount",
                                                     label: "Amount",
                                                     error: None,
-                                                    right_text: { rsx!(span { class : "input--right__text", "KSM" }) },
+                                                    right_text: rsx!(span { class : "input--right__text", "KSM" }),
                                                     on_input: move |event: Event<FormData>| {
                                                         withdraw
                                                             .withdraw_mut()
