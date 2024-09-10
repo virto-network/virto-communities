@@ -4,8 +4,8 @@ use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::{
         atoms::{
-            button::Variant, dropdown::ElementSize, input::InputType, AccountButton, Button,
-            CircleCheck, Dropdown, Icon, Input, Polkadot, VirtoLogo,
+            button::Variant, dropdown::ElementSize, AccountButton, Button,
+            CircleCheck, Dropdown, Icon, Polkadot, VirtoLogo,
         },
         molecules::header::set_signer,
     },
@@ -144,47 +144,8 @@ pub fn Login() -> Element {
                             h3 { class: "login__form__title",
                                 "Login"
                             },
-                            p { class: "login__form__description",
-                                "Sign in with your email address or phone"
-                            }
-                        }
-                        Input {
-                            message: "".to_string(),
-                            size: ElementSize::Big,
-                            label: "Email or Username",
-                            placeholder: "Enter your email or username",
-                            error: None,
-                            required: true,
-                            on_input: move |_: Event<FormData>| {
-
-                            },
-                            on_keypress: move |_| {},
-                            on_click: move |_| {},
-                        }
-                        Input {
-                            message: "".to_string(),
-                            size: ElementSize::Big,
-                            itype: InputType::Password,
-                            label: "Password",
-                            placeholder: "Enter your password",
-                            error: None,
-                            required: true,
-                            on_input: move |_: Event<FormData>| {
-
-                            },
-                            on_keypress: move |_| {},
-                            on_click: move |_| {},
                         }
                         div { class: "login__form__cta",
-                            Button {
-                                class: "",
-                                text: "Continue",
-                                size: ElementSize::Medium,
-                                on_click: move |_| {
-
-                                },
-                                status: None,
-                            }
                             if !connect_handled() {
                                 Button {
                                     text: translate!(i18, "header.cta.connect"),
