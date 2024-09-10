@@ -12,14 +12,13 @@ use crate::{
         use_timestamp::use_timestamp,
     },
     middlewares::is_chain_available::is_chain_available,
-    services::{kreivo, kusama, market::types::Tokens},
+    services::{kreivo, market::types::Tokens},
 };
 use wasm_bindgen::prelude::*;
 
 #[derive(PartialEq)]
 enum AccountTabs {
     Kreivo,
-    Kusama,
 }
 
 #[derive(PartialEq)]
@@ -46,7 +45,6 @@ pub fn Account() -> Element {
     let mut usdt_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
 
     let mut kreivo_balance = use_signal(|| 0.0);
-    let mut kusama_balance = use_signal(|| 0.0);
     let mut ksm_usd = use_signal(|| 0.0);
 
     let get_balance = move || {
@@ -74,17 +72,7 @@ pub fn Account() -> Element {
 
                 kreivo_balance.set(account.data.free as f64 / 10_f64.powf(12f64));
 
-                let Ok(account) = kusama::balances::account(&format!("0x{}", hex_address)).await
-                else {
-                    ksm_balance.set(('0'.to_string(), "00".to_string()));
-                    usdt_balance.set(('0'.to_string(), "00".to_string()));
-
-                    return Ok(());
-                };
-
-                kusama_balance.set(account.data.free as f64 / 10_f64.powf(12f64));
-
-                let unscaled_value = kreivo_balance() + kusama_balance();
+                let unscaled_value = kreivo_balance();
                 let KSM_PRICE = market_client
                     .get_price_by_token(Tokens::KSM)
                     .await
@@ -121,7 +109,7 @@ pub fn Account() -> Element {
         }
     });
 
-    let mut tab_value = use_signal(|| AccountTabs::Kreivo);
+    let tab_value = use_signal(|| AccountTabs::Kreivo);
     let mut profile_value = use_signal(|| ProfileTabs::Wallet);
 
     rsx! {
@@ -222,22 +210,6 @@ pub fn Account() -> Element {
                                         "Activos"
                                     }
                                     div { class: "account__actives",
-                                        div { class: "account__actives__cta",
-                                            Tab {
-                                                text: "See account on Kreivo",
-                                                is_active: if *tab_value.read() == AccountTabs::Kreivo { true } else {false},
-                                                on_click: move |_| {
-                                                    tab_value.set(AccountTabs::Kreivo);
-                                                },
-                                            }
-                                            Tab {
-                                                text: "See account on Kusama",
-                                                is_active: if *tab_value.read() == AccountTabs::Kusama { true } else {false},
-                                                on_click: move |_| {
-                                                    tab_value.set(AccountTabs::Kusama);
-                                                },
-                                            }
-                                        }
                                         div { class: "actives",
                                             table { class: "actives__list",
                                                 tr {
@@ -257,32 +229,6 @@ pub fn Account() -> Element {
                                                             }
                                                             td {
                                                                 { format!("${} USD", if ksm_usd() == 0.0 || kreivo_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kreivo_balance()) } )}
-                                                            }
-                                                        }
-
-                                                        tr { class: "list__asset--comming-soon",
-                                                            td { class: "list__name", "USDT" }
-                                                            td { "-" }
-                                                            td { "-" }
-                                                            td { "-" }
-                                                        }
-
-                                                        tr { class: "list__asset--comming-soon",
-                                                            td { class: "list__name", "dUSD" }
-                                                            td { "-" }
-                                                            td { "-" }
-                                                            td { "-" }
-                                                        }
-                                                    ),
-                                                    AccountTabs::Kusama => rsx!(
-                                                        tr {
-                                                            td { class: "list__name", "KSM" }
-                                                            td { { format!("{:.2}", kusama_balance()) } }
-                                                            td {
-                                                                { format!("${} USD", if ksm_usd() == 0.0 { "-".to_string() } else { format!("{:.2}", ksm_usd()) } )}
-                                                            }
-                                                            td {
-                                                                { format!("${} USD", if ksm_usd() == 0.0 || kusama_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kusama_balance()) } )}
                                                             }
                                                         }
 
