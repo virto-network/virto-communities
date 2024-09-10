@@ -62,9 +62,11 @@ pub fn Withdraw() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(
-            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
-        ))
+        items.push(rsx!(AccountButton {
+            title: account.name(),
+            description: address.clone(),
+            on_click: move |_| {}
+        }))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
@@ -239,7 +241,7 @@ pub fn Withdraw() -> Element {
                                                     placeholder: "Amount",
                                                     label: "Amount",
                                                     error: None,
-                                                    right_text: { rsx!(span { class : "input--right__text", "KSM" }) },
+                                                    right_text: rsx!(span { class : "input--right__text", "KSM" }),
                                                     on_input: move |event: Event<FormData>| {
                                                         withdraw
                                                             .withdraw_mut()
