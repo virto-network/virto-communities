@@ -2,6 +2,8 @@ use dioxus::prelude::*;
 use super::dropdown::ElementSize;
 #[derive(PartialEq, Props, Clone)]
 pub struct TabProps {
+    #[props(default = "".to_string())]
+    class: String,
     text: String,
     #[props(default = false)]
     is_active: bool,
@@ -18,7 +20,7 @@ pub fn Tab(props: TabProps) -> Element {
     };
     rsx!(
         button {
-            class: "tab {size}",
+            class: "tab {size} {props.class}",
             class: if props.is_active { "tab--active" },
             onclick: move |event| props.on_click.call(event),
             {props.icon},

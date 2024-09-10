@@ -56,6 +56,36 @@
                 "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
             }
         },
+        "withdraw": {
+            "payment": {
+                "label": "Pago",
+                "title": "Completa la información de pago",
+                "subtitle": "Método de Pago",
+                "methods": {
+                    "card": {
+                        "title": "Tarjeta de Crédito",
+                        "fee": "+{fee}%",
+                        "cta": "Añadir Nueva Tarjeta"
+                    },
+                    "paypal": {
+                        "title": "Paypal",
+                        "fee": "+{fee}%"
+                    },
+                    "pse": {
+                        "title": "PSE",
+                        "fee": "+{fee}%"
+                    },
+                    "kusama": {
+                        "title": "Kusama",
+                        "fee": "Gratis"
+                    },
+                    "eth": {
+                        "title": "ETH/Polygon",
+                        "fee": "Gratis"
+                    }
+                }
+            }
+        },
         "dao": {
             "tabs": {
                 "all": "Iniciativas",

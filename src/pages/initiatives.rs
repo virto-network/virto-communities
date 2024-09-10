@@ -209,13 +209,7 @@ pub fn Initiatives(id: u16) -> Element {
                             p { class: "card__description", "" }
                             div { class: "card__metrics",
                                 span { class: "card__metric",
-                                    Icon {
-                                        icon: CircleCheck,
-                                        height: 16,
-                                        width: 16,
-                                        stroke_width: 2,
-                                        stroke: "var(--text-primary)"
-                                    }
+                                    Icon { icon: CircleCheck, height: 16, width: 16, fill: "var(--text-primary)" }
                                     small { "{initiative.ongoing.tally.ayes} Aye" }
                                 }
                                 span { class: "card__metric",

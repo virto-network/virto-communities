@@ -2,11 +2,12 @@ use dioxus::prelude::*;
 use pjs::Account as PjsAccount;
 pub type Account = PjsAccount;
 pub type Accounts = Vec<Account>;
+#[derive(Debug)]
 pub struct IsDaoOwner(pub bool);
 pub fn use_accounts() -> UseAccountsState {
     let accounts = consume_context::<Signal<Vec<Account>>>();
     let account = consume_context::<Signal<Option<Account>>>();
-    let is_dao_owner = consume_context::<Signal<IsDaoOwner>>();
+    let is_dao_owner = consume_context::<Signal<Option<IsDaoOwner>>>();
     use_hook(|| UseAccountsState {
         inner: accounts,
         account,
@@ -17,7 +18,7 @@ pub fn use_accounts() -> UseAccountsState {
 pub struct UseAccountsState {
     inner: Signal<Accounts>,
     account: Signal<Option<Account>>,
-    is_dao_owner: Signal<IsDaoOwner>,
+    is_dao_owner: Signal<Option<IsDaoOwner>>,
 }
 impl UseAccountsState {
     pub fn get(&self) -> Accounts {
@@ -40,9 +41,13 @@ impl UseAccountsState {
         *c = account;
     }
     pub fn is_active_account_an_admin(&self) -> bool {
-        self.is_dao_owner.read().0.clone()
+        log::info!("is_dao_owner: {:?}", self.is_dao_owner.read());
+        match &*self.is_dao_owner.read() {
+            Some(is_dao_owner) => is_dao_owner.0,
+            None => true,
+        }
     }
-    pub fn set_is_active_account_an_admin(&mut self, is_dao_owner: IsDaoOwner) {
+    pub fn set_is_active_account_an_admin(&mut self, is_dao_owner: Option<IsDaoOwner>) {
         let mut c = self.is_dao_owner.write();
         *c = is_dao_owner;
     }

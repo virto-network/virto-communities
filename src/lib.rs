@@ -1,13 +1,16 @@
 #![allow(non_snake_case)]
 pub mod pages {
+    pub mod account;
     pub mod dashboard;
     pub mod explore;
     pub mod initiative;
     pub mod initiatives;
+    pub mod login;
     pub mod not_found;
     pub mod onboarding;
     pub mod route;
     pub mod vote;
+    pub mod withdraw;
 }
 pub mod middlewares {
     pub mod is_chain_available;
@@ -24,6 +27,7 @@ pub mod hooks {
     pub mod use_connect_wallet;
     pub mod use_initiative;
     pub mod use_language;
+    pub mod use_market_client;
     pub mod use_notification;
     pub mod use_onboard;
     pub mod use_our_navigator;
@@ -35,6 +39,7 @@ pub mod hooks {
     pub mod use_timestamp;
     pub mod use_tooltip;
     pub mod use_vote;
+    pub mod use_withdraw;
 }
 pub mod components {
     pub mod atoms;
@@ -42,6 +47,10 @@ pub mod components {
 }
 pub mod services {
     pub mod bot {
+        pub mod client;
+        pub mod types;
+    }
+    pub mod market {
         pub mod client;
         pub mod types;
     }
@@ -57,6 +66,7 @@ pub mod services {
         pub mod timestamp;
     }
     pub mod kusama {
+        pub mod balances;
         pub mod system;
     }
 }

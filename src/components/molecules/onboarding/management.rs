@@ -2,7 +2,8 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::atoms::{
-        CheckboxCard, Icon, KeyFill, MedalFill, ShieldKeyholeFill, TeamFill, Title,
+        management_method::ManagementMethod, CheckboxCard, Icon, KeyFill, MedalFill,
+        ShieldKeyholeFill, TeamFill, Title,
     },
     hooks::use_onboard::{use_onboard, ManagementOptions},
 };
@@ -18,11 +19,14 @@ pub fn OnboardingManagement() -> Element {
         div { class: "form__inputs",
             CheckboxCard {
                 id: "a".to_string(),
-                title: translate!(i18, "onboard.management.form.membership.title"),
-                description: translate!(i18, "onboard.management.form.membership.description"),
                 name: String::from("management"),
                 checked: matches!(onboard.get_management().value, ManagementOptions::Membership),
-                icon: rsx!(Icon { icon : TeamFill, height : 20, width : 20, fill : "var(--fill-600)" }),
+                body: rsx!(
+                    ManagementMethod { title : translate!(i18,
+                    "onboard.management.form.membership.title"), description : translate!(i18,
+                    "onboard.management.form.membership.description"), icon : rsx!(Icon { icon :
+                    TeamFill, height : 20, width : 20, fill : "var(--fill-600)" }), }
+                ),
                 on_change: move |_| {
                     onboard
                         .management_mut()
@@ -31,34 +35,40 @@ pub fn OnboardingManagement() -> Element {
             }
             CheckboxCard {
                 id: "a".to_string(),
-                title: translate!(i18, "onboard.management.form.rank.title"),
-                description: translate!(i18, "onboard.management.form.rank.description"),
                 name: String::from("management"),
                 checked: false,
                 soon: true,
-                icon: rsx!(Icon { icon : MedalFill, height : 20, width : 20, fill : "var(--fill-600)" }),
+                body: rsx!(
+                    ManagementMethod { title : translate!(i18, "onboard.management.form.rank.title"),
+                    description : translate!(i18, "onboard.management.form.rank.description"), icon :
+                    rsx!(Icon { icon : MedalFill, height : 20, width : 20, fill : "var(--fill-600)"
+                    }), }
+                ),
                 on_change: move |_| {}
             }
             CheckboxCard {
                 id: "a".to_string(),
-                title: translate!(i18, "onboard.management.form.native_token.title"),
-                description: translate!(i18, "onboard.management.form.native_token.description"),
                 name: String::from("management"),
                 checked: false,
                 soon: true,
-                icon: rsx!(Icon { icon : KeyFill, height : 20, width : 20, fill : "var(--fill-600)" }),
+                body: rsx!(
+                    ManagementMethod { title : translate!(i18,
+                    "onboard.management.form.native_token.title"), description : translate!(i18,
+                    "onboard.management.form.native_token.description"), icon : rsx!(Icon { icon :
+                    KeyFill, height : 20, width : 20, fill : "var(--fill-600)" }), }
+                ),
                 on_change: move |_| {}
             }
             CheckboxCard {
                 id: "a".to_string(),
-                title: translate!(i18, "onboard.management.form.own_token.title"),
-                description: translate!(i18, "onboard.management.form.own_token.description"),
                 name: String::from("management"),
                 checked: false,
                 soon: true,
-                icon: rsx!(
-                    Icon { icon : ShieldKeyholeFill, height : 20, width : 20, fill :
-                    "var(--fill-600)" }
+                body: rsx!(
+                    ManagementMethod { title : translate!(i18,
+                    "onboard.management.form.own_token.title"), description : translate!(i18,
+                    "onboard.management.form.own_token.description"), icon : rsx!(Icon { icon :
+                    ShieldKeyholeFill, height : 20, width : 20, fill : "var(--fill-600)" }), }
                 ),
                 on_change: move |_| {}
             }
