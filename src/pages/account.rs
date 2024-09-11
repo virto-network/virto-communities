@@ -76,7 +76,7 @@ pub fn Account() -> Element {
                 let KSM_PRICE = market_client
                     .get_price_by_token(Tokens::KSM)
                     .await
-                    .map_err(|_| String::from("No se ha podido consultar el precio"))?;
+                    .map_err(|_| translate!(i18, "errors.market.query_failed"))?;
 
                 ksm_usd.set(KSM_PRICE);
 
@@ -117,7 +117,7 @@ pub fn Account() -> Element {
             div { class: "account",
                 div { class: "account__options",
                     Tab {
-                        text: "Wallet",
+                        text: translate!(i18, "account.tabs.wallet.tab"),
                         is_active: if *profile_value.read() == ProfileTabs::Wallet { true } else { false },
                         on_click: move |_| {
                             profile_value.set(ProfileTabs::Wallet);
@@ -125,7 +125,7 @@ pub fn Account() -> Element {
                     }
                     Tab {
                         class: "tab--comming-soon",
-                        text: "Transfers",
+                        text: translate!(i18, "account.tabs.transfers.tab"),
                         is_active: true,
                         on_click: move |_| {}
                     }
@@ -137,12 +137,12 @@ pub fn Account() -> Element {
                                 div { class: "account__container",
                                     div { class: "account__balance",
                                         h3 { class: "account__balance__title",
-                                            "Balance"
+                                            {translate!(i18, "account.tabs.wallet.balance.title")}
                                         }
                                         div { class: "account__balance__cta",
                                             Button {
                                                 class: "button--comming-soon",
-                                                text: "Deposit",
+                                                text: translate!(i18, "account.tabs.wallet.balance.options.deposit"),
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
                                                 on_click: move |_| {
@@ -159,7 +159,7 @@ pub fn Account() -> Element {
                                             }
                                             Button {
                                                 class: "",
-                                                text: "Withdraw",
+                                                text: translate!(i18, "account.tabs.wallet.balance.options.withdraw"),
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
                                                 on_click: move |_| {
@@ -207,16 +207,16 @@ pub fn Account() -> Element {
                                 }
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
-                                        "Activos"
+                                        {translate!(i18, "account.tabs.wallet.assets.title")}
                                     }
                                     div { class: "account__actives",
                                         div { class: "actives",
                                             table { class: "actives__list",
                                                 tr {
-                                                    th { class: "list__name", "Asset" }
-                                                    th { "Quantity" }
-                                                    th { "Cost" }
-                                                    th { "Total" }
+                                                    th { class: "list__name", {translate!(i18, "account.tabs.wallet.assets.title")} }
+                                                    th { {translate!(i18, "account.tabs.wallet.assets.quantity")} }
+                                                    th { {translate!(i18, "account.tabs.wallet.assets.cost")} }
+                                                    th { {translate!(i18, "account.tabs.wallet.assets.total")} }
                                                 }
                 
                                                 match *tab_value.read() {
@@ -259,14 +259,14 @@ pub fn Account() -> Element {
                             section { class: "transfers",
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
-                                        "Transferencias"
+                                        {translate!(i18, "account.tabs.transfers.title")}
                                     }
                                     table { class: "actives__list",
                                         tr {
-                                            th { class: "list__name", "Asset" }
-                                            th { "Time" }
-                                            th { "Quantity" }
-                                            th { "Account" }
+                                            th { class: "list__name", {translate!(i18, "account.tabs.transfers.table.asset")} }
+                                            th { {translate!(i18, "account.tabs.transfers.table.time")} }
+                                            th { {translate!(i18, "account.tabs.transfers.table.quantity")} }
+                                            th { {translate!(i18, "account.tabs.transfers.table.account")} }
                                         }
                 
                                         tr {
