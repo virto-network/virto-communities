@@ -3,8 +3,53 @@
     "texts": {
         "dynamic_text": {
             "dynamic_one": "business",
-            "dynamic_two": "organization", 
+            "dynamic_two": "organization",
             "dynamic_three": "community"
+        },
+        "login": {
+            "welcome": "Welcome to",
+            "description": "Explore local projects and Initiatives that are making an impact",
+            "opportunities": {
+                "connect": "Connect with others around you",
+                "learn": "Show your work, learn from others",
+                "impact": "Find new opportunities to make an impact."
+            },
+            "form": {
+                "title": "Login"
+            }
+        },
+        "account": {
+            "tabs": {
+                "wallet": {
+                    "tab": "Wallet",
+                    "balance": {
+                        "title": "Balance",
+                        "options": {
+                            "deposit": "Deposit",
+                            "withdraw": "Withdraw"
+                        }
+                    },
+                    "assets": {
+                        "title": "Assets",
+                        "table": {
+                            "asset": "Asset",
+                            "quantity": "Quantity",
+                            "cost": "Cost",
+                            "total": "Total"
+                        }
+                    }
+                },
+                "transfers": {
+                    "tab": "Transfers",
+                    "title": "Transfers",
+                    "table": {
+                        "asset": "Asset",
+                        "time": "Time",
+                        "quantity": "Quantity",
+                        "account": "Account"
+                    }
+                }
+            }
         },
         "sidebar": {
             "cta": "Add community"
@@ -409,6 +454,9 @@
                 "upload_fail": "Oops! ✋ The file could not be uploaded. Please try again.",
                 "community_creation": "Oops! ✋ We couldn't create your community. Please check and try again.",
                 "initiative_creation": "Oops! ✋ We couldn't create the initiative. Please try again."
+            },
+            "market": {
+                "query_failed": "The price could not be consulted"
             }
         }
     }

@@ -87,12 +87,12 @@ pub fn Login() -> Element {
                                 stroke_width: 1,
                                 fill: "var(--color-lavanda-400)"
                             }
-                            div { class: "login__welcome", "Welcome to" }
+                            div { class: "login__welcome", {translate!(i18, "login.welcome")} }
                             div { class: "login__name", "VIRTO" }
                         }
                         div { class: "login__info",
                             p { class: "login__info__description",
-                                "Explore local projects and Initiatives that are making an impact"
+                                {translate!(i18, "login.description")}
                             }
                             ul { class: "login__info__opportunities",
                                 li { class: "icon-text",
@@ -102,7 +102,7 @@ pub fn Login() -> Element {
                                         width: 36,
                                         fill: "var(--state-primary-active)"
                                     }
-                                    span { class: "icon-text__title", "Connect with others around you" }
+                                    span { class: "icon-text__title", {translate!(i18, "login.opportunities.connect")} }
                                 }
                                 li { class: "icon-text",
                                     Icon {
@@ -112,7 +112,7 @@ pub fn Login() -> Element {
                                         fill: "var(--state-primary-active)"
                                     }
                                     span { class: "icon-text__title",
-                                        "Show your work, learn from others"
+                                        {translate!(i18, "login.opportunities.learn")}
                                     }
                                 }
                                 li { class: "icon-text",
@@ -123,7 +123,7 @@ pub fn Login() -> Element {
                                         fill: "var(--state-primary-active)"
                                     }
                                     span { class: "icon-text__title",
-                                        "Find new opportunities to make an impact."
+                                        {translate!(i18, "login.opportunities.impact")}
                                     }
                                 }
                             }
@@ -133,7 +133,7 @@ pub fn Login() -> Element {
                 div { class: "login__form",
                     div { class: "login__form__wrapper",
                         div { class: "login__form__head",
-                            h3 { class: "login__form__title", "Login" }
+                            h3 { class: "login__form__title", {translate!(i18, "login.form.title")} }
                         }
                         div { class: "login__form__cta",
                             if !connect_handled() {
