@@ -8,7 +8,7 @@ pub struct TrackInfo {
     pub count: u32,
 }
 pub async fn track_queue(item: u16) -> Result<Vec<TrackInfo>, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityReferenda/trackQueue/{}", item);
+    let query = format!("wss://kreivo.io/communityReferenda/trackQueue/{}", item);
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
@@ -26,7 +26,7 @@ pub async fn track_queue(item: u16) -> Result<Vec<TrackInfo>, ChainStateError> {
     Ok(track_infos)
 }
 pub async fn referendum_count() -> Result<u16, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityReferenda/referendumCount");
+    let query = format!("wss://kreivo.io/communityReferenda/referendumCount");
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
@@ -88,7 +88,7 @@ pub struct OngoingWrapper {
     pub ongoing: Ongoing,
 }
 pub async fn referendum_info_for(id: u16) -> Result<OngoingWrapper, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityReferenda/referendumInfoFor/{}", id);
+    let query = format!("wss://kreivo.io/communityReferenda/referendumInfoFor/{}", id);
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
@@ -101,7 +101,7 @@ pub async fn referendum_info_for(id: u16) -> Result<OngoingWrapper, ChainStateEr
     Ok(initiative)
 }
 pub async fn metadata_of(id: u16) -> Result<Vec<u8>, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityReferenda/metadataOf/{}", id);
+    let query = format!("wss://kreivo.io/communityReferenda/metadataOf/{}", id);
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);

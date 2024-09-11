@@ -14,7 +14,7 @@ pub struct CollectionDetails {
 }
 pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainStateError> {
     let query = format!(
-        "ws://localhost:12281/communityMemberships/collection/{}",
+        "wss://kreivo.io/communityMemberships/collection/{}",
         collection,
     );
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
@@ -28,7 +28,7 @@ pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainState
 }
 
 pub async fn item(item: u16) -> Result<u16, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityMemberships/item/{}", item);
+    let query = format!("wss://kreivo.io/communityMemberships/item/{}", item);
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::ValueSet(value) = response else {
         return Err(ChainStateError::InternalError);
@@ -40,7 +40,7 @@ pub async fn get_membership_id(
     community_id: u16,
 ) -> Result<u16, ChainStateError> {
     let query = format!(
-        "ws://localhost:12281/communityMemberships/account/{}/{}",
+        "wss://kreivo.io/communityMemberships/account/{}/{}",
         address,
         community_id,
     );
@@ -63,7 +63,7 @@ pub async fn get_membership_id(
     Ok(membership_id)
 }
 pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError> {
-    let query = format!("ws://localhost:12281/communityMemberships/account/{}", address);
+    let query = format!("wss://kreivo.io/communityMemberships/account/{}", address);
     let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::ValueSet(ref value) = response else {
         return Err(ChainStateError::InternalError);
@@ -136,7 +136,7 @@ pub async fn is_community_member_by_address(
 
     let is_member = {
         let query = format!(
-            "ws://localhost:12281/communityMemberships/account/{}/{}",
+            "wss://kreivo.io/communityMemberships/account/{}/{}",
             address, community_id
         );
 
