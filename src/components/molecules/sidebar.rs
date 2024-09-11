@@ -3,14 +3,13 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        avatar::Variant, dropdown::ElementSize, icon_button, AddPlus, Avatar, Compass, Hamburguer,
-        Home, Icon, IconButton, Star,
+        avatar::Variant, dropdown::ElementSize, icon_button, Avatar, Compass, Hamburguer, Home,
+        Icon, IconButton, OnOff, Star,
     },
     hooks::{
-        use_communities::use_communities, use_our_navigator::use_our_navigator,
-        use_tooltip::use_tooltip,
+        use_accounts::use_accounts, use_communities::use_communities,
+        use_our_navigator::use_our_navigator, use_tooltip::use_tooltip,
     },
-    middlewares::is_dao_owner::is_dao_owner,
 };
 #[component]
 pub fn Sidebar() -> Element {
@@ -18,6 +17,7 @@ pub fn Sidebar() -> Element {
     let mut communities = use_communities();
     let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
+    let accounts = use_accounts();
 
     let mut is_active = use_signal(|| false);
 
@@ -41,6 +41,55 @@ pub fn Sidebar() -> Element {
                     }
                 }
                 ul { class: "sidebar__list",
+                    match accounts.get_account() {
+                        Some(account) => rsx!(
+                            li { class: "sidebar__item",
+                                onclick: move |_|{},
+                                IconButton {
+                                    class: "button--avatar",
+                                    body: rsx!(
+                                        Avatar {
+                                            name: "{account.name()}",
+                                            size: 60,
+                                            uri: None,
+                                            variant: Variant::Round
+                                        }
+                                    ),
+                                    on_click: move |_| {
+                                        nav.push(vec![], "/account")
+                                    }
+                                }
+                                span {
+                                    "{account.name()}"
+                                },
+                            }
+                        ),
+                        None => rsx!(
+                            li { class: "sidebar__item",
+                                onclick: move |_|{},
+                                IconButton {
+                                    class: "button--icon bg--state-primary-active",
+                                    size: ElementSize::Big,
+                                    variant: icon_button::Variant::Round,
+                                    body: rsx!(
+                                        Icon {
+                                            icon: OnOff,
+                                            height: 32,
+                                            width: 32,
+                                            stroke_width: 2,
+                                            stroke: "var(--fill-00)"
+                                        }
+                                    ),
+                                    on_click: move |_| {
+                                        nav.push(vec![], "/login");
+                                    }
+                                }
+                                span {
+                                    {translate!(i18, "sidebar.cta")}
+                                }
+                            }
+                        ),
+                    },
                     li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
                             class: "button--icon bg--state-primary-active",
@@ -67,23 +116,7 @@ pub fn Sidebar() -> Element {
                             ),
                             on_click: move |_| {
                                 tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/explore");
-                            }
-                        }
-                        span { {translate!(i18, "sidebar.cta")} }
-                    }
-                    li { class: "sidebar__item", onclick: move |_| {},
-                        IconButton {
-                            class: "button--icon bg--state-primary-active",
-                            size: ElementSize::Big,
-                            variant: icon_button::Variant::Round,
-                            body: rsx!(
-                                Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                "var(--fill-00)" }
-                            ),
-                            on_click: move |_| {
-                                tooltip.hide();
-                                nav.push(vec![Box::new(is_dao_owner())], "/onboarding");
+                                nav.push(vec![], "/explore");
                             }
                         }
                         span { {translate!(i18, "sidebar.cta")} }

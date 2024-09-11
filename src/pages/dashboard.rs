@@ -7,15 +7,15 @@ use crate::{
     components::{
         atoms::{
             avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
-            ArrowRight, Avatar, Badge, Compass, Icon, IconButton, SearchInput, Star, Tab, UserAdd,
-            UserGroup, DynamicText, CardSkeleton
+            ArrowRight, Avatar, Badge, CardSkeleton, Compass, DynamicText, Icon, IconButton, SearchInput, Star,
+            Tab, UserAdd, UserGroup,
         },
         molecules::tabs::TabItem,
     },
     hooks::{
-        use_communities::{use_communities, CommunitiesError}, use_our_navigator::use_our_navigator,
-        use_tooltip::use_tooltip,
-        use_notification::use_notification,
+        use_accounts::use_accounts, use_communities::{use_communities, CommunitiesError},
+        use_notification::use_notification, use_our_navigator::use_our_navigator,
+        use_timestamp::use_timestamp, use_tooltip::use_tooltip,
     },
     middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
 };
@@ -47,15 +47,15 @@ pub fn Dashboard() -> Element {
     let nav = use_our_navigator();
     let mut communities = use_communities();
     let mut notification = use_notification();
+    let accounts = use_accounts();
+    let timestamp = use_timestamp();
 
     let mut current_page = use_signal::<usize>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
-    let tab_items = vec![
-        TabItem {
-            k: String::from("all"),
-            value: translate!(i18, "dashboard.tabs.all"),
-        },
-    ];
+    let tab_items = vec![TabItem {
+        k: String::from("all"),
+        value: translate!(i18, "dashboard.tabs.all"),
+    }];
     let tab_value = use_signal::<String>(|| String::from("all"));
 
     let mut filter_name = use_signal::<Option<String>>(|| None);
@@ -78,7 +78,7 @@ pub fn Dashboard() -> Element {
     let dynamic_two = translate!(i18, "dynamic_text.dynamic_two");
     let dynamic_three = translate!(i18, "dynamic_text.dynamic_three");
 
-    let words = vec!(dynamic_one, dynamic_two, dynamic_three);
+    let words = vec![dynamic_one, dynamic_two, dynamic_three];
 
     rsx! {
         div { class: "dashboard grid-main",
@@ -119,7 +119,10 @@ pub fn Dashboard() -> Element {
                         on_click: move |_| {
                             tooltip.hide();
                             nav.push(
-                                vec![Box::new(is_chain_available()), Box::new(is_dao_owner())],
+                                vec![
+                                    Box::new(is_chain_available(i18, timestamp, notification)),
+                                    Box::new(is_dao_owner(i18, accounts, notification)),
+                                ],
                                 "/onboarding",
                             );
                         }
@@ -133,6 +136,7 @@ pub fn Dashboard() -> Element {
                     CardSkeleton {}
                     CardSkeleton {}
                 }
+
                } else {
                    rsx! {
                        for community in communities
@@ -275,20 +279,23 @@ pub fn Dashboard() -> Element {
                                    }
                                }
                            }
-                           div { class: "card__cta",
-                               IconButton {
-                                   class: "button--avatar",
-                                   size: ElementSize::Big,
-                                   body: rsx!(
-                                       Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                       "var(--fill-00)" }
-                                   ),
-                                   on_click: move |_| {
-                                       tooltip.hide();
-                                       nav.push(
-                                           vec![Box::new(is_chain_available()), Box::new(is_dao_owner())],
-                                           "/onboarding",
-                                       );
+                          div { class: "card__cta",
+                              IconButton {
+                                  class: "button--avatar",
+                                  size: ElementSize::Big,
+                                  body: rsx!(
+                                      Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
+                                      "var(--fill-00)" }
+                                  ),
+                                  on_click: move |_| {
+                                      tooltip.hide();
+                                      nav.push(
+                                          vec![
+                                              Box::new(is_chain_available(i18, timestamp, notification)),
+                                              Box::new(is_dao_owner(i18, accounts, notification)),
+                                          ],
+                                          "/onboarding",
+                                      );
                                    }
                                }
                            }

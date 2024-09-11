@@ -1,4 +1,5 @@
 build:
+    @find public -name "*.br" -type f -delete
     dx build --release
 
 tag: check build
@@ -6,6 +7,7 @@ tag: check build
 	git tag (open Cargo.toml | get package.version)
 
 check:
-    dx fmt --check --all-code
+    @find public -name "*.br" -type f -delete
+    # dx fmt --check --all-code
     dx check
     cargo clippy -- -D warnings

@@ -1,6 +1,6 @@
 [package]
 name = "virto-communities"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["b-avb <brayan.vargas.dev@gmail.com>"]
 edition = "2021"
 

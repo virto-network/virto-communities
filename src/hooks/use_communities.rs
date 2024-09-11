@@ -40,46 +40,39 @@ pub fn use_communities() -> UseCommunitiesState {
             is_loading.set(true);
         }
 
-        let session = match session.get() {
-            Some(s) => s,
-            None => {
-                log::error!("Error: No session found");
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            }
-        };
+        let public_address = session
+            .get()
+            .map(
+                |session| match sp_core::sr25519::Public::from_str(&session.address) {
+                    Ok(public_address) => Some(public_address.0),
+                    Err(_) => {
+                        log::warn!("error here by address");
+                        notification
+                            .handle_error(&translate!(i18, "errors.wallet.account_address"));
+                        None
+                    }
+                },
+            )
+            .flatten();
 
-        let public_address = match sp_core::sr25519::Public::from_str(&session.address) {
-            Ok(addr) => addr,
-            Err(e) => {
-                log::error!("Error parsing address: {:?}", e);
-                notification.handle_error(&translate!(i18, "errors.wallet.account_address"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            }
-        };
-
-        let mut community_tracks = match get_communities().await {
-            Ok(tracks) => tracks,
-            Err(e) => {
-                log::error!("Error fetching communities: {:?}", e);
-                notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
-                tooltip.hide();
-                is_loading.set(false);
-                return;
-            }
+        let Ok(mut community_tracks) = get_communities().await else {
+            log::warn!("error here by member");
+            notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+            tooltip.hide();
+            is_loading.set(false);
+            return;
         };
 
         let mut temporal_favorite_communities = get_favorite_communities();
 
         for community in &mut community_tracks {
-            let Ok(is_member) =
-                is_community_member_by_address(&public_address.0, community.id).await
-            else {
-                continue;
+            let is_member = match public_address {
+                Some(public_address) => {
+                    is_community_member_by_address(&public_address, community.id)
+                        .await
+                        .unwrap_or(false)
+                }
+                None => false,
             };
 
             community.has_membership = is_member;

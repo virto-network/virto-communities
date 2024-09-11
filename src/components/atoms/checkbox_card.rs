@@ -1,26 +1,23 @@
 use dioxus::prelude::*;
 #[derive(PartialEq, Props, Clone)]
 pub struct CheckboxCardProps {
+    #[props(default = "".to_string())]
+    class: String,
     id: String,
-    title: String,
-    description: String,
-    icon: Element,
     name: String,
     checked: bool,
     #[props(default = false)]
     soon: bool,
+    body: Element,
+    editable: Option<Element>,
     on_change: EventHandler,
 }
 pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
     rsx!(
         label {
-            class: "checkbox-card",
+            class: "checkbox-card {props.class}",
             class: if props.soon { "checkbox-card--comming-soon" },
-            div { class: "checkbox-card__media", {props.icon} }
-            div {
-                span { class: "checkbox-card__title", "{props.title}" }
-                p { class: "checkbox-card__description", "{props.description}" }
-            }
+            class: if props.checked { "checkbox-card--active" },
             input {
                 class: "checkbox__cta",
                 r#type: "radio",
@@ -29,7 +26,15 @@ pub fn CheckboxCard(props: CheckboxCardProps) -> Element {
                 checked: props.checked,
                 onchange: move |_| { props.on_change.call(()) }
             }
-            div { class: "checkbox-custom" }
+            div { class: "checkbox-card__header",
+                div { class: "checkbox-custom" }
+                {props.body}
+            }
+            if props.checked {
+                if let Some(editable) = props.editable {
+                    {editable}
+                }
+            }
         }
     )
 }

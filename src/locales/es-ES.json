@@ -3,8 +3,53 @@
     "texts": {
         "dynamic_text": {
             "dynamic_one": "empresa",
-            "dynamic_two": "organización", 
+            "dynamic_two": "organización",
             "dynamic_three": "comunidad"
+        },
+        "login": {
+            "welcome": "Bienvenido a",
+            "description": "Explora proyectos locales e iniciativas que están generando impacto",
+            "opportunities": {
+                "connect": "Conéctate con otros a tu alrededor",
+                "learn": "Muestra tu trabajo, aprende de los demás",
+                "impact": "Encuentra nuevas oportunidades para generar impacto"
+            },
+            "form": {
+                "title": "Iniciar sesión"
+            }
+        },
+        "account": {
+            "tabs": {
+                "wallet": {
+                    "tab": "Billetera",
+                    "balance": {
+                        "title": "Saldo",
+                        "options": {
+                            "deposit": "Depositar",
+                            "withdraw": "Retirar"
+                        }
+                    },
+                    "assets": {
+                        "title": "Activos",
+                        "table": {
+                            "asset": "Activo",
+                            "quantity": "Cantidad",
+                            "cost": "Costo",
+                            "total": "Total"
+                        }
+                    }
+                },
+                "transfers": {
+                    "tab": "Transferencias",
+                    "title": "Transferencias",
+                    "table": {
+                        "asset": "Activo",
+                        "time": "Hora",
+                        "quantity": "Cantidad",
+                        "account": "Cuenta"
+                    }
+                }
+            }
         },
         "sidebar": {
             "cta": "Agregar comunidad"
@@ -54,6 +99,36 @@
             "footer": {
                 "paginator": "{from} of {to}",
                 "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
+            }
+        },
+        "withdraw": {
+            "payment": {
+                "label": "Pago",
+                "title": "Completa la información de pago",
+                "subtitle": "Método de Pago",
+                "methods": {
+                    "card": {
+                        "title": "Tarjeta de Crédito",
+                        "fee": "+{fee}%",
+                        "cta": "Añadir Nueva Tarjeta"
+                    },
+                    "paypal": {
+                        "title": "Paypal",
+                        "fee": "+{fee}%"
+                    },
+                    "pse": {
+                        "title": "PSE",
+                        "fee": "+{fee}%"
+                    },
+                    "kusama": {
+                        "title": "Kusama",
+                        "fee": "Gratis"
+                    },
+                    "eth": {
+                        "title": "ETH/Polygon",
+                        "fee": "Gratis"
+                    }
+                }
             }
         },
         "dao": {
@@ -144,7 +219,7 @@
                             "nay": "Balance en contra",
                             "abstain": "Balance en abstención"
                         }
-                    } 
+                    }
                 },
                 "settings": {
                     "label": "Configuraciones"
@@ -375,6 +450,9 @@
                 "upload_fail": "¡Ups! ✋ No se pudo subir el archivo. Por favor, inténtalo de nuevo.",
                 "community_creation": "¡Ups! ✋ No logramos crear tu comunidad. Por favor, verifica e inténtalo de nuevo.",
                 "initiative_creation": "¡Ups! ✋ No logramos crear tu iniciativa. Por favor, inténtalo de nuevo."
+            },
+            "market": {
+                "query_failed": "No se pudo consultar el precio"
             }
         }
     }

@@ -17,7 +17,7 @@ impl UseOurNavigatorState {
     ) {
         for middleware in middlewares {
             if let Err(e) = middleware() {
-                println!("Middleware failed: {}", e);
+                log::info!("Middleware failed: {}", e);
                 return;
             }
         }
