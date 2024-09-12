@@ -332,19 +332,23 @@
                 "form": {
                     "membership": {
                         "title": "Membresía",
-                        "description": "Cualquier miembro puede votar y tomar decisiones."
+                        "description": "Cualquier miembro puede votar y tomar decisiones.",
+                        "cost": "${cost} USD acceso total/mes"
                     },
                     "rank": {
                         "title": "Rango de Membresía",
-                        "description": "Miembros con roles específicos pueden votar y tomar decisiones."
+                        "description": "Miembros con roles específicos pueden votar y tomar decisiones.",
+                        "cost": "${cost} USD acceso total/mes"
                     },
                     "native_token": {
                         "title": "Token Kusama",
-                        "description": "Cualquier poseedor de tokens puede votar y tomar decisiones."
+                        "description": "Cualquier poseedor de tokens puede votar y tomar decisiones.",
+                        "cost": "${cost} USD acceso total/mes"
                     },
                     "own_token": {
                         "title": "Token Propio (Avanzado)",
-                        "description": "Configuras el token y los poseedores para votar o tomar decisiones."
+                        "description": "Configuras el token y los poseedores para votar o tomar decisiones.",
+                        "cost": "${cost} USD acceso total/mes"
                     }
                 },
                 "cta": {
@@ -372,6 +376,72 @@
                 "cta": {
                     "back": "Regresar",
                     "next": "Pagar"
+                }
+            },
+            "checkout": {
+                "label": "Pago",
+                "title": "Estás a punto de crear tu organización",
+                "summary": {
+                    "subtitle": "Resumen del pedido",
+                    "account": {
+                        "label": "Creación de Cuenta de la Organización"
+                    },
+                    "verification": {
+                        "label": "Verificación de Identidad",
+                        "help": "Esto es una ayuda"
+                    },
+                    "membership": {
+                        "label": "Membresía",
+                        "help": "Esto es una ayuda",
+                        "users": "usuarios"
+                    },
+                    "subtotal": {
+                        "label": "Subtotal",
+                        "help": "Esto es una ayuda"
+                    },
+                    "total": {
+                        "label": "Total"
+                    },
+                    "disclaimer": "Pueden aplicarse algunas tarifas al realizar el pago",
+                    "fee": {
+                        "label": "Tarifa"
+                    },
+                    "rate": "Tasa"
+                },
+                "cta": {
+                    "next": "Pagar Ahora"
+                }
+            },
+            "payment": {
+                "label": "Pago",
+                "title": "Completa la información de pago",
+                "subtitle": "Método de Pago",
+                "methods": {
+                    "card": {
+                        "title": "Tarjeta de Crédito",
+                        "fee": "+{fee}%",
+                        "cta": "Añadir Nueva Tarjeta"
+                    },
+                    "paypal": {
+                        "title": "Paypal",
+                        "fee": "+{fee}%"
+                    },
+                    "pse": {
+                        "title": "PSE",
+                        "fee": "+{fee}%"
+                    },
+                    "kusama": {
+                        "title": "KSM",
+                        "fee": "Gratis"
+                    },
+                    "dot": {
+                        "title": "DOT",
+                        "fee": "Gratis"
+                    },
+                    "eth": {
+                        "title": "ETH/Polygon",
+                        "fee": "Gratis"
+                    }
                 }
             },
             "tips": {

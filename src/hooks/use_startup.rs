@@ -16,7 +16,8 @@ use super::{
     use_timestamp::{IsTimestampHandled, TimestampValue},
     use_tooltip::TooltipItem, use_withdraw::WithdrawForm,
 };
-const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
+// const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
+const SPACES_CLIENT_URL: &str = "http://localhost:8000";
 const MARKET_CLIENT_URL: &str = "https://sapi.coincarp.com/api/v1";
 
 pub fn use_startup() {

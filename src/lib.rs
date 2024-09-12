@@ -8,6 +8,7 @@ pub mod pages {
     pub mod login;
     pub mod not_found;
     pub mod onboarding;
+    pub mod payment;
     pub mod route;
     pub mod vote;
     pub mod withdraw;

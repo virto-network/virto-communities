@@ -7,6 +7,7 @@ use crate::{
     },
     hooks::use_onboard::{use_onboard, ManagementOptions},
 };
+
 #[component]
 pub fn OnboardingManagement() -> Element {
     let i18 = use_i18();

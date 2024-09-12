@@ -13,8 +13,7 @@ use crate::{
             Step, StepCard,
         },
         molecules::{InitiativeActions, InitiativeInfo},
-    },
-    hooks::{
+    }, hooks::{
         use_initiative::{
             use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
             InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov,
@@ -22,12 +21,10 @@ use crate::{
         use_notification::use_notification, use_our_navigator::use_our_navigator,
         use_session::use_session, use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
-    },
-    pages::onboarding::convert_to_jsvalue,
-    services::{
+    }, pages::payment::convert_to_jsvalue, services::{
         kreivo::{community_referenda::referendum_count, timestamp::now},
         kusama::system::number,
-    },
+    }
 };
 #[derive(Clone, Debug)]
 pub enum InitiativeStep {

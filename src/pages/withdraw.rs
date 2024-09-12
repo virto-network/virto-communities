@@ -16,8 +16,7 @@ use crate::{
         use_our_navigator::use_our_navigator,
         use_tooltip::{use_tooltip, TooltipItem},
         use_withdraw::use_withdraw,
-    },
-    pages::onboarding::convert_to_jsvalue,
+    }, pages::payment::convert_to_jsvalue,
 };
 use wasm_bindgen::prelude::*;
 

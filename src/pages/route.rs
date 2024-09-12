@@ -1,17 +1,19 @@
-use dioxus::prelude::*;
 use crate::{
     layouts::{authenticated::Authenticated, onboard::Onboard},
     pages::{
         account::Account, dashboard::Dashboard, explore::Explore, initiative::Initiative,
         initiatives::Initiatives, login::Login, not_found::PageNotFound, onboarding::Onboarding,
-        vote::Vote, withdraw::Withdraw
+        payment::Payment, vote::Vote, withdraw::Withdraw,
     },
 };
+use dioxus::prelude::*;
 #[derive(Clone, Routable, Debug, PartialEq)]
 #[rustfmt::skip]
 pub enum Route {
     #[route("/onboarding")]
     Onboarding {},
+    #[route("/payment")]
+    Payment {},
     #[route("/login")]
     Login {},
     #[layout(Authenticated)]

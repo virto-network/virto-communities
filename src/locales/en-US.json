@@ -336,19 +336,23 @@
                 "form": {
                     "membership": {
                         "title": "Membership",
-                        "description": "Any member can vote and take decisions."
+                        "description": "Any member can vote and take decisions.",
+                        "cost": "${cost} USD full seat/mo"
                     },
                     "rank": {
                         "title": "Membership-Rank",
-                        "description": "Members with specific roles can vote and take decisions."
+                        "description": "Members with specific roles can vote and take decisions.",
+                        "cost": "${cost} USD full seat/mo"
                     },
                     "native_token": {
                         "title": "Kusama Token",
-                        "description": "Any token holder can vote and take decisions."
+                        "description": "Any token holder can vote and take decisions.",
+                        "cost": "${cost} USD full seat/mo"
                     },
                     "own_token": {
                         "title": "Own Token (Advanced)",
-                        "description": "You configure the token and holders to vote or take decisions."
+                        "description": "You configure the token and holders to vote or take decisions.",
+                        "cost": "${cost} USD full seat/mo"
                     }
                 },
                 "cta": {
@@ -376,6 +380,72 @@
                 "cta": {
                     "back": "Back",
                     "next": "Pay"
+                }
+            },
+            "checkout": {
+                "label": "Checkout",
+                "title": "You’re about to create your organization",
+                "summary": {
+                    "subtitle": "Order summary",
+                    "account": {
+                        "label": "Organization Account Creation"
+                    },
+                    "verification": {
+                        "label": "Indentity Verification",
+                        "help": "This is a help"
+                    },
+                    "membership": {
+                        "label": "Membership",
+                        "help": "This is a help",
+                        "users": "users"
+                    },
+                    "subtotal": {
+                        "label": "Subtotal",
+                        "help": "This is a help"
+                    },
+                    "total": {
+                        "label": "Total"
+                    },
+                    "disclaimer": "Some fees may apply at checkout",
+                    "fee": {
+                        "label": "Fee"
+                    },
+                    "rate": "Rate"
+                },
+                "cta": {
+                    "next": "Pay Now"
+                }
+            },
+            "payment": {
+                "label": "Checkout",
+                "title": "Payment",
+                "subtitle": "Payment Method",
+                "methods": {
+                    "card": {
+                        "title": "Credit Card",
+                        "fee": "+{fee}%",
+                        "cta": "Add New Card"
+                    },
+                    "paypal": {
+                        "title": "Paypal",
+                        "fee": "+{fee}%"
+                    },
+                    "pse": {
+                        "title": "PSE",
+                        "fee": "+{fee}%"
+                    },
+                    "kusama": {
+                        "title": "KSM",
+                        "fee": "Free"
+                    },
+                    "dot": {
+                        "title": "DOT",
+                        "fee": "Free"
+                    },
+                    "eth": {
+                        "title": "ETH/Polygon",
+                        "fee": "Free"
+                    }
                 }
             },
             "tips": {
