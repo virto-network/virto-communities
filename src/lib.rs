@@ -27,6 +27,7 @@ pub mod hooks {
     pub mod use_connect_wallet;
     pub mod use_initiative;
     pub mod use_language;
+    pub mod use_location;
     pub mod use_market_client;
     pub mod use_notification;
     pub mod use_onboard;
