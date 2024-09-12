@@ -57,7 +57,7 @@ pub fn Explore() -> Element {
         on_handle_paginator.send(current_page());
     });
 
-    let storage_is_empty = get_cached_communities().len();
+    let cached_communities_len = get_cached_communities().len();
 
     let dynamic_one = translate!(i18, "dynamic_text.dynamic_one");
     let dynamic_two = translate!(i18, "dynamic_text.dynamic_two");
@@ -118,7 +118,7 @@ pub fn Explore() -> Element {
                 {
                     if (communities.is_loading)() {
                     rsx! {
-                        for _ in 0..storage_is_empty / 2 {
+                        for _ in 0..cached_communities_len / 2 {
                             CardSkeleton {}
                         }
                         CardSkeleton {}
