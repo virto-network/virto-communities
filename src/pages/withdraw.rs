@@ -38,8 +38,8 @@ pub enum WithdrawKreivoTabs {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenWithdraw)]
-    async fn topup_then_withdraw(dest: JsValue, amount: u64) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(catch, js_namespace = window, js_name = withdraw)]
+    async fn withdrawAction(dest: JsValue, amount: u64) -> Result<JsValue, JsValue>;
 }
 
 #[component]
@@ -307,7 +307,7 @@ pub fn Withdraw() -> Element {
                                                     String::from("Invalid amount to withdraw")
                                                 })?;
                                             let amount = (amount * 1_000_000_000_000.0) as u64;
-                                            topup_then_withdraw(destination_address, amount)
+                                            withdrawAction(destination_address, amount)
                                                 .await
                                                 .map_err(|e| {
                                                     log::warn!("Withdraw failed {:?}", e);
