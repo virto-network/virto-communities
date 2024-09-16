@@ -1726,6 +1726,7 @@ textarea::placeholder {
     align-items: center;
     gap: 12px;
     position: relative;
+    flex-direction: column;
 }
 
 .sidebar__item--uncomplete {
@@ -1752,8 +1753,17 @@ textarea::placeholder {
     border-radius: 0 8px 8px 0;
 }
 
-.sidebar__list>li>span {
-    display: none;
+.sidebar__action-label {
+    @extend %text-xs-font-regular;
+    width: 85px;
+    font-size: 0.875rem;
+    color: var(--color-green-100);
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.sidebar__item--active .sidebar__action-label {
+    color: var(--state-primary-active);
 }
 
 .textarea {
