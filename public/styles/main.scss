@@ -3440,7 +3440,7 @@ small.summary__item__value {
 
     .sidebar {
         width: 100%;
-        height: 80px;
+        height: 120px;
         position: fixed;
         bottom: 0;
     }
@@ -3454,7 +3454,7 @@ small.summary__item__value {
 
     .sidebar__list {
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
     }
 
     .sidebar__divider {
