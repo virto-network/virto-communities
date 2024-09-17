@@ -3443,18 +3443,24 @@ small.summary__item__value {
         height: 120px;
         position: fixed;
         bottom: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
     }
 
     .sidebar__container {
-        display: flex;
+        display: inline-flex;
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: flex-start;
         align-items: center;
     }
 
     .sidebar__list {
+        display: inline-flex;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
+        gap: 16px;
     }
 
     .sidebar__divider {
