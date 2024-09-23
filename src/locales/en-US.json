@@ -188,7 +188,11 @@
                 },
                 "actions": {
                     "label": "Actions",
+                    "add_members": {
+                        "title": "Add Members"
+                    },
                     "kusama_treasury": {
+                        "title": "Kusama Treasury Request",
                         "disclaimer": {
                             "period_1": "The delivery of resources from the treasury will be made instantly once the proposal is approved.",
                             "period_n": "\nImportant: The resources for the other periods will be delivered on the dates established for each one."
@@ -196,7 +200,18 @@
                         "error": "Must be greater than 0",
                         "placeholder": "Delivery date"
                     },
+                    "community_transfer": {
+                        "title": "Community Transfer",
+                        "dest": {
+                            "placeholder": "Recipient"
+                        },
+                        "amount": {
+                            "error": "Must be greater than 0",
+                            "placeholder": "Amount"
+                        }
+                    },
                     "voting_open_gov": {
+                        "title": "Voting Open Gov",
                         "poll_index": "Poll Index",
                         "standard": {
                             "title": "Standard",
