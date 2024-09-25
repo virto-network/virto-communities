@@ -141,24 +141,24 @@ pub fn Account() -> Element {
                                         }
                                         div { class: "account__balance__cta",
                                             Button {
-                                                class: "button--comming-soon",
                                                 text: translate!(i18, "account.tabs.wallet.balance.options.deposit"),
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
                                                 on_click: move |_| {
                                                     spawn(
                                                         async move {
-                
+                                                            nav.push(vec![
+                                                                Box::new(is_chain_available(i18, timestamp, notification))
+                                                            ], "/deposit");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
-                
+
                                                         })
                                                     );
                                                 },
                                                 status: None,
                                             }
                                             Button {
-                                                class: "",
                                                 text: translate!(i18, "account.tabs.wallet.balance.options.withdraw"),
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
@@ -168,7 +168,7 @@ pub fn Account() -> Element {
                                                             nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification))], "/withdraw");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
-                
+
                                                         })
                                                     );
                                                 },
@@ -203,7 +203,7 @@ pub fn Account() -> Element {
                                             }
                                         }
                                     }
-                
+
                                 }
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
@@ -218,7 +218,7 @@ pub fn Account() -> Element {
                                                     th { {translate!(i18, "account.tabs.wallet.assets.cost")} }
                                                     th { {translate!(i18, "account.tabs.wallet.assets.total")} }
                                                 }
-                
+
                                                 match *tab_value.read() {
                                                     AccountTabs::Kreivo => rsx!(
                                                         tr {
@@ -231,14 +231,14 @@ pub fn Account() -> Element {
                                                                 { format!("${} USD", if ksm_usd() == 0.0 || kreivo_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kreivo_balance()) } )}
                                                             }
                                                         }
-                
+
                                                         tr { class: "list__asset--comming-soon",
                                                             td { class: "list__name", "USDT" }
                                                             td { "-" }
                                                             td { "-" }
                                                             td { "-" }
                                                         }
-                
+
                                                         tr { class: "list__asset--comming-soon",
                                                             td { class: "list__name", "dUSD" }
                                                             td { "-" }
@@ -268,28 +268,28 @@ pub fn Account() -> Element {
                                             th { {translate!(i18, "account.tabs.transfers.table.quantity")} }
                                             th { {translate!(i18, "account.tabs.transfers.table.account")} }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
