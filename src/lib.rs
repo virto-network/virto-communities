@@ -2,6 +2,7 @@
 pub mod pages {
     pub mod account;
     pub mod dashboard;
+    pub mod deposit;
     pub mod explore;
     pub mod initiative;
     pub mod initiatives;
@@ -25,6 +26,7 @@ pub mod hooks {
     pub mod use_attach;
     pub mod use_communities;
     pub mod use_connect_wallet;
+    pub mod use_deposit;
     pub mod use_initiative;
     pub mod use_language;
     pub mod use_market_client;

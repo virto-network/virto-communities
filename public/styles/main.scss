@@ -1454,6 +1454,8 @@ $fw-bold: 700;
     border-radius: 12px;
     list-style: none;
     z-index: 10;
+    max-height: 30vh;
+    overflow: auto;
 }
 
 .dropdown--right .dropdown__list {
@@ -2374,6 +2376,21 @@ textarea::placeholder {
 
 .deposit {
     width: max-content;
+}
+
+.deposit__form__inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.deposit__row {
+    display: flex;
+    gap: 32px;
+}
+
+.summary .dropdown__label {
+    color: var(--text-secondary);
 }
 
 .balances {

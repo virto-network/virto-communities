@@ -4,7 +4,7 @@ use crate::{
     pages::{
         account::Account, dashboard::Dashboard, explore::Explore, initiative::Initiative,
         initiatives::Initiatives, login::Login, not_found::PageNotFound, onboarding::Onboarding,
-        vote::Vote, withdraw::Withdraw
+        vote::Vote, withdraw::Withdraw, deposit::Deposit
     },
 };
 #[derive(Clone, Routable, Debug, PartialEq)]
@@ -21,6 +21,8 @@ pub enum Route {
         Account {},
         #[route("/withdraw")]
         Withdraw {},
+        #[route("/deposit")]
+        Deposit {},
         #[layout(Onboard)]
             #[route("/explore")]
             Explore {},
