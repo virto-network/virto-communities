@@ -6,7 +6,7 @@ use crate::{
             dropdown::ElementSize, icon_button::Variant, AddPlus, Dropdown, Icon,
             IconButton, SubstractLine,
         },
-        molecules::{MembersAction, TreasuryAction, VotingAction},
+        molecules::{MembersAction, TransferAction, TreasuryAction, VotingAction},
     },
     hooks::use_initiative::{
         use_initiative, ActionItem, AddMembersAction, MediumOptions, MemberItem,
@@ -82,6 +82,14 @@ pub fn InitiativeActions() -> Element {
                                 ActionItem::VotingOpenGov(meta) =>  {
                                     rsx!(
                                         VotingAction {
+                                            index: index,
+                                            meta: meta.clone()
+                                        }
+                                    )
+                                }
+                                ActionItem::CommunityTransfer(meta) =>  {
+                                    rsx!(
+                                        TransferAction {
                                             index: index,
                                             meta: meta.clone()
                                         }

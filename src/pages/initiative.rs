@@ -1,26 +1,23 @@
 use std::str::FromStr;
 
-use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
-use wasm_bindgen::prelude::*;
 use crate::{
     components::{
         atoms::{
-            button::Variant, dropdown::ElementSize,
-            icon_button::Variant as IconButtonVariant, Arrow, Button, Icon, IconButton,
-            Step, StepCard,
+            button::Variant, dropdown::ElementSize, icon_button::Variant as IconButtonVariant,
+            Arrow, Button, Icon, IconButton, Step, StepCard,
         },
         molecules::{InitiativeActions, InitiativeInfo},
     },
     hooks::{
         use_initiative::{
             use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
-            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, VotingOpenGov,
+            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, TransferItem,
+            VotingOpenGov,
         },
-        use_notification::use_notification, use_our_navigator::use_our_navigator,
-        use_session::use_session, use_spaces_client::use_spaces_client,
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_session::use_session,
+        use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
     },
     pages::onboarding::convert_to_jsvalue,
@@ -29,6 +26,11 @@ use crate::{
         kusama::system::number,
     },
 };
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
+use futures_util::TryFutureExt;
+use wasm_bindgen::prelude::*;
 #[derive(Clone, Debug)]
 pub enum InitiativeStep {
     Info,
@@ -39,8 +41,8 @@ pub enum InitiativeStep {
 }
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenInitiativeSetup)]
-    pub async fn topup_then_initiative_setup(
+    #[wasm_bindgen(catch, js_namespace = window, js_name = initiativeSetup)]
+    pub async fn initiative_setup(
         community_id: u16,
         initiative_id: u16,
         room_id: JsValue,
@@ -49,6 +51,7 @@ extern "C" {
         membership_accounts_remove: JsValue,
         periods_treasury_request: JsValue,
         proposals_voting_open_gov: JsValue,
+        community_transfers: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
 const BLOCK_TIME_IN_SECONDS: i64 = 6;
@@ -305,6 +308,36 @@ pub fn Initiative(id: u16) -> Element {
                                     .map(|v| v.serialize_vote_type())
                                     .collect::<Vec<serde_json::Value>>();
                                 log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
+                                let community_transfer_action = initiative
+                                    .get_actions()
+                                    .into_iter()
+                                    .filter_map(|action| {
+                                        match action {
+                                            ActionItem::CommunityTransfer(community_transfer_action) => {
+                                                Some(
+                                                    community_transfer_action
+                                                        .transfers
+                                                        .clone()
+                                                        .into_iter()
+                                                        .filter_map(|transfer| {
+                                                            if transfer.value > 0 {
+                                                                Some(transfer)
+                                                            } else {
+                                                                None
+                                                            }
+                                                        })
+                                                        .collect::<Vec<TransferItem>>(),
+                                                )
+                                            }
+                                            _ => None,
+                                        }
+                                    })
+                                    .collect::<Vec<Vec<TransferItem>>>();
+                                let community_transfer_action = community_transfer_action
+                                    .into_iter()
+                                    .flat_map(|v| v.into_iter())
+                                    .collect::<Vec<TransferItem>>();
+                                log::info!("community_transfer_action {:?}", community_transfer_action);
                                 let votiong_open_gov_action = convert_to_jsvalue(
                                         &votiong_open_gov_action,
                                     )
@@ -312,6 +345,12 @@ pub fn Initiative(id: u16) -> Element {
                                         log::warn!("Malformed voting open gov");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
+                                let community_transfer_action = convert_to_jsvalue(
+                                    &community_transfer_action,
+                                ).map_err(|_| {
+                                    log::warn!("Malformed voting open gov");
+                                    translate!(i18, "errors.form.initiative_creation")
+                                })?;
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                     .map_err(|_| {
                                         log::warn!("Malformed membership accounts add");
@@ -339,7 +378,7 @@ pub fn Initiative(id: u16) -> Element {
                                         log::warn!("Malformed remark");
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
-                                topup_then_initiative_setup(
+                                initiative_setup(
                                         id,
                                         last_initiative,
                                         room_id,
@@ -348,6 +387,7 @@ pub fn Initiative(id: u16) -> Element {
                                         membership_accounts_remove,
                                         treasury_action,
                                         votiong_open_gov_action,
+                                        community_transfer_action
                                     )
                                     .await
                                     .map_err(|e| {
@@ -401,11 +441,8 @@ fn convert_treasury_to_period(
     current_date_millis: u64,
 ) -> KusamaTreasuryPeriod {
     if treasury.date != "" {
-        let future_block = calculate_future_block(
-            current_block,
-            current_date_millis,
-            &treasury.date,
-        );
+        let future_block =
+            calculate_future_block(current_block, current_date_millis, &treasury.date);
         KusamaTreasuryPeriod {
             blocks: Some(future_block as u64),
             amount: treasury.amount,

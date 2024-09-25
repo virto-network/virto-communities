@@ -1,12 +1,12 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::atoms::ActionRequest,
     hooks::use_initiative::{
-        ActionItem, AddMembersAction, ConvictionVote, KusamaTreasuryAction, VoteType,
-        VotingOpenGovAction,
+        ActionItem, AddMembersAction, CommunityTransferAction, ConvictionVote,
+        KusamaTreasuryAction, VoteType, VotingOpenGovAction,
     },
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 #[derive(PartialEq, Props, Clone)]
 pub struct ActionRequestListProps {
     actions: Vec<ActionItem>,
@@ -15,7 +15,7 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
     let i18 = use_i18();
     let render_add_members = |action: &AddMembersAction| {
         rsx!(
-            ActionRequest { name: "Add Members", details: action.members.len().to_string() }
+            ActionRequest { name: translate!(i18, "initiative.steps.actions.add_members.title"), details: action.members.len().to_string() }
             ul { class: "requests",
                 for member in action.members.iter() {
                     li {
@@ -27,7 +27,7 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
     };
     let render_kusama_treasury = |action: &KusamaTreasuryAction| {
         rsx!(
-            ActionRequest { name: "Kusama Treasury Request" }
+            ActionRequest { name: translate!(i18, "initiative.steps.actions.kusama_treasury.title") }
             ul { class: "requests",
                 for (index , period) in action.periods.iter().enumerate() {
                     li {
@@ -42,7 +42,7 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
     };
     let render_voting_open_gov = |action: &VotingOpenGovAction| {
         rsx!(
-            ActionRequest { name: "Voting Open Gov", details: action.proposals.len().to_string() }
+            ActionRequest { name: translate!(i18, "initiative.steps.actions.voting_open_gov.title"), details: action.proposals.len().to_string() }
             ul { class: "requests",
                 for proposal in action.proposals.iter() {
                     li {
@@ -70,13 +70,29 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
             }
         )
     };
+    let render_community_transfer = |action: &CommunityTransferAction| {
+        rsx!(
+            ActionRequest { name: translate!(i18, "initiative.steps.actions.community_transfer.title") }
+            ul { class: "requests",
+                for transfer in action.transfers.iter() {
+                    li {
+                        ActionRequest {
+                            name: format!("{}", transfer.account),
+                            details: format!("{} KSM", transfer.value as f64 / 1_000_000_000_000.0)
+                        }
+                    }
+                }
+            }
+        )
+    };
     rsx!(
         for request in props.actions.iter() {
             div { class: "requests",
                 match request {
                 ActionItem::AddMembers(action) => render_add_members(& action),
                 ActionItem::KusamaTreasury(action) => render_kusama_treasury(& action),
-                ActionItem::VotingOpenGov(action) => render_voting_open_gov(& action) }
+                ActionItem::VotingOpenGov(action) => render_voting_open_gov(& action) ,
+                ActionItem::CommunityTransfer(action) => render_community_transfer(& action) }
             }
         }
     )

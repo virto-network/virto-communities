@@ -1,6 +1,6 @@
+use crate::components::atoms::dropdown::DropdownItem;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::components::atoms::dropdown::DropdownItem;
 #[derive(Clone, Default, Deserialize, Serialize, Debug)]
 pub struct InfoForm {
     pub name: String,
@@ -154,43 +154,70 @@ impl VotingOpenGovAction {
         }
     }
 }
+#[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
+pub struct TransferItem {
+    pub account: String,
+    pub value: u64
+}
+pub type Transfers = Vec<TransferItem>;
+#[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
+pub struct CommunityTransferAction {
+    pub transfers: Transfers,
+}
+impl CommunityTransferAction {
+    pub fn add_transfer(&mut self, transfer: TransferItem) {
+        self.transfers.push(transfer);
+    }
+    pub fn update_transfer(&mut self, index: usize, transfer: TransferItem) {
+        if index < self.transfers.len() {
+            self.transfers[index] = transfer;
+        } else {
+            println!("Index out of bounds.");
+        }
+    }
+    pub fn remove_transfer(&mut self, index: usize) {
+        if index < self.transfers.len() {
+            self.transfers.remove(index);
+        } else {
+            println!("Index out of bounds.");
+        }
+    }
+}
 #[derive(PartialEq, Clone, Deserialize, Serialize, Debug)]
 #[serde(tag = "action_type")]
 pub enum ActionItem {
     AddMembers(AddMembersAction),
     KusamaTreasury(KusamaTreasuryAction),
     VotingOpenGov(VotingOpenGovAction),
+    CommunityTransfer(CommunityTransferAction),
 }
 impl ActionItem {
     pub fn option(&self) -> DropdownItem {
         match self {
-            ActionItem::AddMembers(_) => {
-                DropdownItem {
-                    key: "AddMembers".to_string(),
-                    value: "Add Members".to_string(),
-                }
-            }
-            ActionItem::KusamaTreasury(_) => {
-                DropdownItem {
-                    key: "KusamaTreasury".to_string(),
-                    value: "Kusama - Request treasury spend".to_string(),
-                }
-            }
-            ActionItem::VotingOpenGov(_) => {
-                DropdownItem {
-                    key: "VotingOpenGov".to_string(),
-                    value: "Kusama - Vote in OpenGov".to_string(),
-                }
-            }
+            ActionItem::AddMembers(_) => DropdownItem {
+                key: "AddMembers".to_string(),
+                value: "Add Members".to_string(),
+            },
+            ActionItem::KusamaTreasury(_) => DropdownItem {
+                key: "KusamaTreasury".to_string(),
+                value: "Kusama - Request treasury spend".to_string(),
+            },
+            ActionItem::VotingOpenGov(_) => DropdownItem {
+                key: "VotingOpenGov".to_string(),
+                value: "Kusama - Vote in OpenGov".to_string(),
+            },
+            ActionItem::CommunityTransfer(_) => DropdownItem {
+                key: "CommunityTransfer".to_string(),
+                value: "Community Transfer".to_string(),
+            },
         }
     }
     fn to_option(option: String) -> ActionItem {
         match &*option {
             "AddMembers" => ActionItem::AddMembers(AddMembersAction::default()),
-            "KusamaTreasury" => {
-                ActionItem::KusamaTreasury(KusamaTreasuryAction::default())
-            }
+            "KusamaTreasury" => ActionItem::KusamaTreasury(KusamaTreasuryAction::default()),
             "VotingOpenGov" => ActionItem::VotingOpenGov(VotingOpenGovAction::default()),
+            "CommunityTransfer" => ActionItem::CommunityTransfer(CommunityTransferAction::default()),
             _ => todo!(),
         }
     }
@@ -199,6 +226,7 @@ impl ActionItem {
             ActionItem::AddMembers(AddMembersAction::default()).option(),
             ActionItem::KusamaTreasury(KusamaTreasuryAction::default()).option(),
             ActionItem::VotingOpenGov(VotingOpenGovAction::default()).option(),
+            ActionItem::CommunityTransfer(CommunityTransferAction::default()).option(),
         ]
     }
 }
@@ -262,7 +290,7 @@ pub fn use_initiative() -> UseInitiativeState {
     let actions = consume_context::<Signal<ActionsForm>>();
     let settings = consume_context::<Signal<SettingsForm>>();
     let confirmation = consume_context::<Signal<ConfirmationForm>>();
-    let mut is_loading = use_signal(|| false);
+    let is_loading = use_signal(|| false);
     use_hook(|| UseInitiativeState {
         inner: UseInitiativeInner {
             info,

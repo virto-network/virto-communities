@@ -278,6 +278,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                             ActionItem::AddMembers(action) => action.members.len(),
                                                             ActionItem::KusamaTreasury(action) => action.periods.len(),
                                                             ActionItem::VotingOpenGov(action) => action.proposals.len(),
+                                                            ActionItem::CommunityTransfer(action) => action.transfers.len()
                                                         }
                                                     })
                                                     .sum::<usize>()
