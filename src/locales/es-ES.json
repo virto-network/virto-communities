@@ -183,7 +183,11 @@
                 },
                 "actions": {
                     "label": "Acciones",
+                    "add_members": {
+                        "title": "Agregar Miembros"
+                    },
                     "kusama_treasury": {
+                        "title": "Solicitud Tesoro de Kusama",
                         "disclaimer": {
                             "period_1": "La entrega de recursos por parte del tesoro se realizará instantáneamente, una vez la propuesta sea aprobada.",
                             "period_n": "\nImportante: Los recursos de los demás periodos serán entregados en las fechas establecidas para cada uno."
@@ -191,7 +195,18 @@
                         "error": "Debe ser mayor a 0",
                         "placeholder": "Fecha de entrega"
                     },
+                    "community_transfer": {
+                        "title": "Transferencia Comunitaria",
+                        "dest": {
+                            "placeholder": "Destinatario"
+                        },
+                        "amount": {
+                            "error": "Debe ser mayor a 0",
+                            "placeholder": "Cantidad"
+                        }
+                    },
                     "voting_open_gov": {
+                        "title": "Voto en Open Gov",
                         "poll_index": "Número de la propuesta",
                         "standard": {
                             "title": "Standard",
