@@ -32,7 +32,7 @@ use crate::{
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(catch, js_namespace = window, js_name = topupThenInitiativeVote)]
+    #[wasm_bindgen(catch, js_namespace = window, js_name = initiativeVote)]
     async fn topup_then_initiative_vote(
         membershipId: u16,
         pollIndex: u16,
