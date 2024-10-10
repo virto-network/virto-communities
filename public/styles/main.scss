@@ -819,6 +819,7 @@ $fw-bold: 700;
     width: 60px;
     padding: 0;
     transition: background-color 0.2s ease-in;
+
     &:hover {
         background-color: var(--fill-600);
     }
@@ -849,7 +850,6 @@ $fw-bold: 700;
     min-width: fit-content !important;
     display: inline-block;
 }
-
 
 .button--comming-soon {
     opacity: .7;
@@ -1382,11 +1382,15 @@ $fw-bold: 700;
 
 .button--disabled,
 .dropdown--disabled {
-    background: var(--background-disabled);
-    color: var(--text-disabled);
     border: 0;
     box-shadow: none;
     cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.dropdown--disabled {
+    background: var(--background-disabled);
+    color: var(--text-disabled);
 }
 
 .dropdown {
@@ -2626,20 +2630,19 @@ textarea::placeholder {
     background: var(--fill-00);
 }
 
-.dashboard__footer__pagination {
+.paginator {
     display: flex;
     gap: 16px;
     align-items: center;
-    opacity: 0.3;
 }
 
-.dashboard__footer__paginators {
+.paginator__jumpers {
     display: flex;
     gap: 8px;
     align-items: center;
 }
 
-.dashboard__footer__paginator {
+.paginator__range {
     @extend %text-xs-font-regular;
     color: var(--text-primary);
 }

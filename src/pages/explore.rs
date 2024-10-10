@@ -5,7 +5,7 @@ use crate::{
             ArrowRight, Avatar, Badge, CardSkeleton, DynamicText, Icon, IconButton, SearchInput,
             Star, Tab, UserAdd, UserGroup,
         },
-        molecules::tabs::TabItem,
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
 
@@ -259,31 +259,11 @@ pub fn Explore() -> Element {
                 }
             }
             div { class: "dashboard__footer grid-footer",
-                div { class: "dashboard__footer__pagination",
-                    span { class: "dashboard__footer__paginator",
-                        {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: (((communities.get_communities().len() as f64 + 1f64) / SKIP as f64) as f64).ceil())}
-                    }
-                    div { class: "dashboard__footer__paginators",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(Icon { icon : ArrowLeft, height : 24, width : 24, fill : "var(--white)" }),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current - 1);
-                                on_handle_paginator.send(current_page())
-                            }
-                        }
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Small,
-                            body: rsx!(Icon { icon : ArrowRight, height : 24, width : 24, fill : "var(--white)" }),
-                            on_click: move |_| {
-                                let current = current_page();
-                                current_page.set(current + 1);
-                                on_handle_paginator.send(current_page())
-                            }
-                        }
+                Paginator {
+                    to: (communities.get_communities().len() + SKIP - 1 ).saturating_div(SKIP).max(1),
+                    on_change: move |event: PaginatorValue| {
+                        current_page.set(event.value());
+                        on_handle_paginator.send(current_page())
                     }
                 }
             }
