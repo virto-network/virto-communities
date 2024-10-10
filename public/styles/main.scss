@@ -302,11 +302,11 @@ $fw-bold: 700;
         "sidebar header"
         "sidebar main"
         "sidebar footer";
+    grid-template-columns: auto 1fr;
     grid-template-rows: 90px auto auto;
     width: 100%;
     max-width: 100vw;
     min-height: 100vh;
-
 }
 
 .grid-header {
@@ -696,6 +696,7 @@ $fw-bold: 700;
 .tooltip {
     border: 1px solid rgba(0, 0, 0, 0);
     width: 30%;
+    height: fit-content;
     padding: var(--size-1);
     text-align: left;
     position: fixed;
@@ -1457,6 +1458,8 @@ $fw-bold: 700;
     border-radius: 12px;
     list-style: none;
     z-index: 10;
+    max-height: 30vh;
+    overflow: auto;
 }
 
 .dropdown--right .dropdown__list {
@@ -2377,6 +2380,21 @@ textarea::placeholder {
 
 .deposit {
     width: max-content;
+}
+
+.deposit__form__inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.deposit__row {
+    display: flex;
+    gap: 32px;
+}
+
+.summary .dropdown__label {
+    color: var(--text-secondary);
 }
 
 .balances {
@@ -3583,5 +3601,21 @@ small.summary__item__value {
     5%, 28.33% {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+.card--skeleton {
+    animation: loadingBackground 1.5s infinite;
+}
+
+@keyframes loadingBackground {
+    0% {
+        background-color: var(--fill-100);
+    }
+    50% {
+        background-color: var(--fill-50);
+    }
+    100% {
+        background-color: var(--fill-100);
     }
 }

@@ -9,6 +9,7 @@ use super::{
     use_accounts::{Account, IsDaoOwner},
     use_attach::AttachFile,
     use_communities::Communities,
+    use_deposit::DepositForm,
     use_initiative::{ActionsForm, ConfirmationForm, InfoForm, SettingsForm},
     use_notification::NotificationItem,
     use_onboard::{BasicsForm, InvitationForm, ManagementForm},
@@ -57,6 +58,7 @@ pub fn use_startup() {
     use_context_provider::<Signal<IsTimestampHandled>>(|| Signal::new(IsTimestampHandled(false)));
 
     use_context_provider::<Signal<WithdrawForm>>(|| Signal::new(WithdrawForm::default()));
+    use_context_provider::<Signal<DepositForm>>(|| Signal::new(DepositForm::default()));
 
     // Clients
 

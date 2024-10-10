@@ -24,6 +24,7 @@ pub fn use_communities() -> UseCommunitiesState {
 
     let mut communities = consume_context::<Signal<Communities>>();
     let community = consume_context::<Signal<Community>>();
+    let mut is_loading = use_signal(|| false);
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         tooltip.handle_tooltip(TooltipItem {
@@ -32,9 +33,12 @@ pub fn use_communities() -> UseCommunitiesState {
             show: true,
         });
 
-        let cached_communitites = get_cached_communities();
+        let cached_communities = get_cached_communities();
+        communities.set(cached_communities.clone());
 
-        communities.set(cached_communitites);
+        if cached_communities.len() == 0 {
+            is_loading.set(true);
+        }
 
         let public_address = session
             .get()
@@ -55,6 +59,7 @@ pub fn use_communities() -> UseCommunitiesState {
             log::warn!("error here by member");
             notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
             tooltip.hide();
+            is_loading.set(false);
             return;
         };
 
@@ -93,28 +98,29 @@ pub fn use_communities() -> UseCommunitiesState {
 
         communities.set(community_tracks.clone());
 
-        let Ok(cached_communitites) = serde_json::to_string(&community_tracks) else {
-            return;
-        };
-
-        if let Err(_) =
-            <LocalStorage as gloo::storage::Storage>::set("communities", cached_communitites)
-        {
-            log::warn!("Failed to persist communities");
-        };
+        if let Ok(cached_communities) = serde_json::to_string(&community_tracks) {
+            if let Err(e) =
+                <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities)
+            {
+                log::warn!("Failed to persist communities: {:?}", e);
+            }
+        }
 
         tooltip.hide();
+        is_loading.set(false);
     });
 
     use_hook(|| UseCommunitiesState {
         communities,
         community,
+        is_loading,
     })
 }
 #[derive(Clone, Copy)]
 pub struct UseCommunitiesState {
     communities: Signal<Communities>,
     community: Signal<Community>,
+    pub is_loading: Signal<bool>,
 }
 
 pub enum CommunitiesError {
@@ -134,6 +140,10 @@ impl UseCommunitiesState {
         filter_by_name: Option<&str>,
         filter_by_pagination: Option<(usize, usize)>,
     ) -> Vec<Community> {
+        if self.is_loading.read().clone() {
+            return vec![];
+        }
+
         let communities = self.communities.read().clone();
 
         let communities = communities
@@ -221,12 +231,12 @@ impl UseCommunitiesState {
 
         self.communities.write()[position].favorite = is_favorite;
 
-        let Ok(cached_communitites) = serde_json::to_string(&*self.communities.read()) else {
+        let Ok(cached_communities) = serde_json::to_string(&*self.communities.read()) else {
             return Err(CommunitiesError::FailedUpdatingFavorites);
         };
 
         if let Err(_) =
-            <LocalStorage as gloo::storage::Storage>::set("communities", cached_communitites)
+            <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities)
         {
             log::warn!("Failed to persist communities");
         };
@@ -258,7 +268,7 @@ fn get_favorite_communities() -> Vec<u16> {
     favorite_communities
 }
 
-fn get_cached_communities() -> Vec<Community> {
+pub fn get_cached_communities() -> Vec<Community> {
     let communities: Result<String, StorageError> =
         <LocalStorage as gloo::storage::Storage>::get("communities");
 

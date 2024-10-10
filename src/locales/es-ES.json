@@ -131,6 +131,70 @@
                 }
             }
         },
+        "deposit": {
+            "tabs": {
+                "accounts": "Mis cuentas",
+                "others": "Otras cuentas",
+                "communities": "Comunidades"
+            },
+            "form": {
+                "title": "Dirección de Depósito",
+                "account": {
+                    "label": "Cuenta"
+                },
+                "address": {
+                    "label": "Dirección"
+                },
+                "community": {
+                    "label": "Comunidad"
+                },
+                "amount": {
+                    "label": "Cantidad",
+                    "placeholder": "Cantidad"
+                },
+                "cta": {
+                    "continue": "Confirmar depósito"
+                }
+            },
+            "payment": {
+                "label": "Depósito",
+                "title": "Completa la información de depósito",
+                "subtitle": "Método",
+                "methods": {
+                    "card": {
+                        "title": "Tarjeta de Crédito",
+                        "fee": "+{fee}%",
+                        "cta": "Añadir Nueva Tarjeta"
+                    },
+                    "paypal": {
+                        "title": "Paypal",
+                        "fee": "+{fee}%"
+                    },
+                    "pse": {
+                        "title": "PSE",
+                        "fee": "+{fee}%"
+                    },
+                    "kusama": {
+                        "title": "Kusama",
+                        "fee": "Gratis"
+                    },
+                    "eth": {
+                        "title": "ETH/Polygon",
+                        "fee": "Gratis"
+                    }
+                }
+            },
+            "tips": {
+                "loading": {
+                    "title": "El depósito está en proceso",
+                    "description": "Esto puede tardar un momento"
+                },
+                "created": {
+                    "title": "¡Excelente! 🚀",
+                    "description": "Tu depósito ha sido exitoso"
+                }
+            }
+        },
         "dao": {
             "tabs": {
                 "all": "Iniciativas",
@@ -183,7 +247,11 @@
                 },
                 "actions": {
                     "label": "Acciones",
+                    "add_members": {
+                        "title": "Agregar Miembros"
+                    },
                     "kusama_treasury": {
+                        "title": "Solicitud Tesoro de Kusama",
                         "disclaimer": {
                             "period_1": "La entrega de recursos por parte del tesoro se realizará instantáneamente, una vez la propuesta sea aprobada.",
                             "period_n": "\nImportante: Los recursos de los demás periodos serán entregados en las fechas establecidas para cada uno."
@@ -191,7 +259,18 @@
                         "error": "Debe ser mayor a 0",
                         "placeholder": "Fecha de entrega"
                     },
+                    "community_transfer": {
+                        "title": "Transferencia Comunitaria",
+                        "dest": {
+                            "placeholder": "Destinatario"
+                        },
+                        "amount": {
+                            "error": "Debe ser mayor a 0",
+                            "placeholder": "Cantidad"
+                        }
+                    },
                     "voting_open_gov": {
+                        "title": "Voto en Open Gov",
                         "poll_index": "Número de la propuesta",
                         "standard": {
                             "title": "Standard",
@@ -449,7 +528,10 @@
                 "not_empty": "¡Ups! ✋ Este campo no puede estar vacio.",
                 "upload_fail": "¡Ups! ✋ No se pudo subir el archivo. Por favor, inténtalo de nuevo.",
                 "community_creation": "¡Ups! ✋ No logramos crear tu comunidad. Por favor, verifica e inténtalo de nuevo.",
-                "initiative_creation": "¡Ups! ✋ No logramos crear tu iniciativa. Por favor, inténtalo de nuevo."
+                "initiative_creation": "¡Ups! ✋ No logramos crear tu iniciativa. Por favor, inténtalo de nuevo.",
+                "invalid_amount": "¡Ups! ✋ Este campo de cantidad es inválido",
+                "invalid_address": "¡Ups! ✋ Esta dirección es inválida",
+                "deposit_failed": "¡Ups! ✋ No pudimos realizar este depósito. Por favor, inténtalo de nuevo."
             },
             "market": {
                 "query_failed": "No se pudo consultar el precio"
