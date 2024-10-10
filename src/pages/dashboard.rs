@@ -54,7 +54,7 @@ pub fn Dashboard() -> Element {
     let mut search_word = use_signal::<String>(|| String::new());
     let tab_items = vec![TabItem {
         k: String::from("all"),
-        value: translate!(i18, "dashboard.tabs.all"),
+        value: translate!(i18, "dashboard.tabs.owned"),
     }];
     let tab_value = use_signal::<String>(|| String::from("all"));
 

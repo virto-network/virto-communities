@@ -52,7 +52,8 @@
             }
         },
         "sidebar": {
-            "cta": "Add community"
+            "explore": "Explore",
+            "dashboard": "My Communities"
         },
         "header": {
             "cta": {
