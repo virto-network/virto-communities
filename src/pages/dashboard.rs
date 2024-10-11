@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus,
             ArrowRight, Avatar, Badge, CardSkeleton, Compass, DynamicText, Icon, IconButton, SearchInput, Star,
             Tab, UserAdd, UserGroup,
         },

@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 use gloo::storage::{LocalStorage, Storage};
-use wasm_bindgen_futures::spawn_local;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Location {

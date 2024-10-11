@@ -1,7 +1,7 @@
 use crate::{
     components::{
         atoms::{
-            dropdown::ElementSize, AddPlus, ArrowLeft, ArrowRight, Badge, CircleCheck,
+            dropdown::ElementSize, AddPlus, ArrowRight, Badge, CircleCheck,
             Icon, IconButton, SearchInput, StopSign, Tab, CardSkeleton,
         },
         molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
