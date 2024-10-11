@@ -1,7 +1,7 @@
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus,
             ArrowRight, Avatar, Badge, CardSkeleton, DynamicText, Icon, IconButton, SearchInput,
             Star, Tab, UserAdd, UserGroup,
         },
