@@ -38,6 +38,8 @@ pub fn use_communities() -> UseCommunitiesState {
 
         if cached_communities.len() == 0 {
             is_loading.set(true);
+        } else {
+            tooltip.hide();
         }
 
         let public_address = session
