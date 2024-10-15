@@ -57,7 +57,7 @@
         "header": {
             "cta": {
                 "connect": "Conectar",
-                "account": "Selecciona..."
+                "account": "Selecciona"
             },
             "menu": {
                 "invitations": "Invitaciones",
@@ -228,7 +228,7 @@
             "title": "Crear iniciativa",
             "steps": {
                 "info": {
-                    "label": "Información",
+                    "label": "Información básica de tu iniciativa",
                     "name": {
                         "label": "Nombre",
                         "description": "Asegúrate de introducir un nombre claro y conciso para tu iniciativa",
@@ -246,7 +246,7 @@
                     }
                 },
                 "actions": {
-                    "label": "Acciones",
+                    "label": "Modalidad de votación para tu Iniciativa",
                     "add_members": {
                         "title": "Agregar Miembros"
                     },
