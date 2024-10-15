@@ -1469,6 +1469,10 @@ $fw-bold: 700;
 
 .dropdown__item {
     text-align: left;
+    border-bottom: 2px solid #4BAA54;
+    &:hover {
+        background: var(--fill-200);
+    }
 }
 
 .dropdown__item * {
