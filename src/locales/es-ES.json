@@ -246,7 +246,7 @@
                     }
                 },
                 "actions": {
-                    "label": "Modalidad de votación para tu Iniciativa",
+                    "label": "Configuración de ejecución de iniciativa",
                     "add_members": {
                         "title": "Agregar Miembros"
                     },

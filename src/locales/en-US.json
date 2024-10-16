@@ -251,7 +251,7 @@
                     }
                 },
                 "actions": {
-                    "label": "Voting System for Your Initiative",
+                    "label": "Initiative execution setup",
                     "add_members": {
                         "title": "Add Members"
                     },
