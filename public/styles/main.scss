@@ -331,7 +331,6 @@ $fw-bold: 700;
     background: var(--white);
     display: flex;
     width: 100vw;
-    height: 100vh;
 }
 
 .page--vote,
@@ -353,6 +352,7 @@ $fw-bold: 700;
 
 .onboarding__form {
     padding: 64px;
+    height: auto;
     max-width: 50%;
     display: flex;
     flex-direction: column;
@@ -1469,6 +1469,10 @@ $fw-bold: 700;
 
 .dropdown__item {
     text-align: left;
+    border-bottom: 2px solid #4BAA54;
+    &:hover {
+        background: var(--fill-200);
+    }
 }
 
 .dropdown__item * {

@@ -57,7 +57,7 @@
         "header": {
             "cta": {
                 "connect": "Connect",
-                "account": "Select..."
+                "account": "Select"
             },
             "menu": {
                 "invitations": "Invitations",
@@ -233,7 +233,7 @@
             "title": "Create an impactful initiative",
             "steps": {
                 "info": {
-                    "label": "Info",
+                    "label": "Basic Information of Your Initiative",
                     "name": {
                         "label": "Name",
                         "description": "Make sure to enter a clear and concise name for your initiative",
@@ -251,7 +251,7 @@
                     }
                 },
                 "actions": {
-                    "label": "Actions",
+                    "label": "Initiative execution setup",
                     "add_members": {
                         "title": "Add Members"
                     },
