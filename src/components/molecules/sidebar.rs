@@ -59,9 +59,7 @@ pub fn Sidebar() -> Element {
                                         nav.push(vec![], "/account")
                                     }
                                 }
-                                span {
-                                    "{account.name()}"
-                                },
+                                span { class: "sidebar__action-label", "{account.name()}" }
                             }
                         ),
                         None => rsx!(
@@ -84,9 +82,7 @@ pub fn Sidebar() -> Element {
                                         nav.push(vec![], "/login");
                                     }
                                 }
-                                span {
-                                    {translate!(i18, "sidebar.cta")}
-                                }
+                                span { class: "sidebar__action-label", {translate!(i18, "sidebar.dashboard")} }
                             }
                         ),
                     },
@@ -103,7 +99,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/");
                             }
                         }
-                        span { {translate!(i18, "sidebar.cta")} }
+                        span { class: "sidebar__action-label", {translate!(i18, "sidebar.dashboard")} }
                     }
                     li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
@@ -119,7 +115,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/explore");
                             }
                         }
-                        span { {translate!(i18, "sidebar.cta")} }
+                        span { class: "sidebar__action-label", {translate!(i18, "sidebar.explore")} }
                     }
                     hr { class: "sidebar__divider" }
 
@@ -159,9 +155,7 @@ pub fn Sidebar() -> Element {
                                         ),
                                         on_click: move |_| { }
                                     }
-                                    span {
-                                        "{community.name}"
-                                    },
+                                    span { class: "sidebar__action-label", "{community.name}" }
                                 }
                             )
                         }
