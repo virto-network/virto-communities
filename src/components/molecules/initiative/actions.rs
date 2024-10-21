@@ -115,7 +115,9 @@ pub fn InitiativeActions() -> Element {
                         variant: Variant::Round,
                         size: ElementSize::Small,
                         class: "button--action",
-                        body: rsx!(Icon { icon : AddPlus, height : 24, width : 24, fill : "var(--fill-00)" }),
+                        body: rsx! {
+                            Icon { icon: AddPlus, height: 24, width: 24, fill: "var(--fill-00)" }
+                        },
                         on_click: move |_| {
                             initiative
                                 .push_action(

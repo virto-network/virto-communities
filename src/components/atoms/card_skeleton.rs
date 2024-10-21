@@ -4,8 +4,7 @@ use dioxus::prelude::*;
 pub fn CardSkeleton() -> Element {
     rsx!(
         section { class: "card card--skeleton",
-            div { class: "card__container",
-            }
+            div { class: "card__container" }
         }
     )
 }

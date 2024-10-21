@@ -81,7 +81,9 @@ pub fn Markdown(props: MarkdownProps) -> Element {
     });
     rsx!(
         div { class: "markdown",
-            div { class: "markdown__wrapper", class: if !is_markdown_visible() { "hide" } else { "markdown__wrapper--editor" },
+            div {
+                class: "markdown__wrapper",
+                class: if !is_markdown_visible() { "hide" } else { "markdown__wrapper--editor" },
                 div { id: props.toolbar_id }
                 div { id: props.editor_id }
             }

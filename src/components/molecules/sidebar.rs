@@ -25,10 +25,15 @@ pub fn Sidebar() -> Element {
         section { class: "sidebar", class: if is_active() { "sidebar--active" },
             IconButton {
                 class: "button--hamburguer",
-                body: rsx!(
-                    Icon { icon : Hamburguer, height : 30, width : 30, stroke_width : 2, stroke :
-                    "var(--text-1)" }
-                ),
+                body: rsx! {
+                    Icon {
+                        icon: Hamburguer,
+                        height: 30,
+                        width: 30,
+                        stroke_width: 2,
+                        stroke: "var(--text-1)"
+                    }
+                },
                 on_click: move |_| {
                     is_active.toggle();
                 }
@@ -95,10 +100,9 @@ pub fn Sidebar() -> Element {
                             class: "button--icon bg--state-primary-active",
                             size: ElementSize::Big,
                             variant: icon_button::Variant::Round,
-                            body: rsx!(
-                                Icon { icon : Home, height : 32, width : 32, stroke_width : 1, fill :
-                                "var(--fill-00)" }
-                            ),
+                            body: rsx! {
+                                Icon { icon: Home, height: 32, width: 32, stroke_width: 1, fill: "var(--fill-00)" }
+                            },
                             on_click: move |_| {
                                 nav.push(vec![], "/");
                             }
@@ -110,10 +114,15 @@ pub fn Sidebar() -> Element {
                             class: "button--icon bg--state-primary-active",
                             size: ElementSize::Big,
                             variant: icon_button::Variant::Round,
-                            body: rsx!(
-                                Icon { icon : Compass, height : 32, width : 32, stroke_width : 1.5, fill :
-                                "var(--fill-00)" }
-                            ),
+                            body: rsx! {
+                                Icon {
+                                    icon: Compass,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1.5,
+                                    fill: "var(--fill-00)"
+                                }
+                            },
                             on_click: move |_| {
                                 tooltip.hide();
                                 nav.push(vec![], "/explore");

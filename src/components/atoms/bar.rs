@@ -26,13 +26,20 @@ pub fn Bar(props: BarProps) -> Element {
     rsx!(
         section {
             div { class: "bar {variant}",
-                span { class: "bar__content bar__content--left", style: format!("width: {}%", props.left_value),
+                span {
+                    class: "bar__content bar__content--left",
+                    style: format!("width: {}%", props.left_value),
                     p { class: "votes-counter__title", {props.left_helper} }
                 }
                 if let Some(value) = props.center_value {
-                    span { class: "bar__content__threshold", style: format!("left: {}%", value) }
+                    span {
+                        class: "bar__content__threshold",
+                        style: format!("left: {}%", value)
+                    }
                 }
-                span { class: "bar__content bar__content--right", style: format!("width: {}%", props.right_value),
+                span {
+                    class: "bar__content bar__content--right",
+                    style: format!("width: {}%", props.right_value),
                     p { class: "votes-counter__title", {props.right_helper} }
                 }
             }
