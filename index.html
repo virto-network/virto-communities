@@ -236,7 +236,7 @@
     };
 
     init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(
-      async (wasm) => {   
+      async (wasm) => {
         if (wasm.__wbindgen_start == undefined) {
           wasm.main();
         }
@@ -245,10 +245,10 @@
   </script>
   <script src="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.js"></script>
   <script type="text/javascript">
-    function initMarkdownEditor() {
-      let tinyMDE = new TinyMDE.Editor({ element: document.getElementById("editor") });
+    function initMarkdownEditor(editor, toolbar) {
+      let tinyMDE = new TinyMDE.Editor({ element: document.getElementById(editor) });
       let commandBar = new TinyMDE.CommandBar({
-        element: document.getElementById("toolbar"),
+        element: document.getElementById(toolbar),
         editor: tinyMDE,
       });
 

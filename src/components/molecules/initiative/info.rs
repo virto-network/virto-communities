@@ -74,6 +74,8 @@ pub fn InitiativeInfo(error: bool) -> Element {
                 }
                 Markdown {
                     content: initiative.get_info().description,
+                    toolbar_id: "info-toolbar".to_string(),
+                    editor_id: "info-editor".to_string(),
                     on_input: move |event: MarkdownEvent| {
                         initiative.info_mut().with_mut(|info| info.description = event.value);
                     }
