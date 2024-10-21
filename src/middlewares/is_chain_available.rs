@@ -3,7 +3,7 @@ use web_sys::js_sys::Date;
 
 use crate::hooks::{use_notification::UseNotificationState, use_timestamp::UseTimestampState};
 
-const THRESHOLD: u64 = 1000 * 60;
+const THRESHOLD: u64 = 1000 * 60 * 10;
 pub fn is_chain_available(
     i18: UseI18,
     timestamp: UseTimestampState,
