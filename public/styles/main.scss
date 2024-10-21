@@ -237,6 +237,7 @@ $fw-bold: 700;
 
 .bg--state-primary-active {
     background: var(--state-primary-active) !important;
+
     &:hover {
         background-color: var(--fill-400) !important;
     }
@@ -580,6 +581,7 @@ $fw-bold: 700;
     background: var(--fill-50);
 }
 
+.form__inputs--initiative .TinyMDE,
 .form__inputs--initiative .input-wrapper {
     background: var(--fill-00);
 }
@@ -771,6 +773,7 @@ $fw-bold: 700;
     border: none;
     color: var(--fill-00);
     background: var(--state-primary-active);
+
     &:hover {
         background-color: var(--fill-400);
     }
@@ -780,6 +783,7 @@ $fw-bold: 700;
     border: none;
     color: var(--text-loud);
     background: var(--fill-100);
+
     &:hover {
         background-color: var(--fill-200);
     }
@@ -1266,13 +1270,13 @@ $fw-bold: 700;
     background: var(--fill-00);
     border: none;
     box-shadow: 0px 0.5px 0px 0px rgba(26, 26, 26, .08), 0px 1px 3px 0px rgba(26, 26, 26, .08);
+
     &:focus-within {
         outline: 3px solid var(--state-primary-active);
     }
 }
 
 .markdown__wrapper--editor .TinyMDE {
-    background: transparent;
     color: var(--text-primary);
 }
 
@@ -1470,6 +1474,7 @@ $fw-bold: 700;
 .dropdown__item {
     text-align: left;
     border-bottom: 2px solid #4BAA54;
+
     &:hover {
         background: var(--fill-200);
     }
@@ -1530,6 +1535,10 @@ $fw-bold: 700;
     height: var(--element-size-small);
 }
 
+.TinyMDE {
+    height: var(--element-size-medium);
+}
+
 .tab--small {
     padding: 0 16px;
 }
@@ -1582,6 +1591,7 @@ textarea::placeholder {
     color: var(--text-secondary);
 }
 
+.TinyMDE,
 .input-wrapper {
     width: 100%;
     min-width: 220px;
@@ -1593,6 +1603,7 @@ textarea::placeholder {
     background: var(--fill-00);
     border: none;
     box-shadow: 0px 0.5px var(--Blur-blur-0, 0px) 0px var(--Colors-alpha-dark-50, rgba(26, 26, 26, 0.08)), 0px 1px var(--Blur-blur-2, 3px) 0px rgba(26, 26, 26, 0.08);
+
     &:focus-within {
         border: 3px solid var(--state-primary-active);
     }
@@ -1749,6 +1760,7 @@ textarea::placeholder {
     gap: 4px;
     width: 100%;
     border-radius: 12px;
+
     &:focus-within {
         outline: 3px solid var(--state-primary-active);
     }
@@ -1921,7 +1933,7 @@ textarea::placeholder {
     height: fit-content;
 }
 
-.checkbox-card > .checkbox-card__header {
+.checkbox-card>.checkbox-card__header {
     display: flex;
     width: 100%;
     gap: 8px;
@@ -2662,7 +2674,8 @@ textarea::placeholder {
     right: 16px;
 }
 
-.wallet, .transfers {
+.wallet,
+.transfers {
     max-height: 100vh;
     width: 100%;
     display: flex;
@@ -3032,7 +3045,7 @@ small.summary__item__value {
     width: 100%;
 }
 
-.widthdraw__data > * {
+.widthdraw__data>* {
     width: 100%;
 }
 
@@ -3570,7 +3583,7 @@ small.summary__item__value {
     width: auto;
     min-width: 150px;
     height: 1.62em;
-    vertical-align:bottom;
+    vertical-align: bottom;
     overflow: hidden;
     text-align: start;
 }
@@ -3590,19 +3603,25 @@ small.summary__item__value {
 .animated-text span:nth-child(1) {
     animation-delay: 0s;
 }
+
 .animated-text span:nth-child(2) {
     animation-delay: 2s;
 }
+
 .animated-text span:nth-child(3) {
     animation-delay: 4s;
 }
 
 @keyframes roll {
-    0%, 33.33% {
+
+    0%,
+    33.33% {
         opacity: 0;
         transform: translateY(100%);
     }
-    5%, 28.33% {
+
+    5%,
+    28.33% {
         opacity: 1;
         transform: translateY(0);
     }
@@ -3616,9 +3635,11 @@ small.summary__item__value {
     0% {
         background-color: var(--fill-100);
     }
+
     50% {
         background-color: var(--fill-50);
     }
+
     100% {
         background-color: var(--fill-100);
     }
