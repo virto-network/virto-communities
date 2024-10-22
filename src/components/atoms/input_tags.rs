@@ -1,7 +1,7 @@
-use dioxus::prelude::*;
+use super::dropdown::ElementSize;
 use crate::components::atoms::icons::Close;
 use crate::components::atoms::{Icon, IconButton, WarningSign};
-use super::dropdown::ElementSize;
+use dioxus::prelude::*;
 #[derive(PartialEq, Props, Clone)]
 pub struct InputTagsEvent {
     pub tags: Vec<String>,
@@ -36,7 +36,17 @@ pub fn InputTags(props: InputTagsProps) -> Element {
     };
 
     let is_active = use_signal::<bool>(|| false);
-    let mut tags = use_signal::<Vec<String>>(|| vec![]);
+    let mut tags = use_signal::<Vec<String>>(|| {
+        if props.message.len() > 0 {
+            props
+                .message
+                .split(",")
+                .map(|e| String::from(e))
+                .collect::<Vec<String>>()
+        } else {
+            vec![]
+        }
+    });
     let mut complete_value = use_signal(|| String::new());
     let mut new_value = use_signal(|| String::new());
     let mut temporal_value = use_signal(|| String::new());
