@@ -1,17 +1,17 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::atoms::{
         combo_input::{ComboInputOption, ComboInputValue},
         dropdown::{DropdownItem, ElementSize},
-        icon_button::Variant, AddPlus, ComboInput, Icon, IconButton, Input, MinusCircle,
-        RadioButton,
+        icon_button::Variant,
+        AddPlus, ComboInput, Icon, IconButton, Input, MinusCircle, RadioButton,
     },
     hooks::use_initiative::{
-        use_initiative, ActionItem, ConvictionVote, StandardVote, VoteType,
-        VotingOpenGov, VotingOpenGovAction,
+        use_initiative, ActionItem, ConvictionVote, StandardVote, VoteType, VotingOpenGov,
+        VotingOpenGovAction,
     },
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
@@ -33,7 +33,13 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                         message: if proposal.poll_index > 0 { proposal.poll_index.to_string() } else { String::new() },
                                         size: ElementSize::Small,
                                         placeholder: "Ex: 000",
-                                        error: None,
+                                        error: {
+                                            if proposal.poll_index > 0 {
+                                                None
+                                            } else {
+                                                Some("Poll index should be greater than 0".to_string())
+                                            }
+                                        },
                                         label: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
                                         on_input: move |event: Event<FormData>| {
                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
@@ -63,6 +69,13 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                                 value: "None".to_string(),
                                                             }),
                                                             input: if vote.balance / KUSAMA_PRECISION_DECIMALS > 0 { (vote.balance / KUSAMA_PRECISION_DECIMALS).to_string() } else { String::new() },
+                                                        },
+                                                        error: {
+                                                            if vote.balance > 0 {
+                                                                None
+                                                            } else {
+                                                                Some("Amount should be greater than 0".to_string())
+                                                            }
                                                         },
                                                         placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.balance"),
                                                         right_text: {
