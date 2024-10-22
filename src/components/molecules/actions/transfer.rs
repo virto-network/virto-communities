@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{
     components::atoms::{
         dropdown::ElementSize, icon_button::Variant, AddPlus, Icon, IconButton,
@@ -32,7 +34,12 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     message: transfer.account.clone(),
                                     size: ElementSize::Small,
                                     placeholder: translate!(i18, "initiative.steps.actions.community_transfer.dest.placeholder"),
-                                    error: None,
+                                    error: {
+                                        match sp_core::sr25519::Public::from_str(&transfer.account) {
+                                            Ok(_) => None,
+                                            Err(_) => Some("Invalid Address".to_string())
+                                        }
+                                    },
                                     on_input: move |event: Event<FormData>| {
                                         if let ActionItem::CommunityTransfer(ref mut meta) = initiative.get_action(props.index) {
                                             meta.transfers[index_meta].account = event.value() ;
@@ -46,7 +53,13 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     message: (transfer.value / KUSAMA_PRECISION_DECIMALS).to_string(),
                                     size: ElementSize::Small,
                                     placeholder: translate!(i18, "initiative.steps.actions.community_transfer.amount.placeholder"),
-                                    error: None,
+                                    error: {
+                                        if transfer.value > 0 {
+                                            None
+                                        } else {
+                                            Some("Amount should be greater than 0".to_string())
+                                        }
+                                    },
                                     right_text: {
                                         rsx!(
                                             span { class: "input--right__text",
