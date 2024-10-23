@@ -37,7 +37,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                             if proposal.poll_index > 0 {
                                                 None
                                             } else {
-                                                Some("Poll index should be greater than 0".to_string())
+                                                Some(translate!(i18, "initiative.steps.actions.error.amount"))
                                             }
                                         },
                                         label: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
@@ -74,7 +74,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                             if vote.balance > 0 {
                                                                 None
                                                             } else {
-                                                                Some("Amount should be greater than 0".to_string())
+                                                                Some(translate!(i18, "initiative.steps.actions.error.amount"))
                                                             }
                                                         },
                                                         placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.balance"),

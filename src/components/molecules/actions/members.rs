@@ -45,7 +45,7 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                 error: {
                                     match sp_core::sr25519::Public::from_str(&member.account) {
                                         Ok(_) => None,
-                                        Err(_) => Some("Invalid Address".to_string())
+                                        Err(_) => Some(translate!(i18, "onboard.invite.form.error.invalid_address")),
                                     }
                                 },
                                 on_change: move |event: ComboInputValue| {
