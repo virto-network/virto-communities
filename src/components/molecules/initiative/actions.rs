@@ -1,10 +1,8 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::{
         atoms::{
-            dropdown::ElementSize, icon_button::Variant, AddPlus, Dropdown, Icon,
-            IconButton, SubstractLine,
+            dropdown::ElementSize, icon_button::Variant, AddPlus, Dropdown, Icon, IconButton,
+            SubstractLine,
         },
         molecules::{MembersAction, TransferAction, TreasuryAction, VotingAction},
     },
@@ -12,6 +10,8 @@ use crate::{
         use_initiative, ActionItem, AddMembersAction, MediumOptions, MemberItem,
     },
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 #[component]
 pub fn InitiativeActions() -> Element {
     let i18 = use_i18();
@@ -54,9 +54,9 @@ pub fn InitiativeActions() -> Element {
                                     default: None,
                                     on_change: move |event: usize| {
                                         let options = initiative.get_actions_options();
-            
+
                                         let to_assign = &options[event];
-            
+
                                         initiative.update_action(index, initiative.to_action_option(to_assign.key.clone()));
                                     },
                                     body: items.clone()
@@ -108,13 +108,21 @@ pub fn InitiativeActions() -> Element {
                         placeholder: translate!(i18, "header.cta.account"),
                         size: ElementSize::Small,
                         default: None,
-                        on_change: move |_: usize| {},
+                        on_change: move |event: usize| {
+                            let options = initiative.get_actions_options();
+
+                            let to_assign = &options[event];
+                            let action = initiative.to_action_option(to_assign.key.clone());
+
+                            initiative.push_action(action);
+                        },
                         body: items
                     }
                     IconButton {
                         variant: Variant::Round,
                         size: ElementSize::Small,
                         class: "button--action",
+                        disabled: actions_lock.len() == 0,
                         body: rsx! {
                             Icon { icon: AddPlus, height: 24, width: 24, fill: "var(--fill-00)" }
                         },
