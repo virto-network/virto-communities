@@ -65,7 +65,7 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                                         if period.amount > 0 {
                                             None
                                         } else {
-                                            Some("Amount should be greater than 0".to_string())
+                                            Some(translate!(i18, "initiative.steps.actions.error.amount"))
                                         }
                                     },
                                     right_text: {

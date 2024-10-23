@@ -37,7 +37,7 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     error: {
                                         match sp_core::sr25519::Public::from_str(&transfer.account) {
                                             Ok(_) => None,
-                                            Err(_) => Some("Invalid Address".to_string())
+                                            Err(_) => Some(translate!(i18, "initiative.steps.actions.error.invalid_address")),
                                         }
                                     },
                                     on_input: move |event: Event<FormData>| {
@@ -57,7 +57,7 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                         if transfer.value > 0 {
                                             None
                                         } else {
-                                            Some("Amount should be greater than 0".to_string())
+                                            Some(translate!(i18, "initiative.steps.actions.error.amount"))
                                         }
                                     },
                                     right_text: {
