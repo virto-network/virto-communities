@@ -63,19 +63,17 @@ pub fn Markdown(props: MarkdownProps) -> Element {
     pulldown_cmark::html::push_html(&mut html_buf, parser);
     use_effect(move || {
         if !is_editor_loaded() {
-            if let Some(toolbar_ref) = toolbar_ref() {
-                if let Some(editor_ref) = editor_ref() {
-                    let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
-                        if let Some(text) = new_content.as_string() {
-                            props.on_input.call(MarkdownEvent { value: text })
-                        }
-                    }) as Box<dyn FnMut(JsValue)>);
-                    let function = closure.as_ref().unchecked_ref::<Function>();
-                    init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
-                    set_content_markdown_editor(content());
-                    closure.forget();
-                    is_editor_loaded.set(true);
-                }
+            if let (Some(toolbar_ref), Some(editor_ref)) = (toolbar_ref(), editor_ref()) {
+                let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
+                    if let Some(text) = new_content.as_string() {
+                        props.on_input.call(MarkdownEvent { value: text })
+                    }
+                }) as Box<dyn FnMut(JsValue)>);
+                let function = closure.as_ref().unchecked_ref::<Function>();
+                init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
+                set_content_markdown_editor(content());
+                closure.forget();
+                is_editor_loaded.set(true);
             }
         }
     });
