@@ -1713,6 +1713,7 @@ textarea::placeholder {
     align-items: center;
     gap: 12px;
     position: relative;
+    flex-direction: column;
 }
 
 .sidebar__item--uncomplete {
@@ -1739,8 +1740,17 @@ textarea::placeholder {
     border-radius: 0 8px 8px 0;
 }
 
-.sidebar__list>li>span {
-    display: none;
+.sidebar__action-label {
+    @extend %text-xs-font-regular;
+    width: 85px;
+    font-size: 0.875rem;
+    color: var(--color-green-100);
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.sidebar__item--active .sidebar__action-label {
+    color: var(--state-primary-active);
 }
 
 .textarea {
@@ -3415,21 +3425,27 @@ small.summary__item__value {
 
     .sidebar {
         width: 100%;
-        height: 80px;
+        height: 120px;
         position: fixed;
         bottom: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
     }
 
     .sidebar__container {
-        display: flex;
+        display: inline-flex;
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: flex-start;
         align-items: center;
     }
 
     .sidebar__list {
+        display: inline-flex;
         flex-direction: row;
         align-items: center;
+        gap: 16px;
     }
 
     .sidebar__divider {
