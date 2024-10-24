@@ -7,6 +7,7 @@ use dioxus_std::translate;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 use web_sys::js_sys::Function;
+use web_sys::HtmlElement;
 #[derive(PartialEq, Props, Clone)]
 pub struct MarkdownEvent {
     pub value: String,
@@ -16,16 +17,11 @@ pub struct MarkdownProps {
     #[props(default = "".to_string())]
     class: String,
     content: String,
-    toolbar_id: String,
-    editor_id: String,
     on_input: EventHandler<MarkdownEvent>,
 }
 #[wasm_bindgen(inline_js = r#"
     let tinyEditor;
-    export function initMarkdownEditor(editor_id, toolbar_id, onChangeCallback) {
-        let editorElement = document.getElementById(editor_id);
-        let toolbarElement = document.getElementById(toolbar_id);
-        
+    export function initMarkdownEditor(editorElement, toolbarElement, onChangeCallback) {       
         tinyEditor = new TinyMDE.Editor({ element: editorElement });
         let commandBar = new TinyMDE.CommandBar({
             element: toolbarElement,
@@ -44,7 +40,7 @@ pub struct MarkdownProps {
 "#)]
 extern "C" {
     #[wasm_bindgen(js_name = initMarkdownEditor)]
-    fn init_markdown_editor(editor: String, toolbar: String, callback: &Function);
+    fn init_markdown_editor(editor: HtmlElement, toolbar: HtmlElement, callback: &Function);
     #[wasm_bindgen(js_name = setContentMarkdownEditor)]
     fn set_content_markdown_editor(content: String);
 }
@@ -59,24 +55,28 @@ pub fn Markdown(props: MarkdownProps) -> Element {
         }
     });
     let mut is_markdown_visible = use_signal(|| true);
+    let mut toolbar_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
+    let mut editor_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
     let cont = props.content;
     let parser = pulldown_cmark::Parser::new(&cont);
     let mut html_buf = String::new();
     pulldown_cmark::html::push_html(&mut html_buf, parser);
-    let editor_id = props.editor_id.clone();
-    let toolbar_id = props.toolbar_id.clone();
     use_effect(move || {
         if !is_editor_loaded() {
-            let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
-                if let Some(text) = new_content.as_string() {
-                    props.on_input.call(MarkdownEvent { value: text })
+            if let Some(toolbar_ref) = toolbar_ref() {
+                if let Some(editor_ref) = editor_ref() {
+                    let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
+                        if let Some(text) = new_content.as_string() {
+                            props.on_input.call(MarkdownEvent { value: text })
+                        }
+                    }) as Box<dyn FnMut(JsValue)>);
+                    let function = closure.as_ref().unchecked_ref::<Function>();
+                    init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
+                    set_content_markdown_editor(content());
+                    closure.forget();
+                    is_editor_loaded.set(true);
                 }
-            }) as Box<dyn FnMut(JsValue)>);
-            let function = closure.as_ref().unchecked_ref::<Function>();
-            init_markdown_editor(editor_id.clone(), toolbar_id.clone(), function);
-            set_content_markdown_editor(content());
-            closure.forget();
-            is_editor_loaded.set(true)
+            }
         }
     });
     rsx!(
@@ -84,8 +84,24 @@ pub fn Markdown(props: MarkdownProps) -> Element {
             div {
                 class: "markdown__wrapper",
                 class: if !is_markdown_visible() { "hide" } else { "markdown__wrapper--editor" },
-                div { id: props.toolbar_id }
-                div { id: props.editor_id }
+                div {
+                    onmounted: move |event| {
+                        event
+                            .data
+                            .downcast::<web_sys::Element>()
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
+                            .map(|html_element| toolbar_ref.set(Some(Box::new(html_element.clone()))));
+                    },
+                }
+                div {
+                    onmounted: move |event| {
+                        event
+                            .data
+                            .downcast::<web_sys::Element>()
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
+                            .map(|html_element| editor_ref.set(Some(Box::new(html_element.clone()))));
+                    },
+                }
             }
             div {
                 class: "markdown__wrapper",

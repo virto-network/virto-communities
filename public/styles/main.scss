@@ -1536,7 +1536,7 @@ $fw-bold: 700;
 }
 
 .TinyMDE {
-    height: var(--element-size-medium);
+    min-height: var(--element-size-medium);
 }
 
 .tab--small {
@@ -1597,9 +1597,6 @@ textarea::placeholder {
     min-width: 220px;
     padding: 0 20px;
     border-radius: 12px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
     background: var(--fill-00);
     border: none;
     box-shadow: 0px 0.5px var(--Blur-blur-0, 0px) 0px var(--Colors-alpha-dark-50, rgba(26, 26, 26, 0.08)), 0px 1px var(--Blur-blur-2, 3px) 0px rgba(26, 26, 26, 0.08);
@@ -1607,6 +1604,11 @@ textarea::placeholder {
     &:focus-within {
         border: 3px solid var(--state-primary-active);
     }
+}
+.input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
 }
 
 .button--primary,

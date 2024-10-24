@@ -1,12 +1,12 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::atoms::{
-        dropdown::ElementSize, input_tags::InputTagsEvent, markdown::MarkdownEvent,
-        Input, InputTags, Markdown,
+        dropdown::ElementSize, input_tags::InputTagsEvent, markdown::MarkdownEvent, Input,
+        InputTags, Markdown,
     },
     hooks::{use_initiative::use_initiative, use_onboard::use_onboard},
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 #[component]
 pub fn InitiativeInfo(error: bool) -> Element {
     let i18 = use_i18();
@@ -74,8 +74,6 @@ pub fn InitiativeInfo(error: bool) -> Element {
                 }
                 Markdown {
                     content: initiative.get_info().description,
-                    toolbar_id: "info-toolbar".to_string(),
-                    editor_id: "info-editor".to_string(),
                     on_input: move |event: MarkdownEvent| {
                         initiative.info_mut().with_mut(|info| info.description = event.value);
                     }
