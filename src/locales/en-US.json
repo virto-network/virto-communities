@@ -252,6 +252,10 @@
                 },
                 "actions": {
                     "label": "Initiative execution setup",
+                    "error": {
+                        "amount": "Must be greater than 0",
+                        "invalid_address":"Oops! ✋ This address is invalid"
+                    },
                     "add_members": {
                         "title": "Add Members"
                     },
@@ -261,7 +265,6 @@
                             "period_1": "The delivery of resources from the treasury will be made instantly once the proposal is approved.",
                             "period_n": "\nImportant: The resources for the other periods will be delivered on the dates established for each one."
                         },
-                        "error": "Must be greater than 0",
                         "placeholder": "Delivery date"
                     },
                     "community_transfer": {
@@ -270,7 +273,6 @@
                             "placeholder": "Recipient"
                         },
                         "amount": {
-                            "error": "Must be greater than 0",
                             "placeholder": "Amount"
                         }
                     },
@@ -450,6 +452,9 @@
                     "phone": {
                         "label": "Telegram",
                         "placeholder": "+57 322 1230000"
+                    },
+                    "error": {
+                        "invalid_address": "Oops! ✋ This address is invalid"
                     }
                 },
                 "cta": {

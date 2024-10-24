@@ -15,7 +15,10 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
     let i18 = use_i18();
     let render_add_members = |action: &AddMembersAction| {
         rsx!(
-            ActionRequest { name: translate!(i18, "initiative.steps.actions.add_members.title"), details: action.members.len().to_string() }
+            ActionRequest {
+                name: translate!(i18, "initiative.steps.actions.add_members.title"),
+                details: action.members.len().to_string()
+            }
             ul { class: "requests",
                 for member in action.members.iter() {
                     li {
@@ -42,7 +45,10 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
     };
     let render_voting_open_gov = |action: &VotingOpenGovAction| {
         rsx!(
-            ActionRequest { name: translate!(i18, "initiative.steps.actions.voting_open_gov.title"), details: action.proposals.len().to_string() }
+            ActionRequest {
+                name: translate!(i18, "initiative.steps.actions.voting_open_gov.title"),
+                details: action.proposals.len().to_string()
+            }
             ul { class: "requests",
                 for proposal in action.proposals.iter() {
                     li {

@@ -97,10 +97,15 @@ pub fn Explore() -> Element {
                     IconButton {
                         class: "button--avatar desktop",
                         size: ElementSize::Medium,
-                        body: rsx!(
-                            Icon { icon : AddPlus, height : 26, width : 26, stroke_width : 1.5, fill :
-                            "var(--fill-00)" }
-                        ),
+                        body: rsx! {
+                            Icon {
+                                icon: AddPlus,
+                                height: 26,
+                                width: 26,
+                                stroke_width: 1.5,
+                                fill: "var(--fill-00)"
+                            }
+                        },
                         on_click: move |_| {
                             tooltip.hide();
                             nav.push(
@@ -260,7 +265,7 @@ pub fn Explore() -> Element {
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
-                    to: (communities.get_communities().len() + SKIP - 1 ).saturating_div(SKIP).max(1),
+                    to: (communities.get_communities().len() + SKIP - 1).saturating_div(SKIP).max(1),
                     on_change: move |event: PaginatorValue| {
                         current_page.set(event.value());
                         on_handle_paginator.send(current_page())

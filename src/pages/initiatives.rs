@@ -184,10 +184,15 @@ pub fn Initiatives(id: u16) -> Element {
                     IconButton {
                         class: "button--avatar desktop",
                         size: ElementSize::Medium,
-                        body: rsx!(
-                            Icon { icon : AddPlus, height : 26, width : 26, stroke_width : 1.5, fill :
-                            "var(--fill-00)" }
-                        ),
+                        body: rsx! {
+                            Icon {
+                                icon: AddPlus,
+                                height: 26,
+                                width: 26,
+                                stroke_width: 1.5,
+                                fill: "var(--fill-00)"
+                            }
+                        },
                         on_click: move |_| {
                             tooltip.hide();
                             let path = format!("/dao/{}/initiative", id);
@@ -197,63 +202,63 @@ pub fn Initiatives(id: u16) -> Element {
                 }
             }
             div { class: "dashboard__communities",
-            { if initiative_state.is_loading() {
-                    rsx! {
-                        CardSkeleton {}
-                    }
-                    } else {
+                { if initiative_state.is_loading() {
                         rsx! {
-                            for initiative in filtered_initiatives() {
-                                section { class: "card",
-                                    div { class: "card__container",
-                                        div { class: "card__head",
-                                            h3 { class: "card__title", "{initiative.info.name}" }
-                                        }
-                                        p { class: "card__description", "" }
-                                        div { class: "card__metrics",
-                                            span { class: "card__metric",
-                                                Icon { icon: CircleCheck, height: 16, width: 16, fill: "var(--text-primary)" }
-                                                small { "{initiative.ongoing.tally.ayes} Aye" }
+                            CardSkeleton {}
+                        }
+                        } else {
+                            rsx! {
+                                for initiative in filtered_initiatives() {
+                                    section { class: "card",
+                                        div { class: "card__container",
+                                            div { class: "card__head",
+                                                h3 { class: "card__title", "{initiative.info.name}" }
                                             }
-                                            span { class: "card__metric",
-                                                Icon {
-                                                    icon: StopSign,
-                                                    height: 16,
-                                                    width: 16,
-                                                    stroke_width: 2,
-                                                    stroke: "var(--text-primary)"
+                                            p { class: "card__description", "" }
+                                            div { class: "card__metrics",
+                                                span { class: "card__metric",
+                                                    Icon { icon: CircleCheck, height: 16, width: 16, fill: "var(--text-primary)" }
+                                                    small { "{initiative.ongoing.tally.ayes} Aye" }
                                                 }
-                                                small { "{initiative.ongoing.tally.nays} Nay" }
+                                                span { class: "card__metric",
+                                                    Icon {
+                                                        icon: StopSign,
+                                                        height: 16,
+                                                        width: 16,
+                                                        stroke_width: 2,
+                                                        stroke: "var(--text-primary)"
+                                                    }
+                                                    small { "{initiative.ongoing.tally.nays} Nay" }
+                                                }
+                                            }
+                                            div { class: "card__tags",
+                                                for tag in initiative.clone().info.tags {
+                                                    { rsx!(Badge {
+                                                    class : "badge--lavanda-dark", text : tag }) }
+                                                }
                                             }
                                         }
-                                        div { class: "card__tags",
-                                            for tag in initiative.clone().info.tags {
-                                                { rsx!(Badge {
-                                                class : "badge--lavanda-dark", text : tag }) }
-                                            }
-                                        }
-                                    }
-                                    div { class: "card__cta",
-                                        IconButton {
-                                            class: "button--avatar buttom--comming-soon",
-                                            body: rsx!(
-                                                Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
-                                                "var(--fill-00)" }
-                                            ),
-                                            on_click: move |_| {
-                                                tooltip.hide();
-                                                initiative_wrapper.set(Some(initiative.clone()));
-                                                let path = format!("/dao/{}/vote/{}", id, initiative.id);
-                                                nav.push(vec![], &path);
+                                        div { class: "card__cta",
+                                            IconButton {
+                                                class: "button--avatar buttom--comming-soon",
+                                                body: rsx!(
+                                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 2, fill :
+                                                    "var(--fill-00)" }
+                                                ),
+                                                on_click: move |_| {
+                                                    tooltip.hide();
+                                                    initiative_wrapper.set(Some(initiative.clone()));
+                                                    let path = format!("/dao/{}/vote/{}", id, initiative.id);
+                                                    nav.push(vec![], &path);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                    
                         }
-                   
-                    }
-            }
+                },
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
@@ -278,10 +283,15 @@ pub fn Initiatives(id: u16) -> Element {
                         IconButton {
                             class: "button--avatar",
                             size: ElementSize::Big,
-                            body: rsx!(
-                                Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                "var(--fill-00)" }
-                            ),
+                            body: rsx! {
+                                Icon {
+                                    icon: AddPlus,
+                                    height: 32,
+                                    width: 32,
+                                    stroke_width: 1.5,
+                                    fill: "var(--fill-00)"
+                                }
+                            },
                             on_click: move |_| {
                                 tooltip.hide();
                                 let path = format!("/dao/{}/initiative", id);

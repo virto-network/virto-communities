@@ -172,10 +172,15 @@ pub fn Onboarding() -> Element {
                                     }
                                 },
                                 status: None,
-                                left_icon: rsx!(
-                                    Icon { icon : ArrowLeft, height : 32, width : 32, stroke_width : 1, fill :
-                                    "var(--text-primary)" }
-                                )
+                                left_icon: rsx! {
+                                    Icon {
+                                        icon: ArrowLeft,
+                                        height: 32,
+                                        width: 32,
+                                        stroke_width: 1,
+                                        fill: "var(--text-primary)"
+                                    }
+                                }
                             }
                         }
                         if !matches!(onboarding_step(), OnboardingStep::Invite) {
@@ -201,10 +206,9 @@ pub fn Onboarding() -> Element {
                                     };
                                 },
                                 status: None,
-                                right_icon: rsx!(
-                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 1, fill :
-                                    "var(--white)" }
-                                )
+                                right_icon: rsx! {
+                                    Icon { icon: ArrowRight, height: 32, width: 32, stroke_width: 1, fill: "var(--white)" }
+                                }
                             }
                         } else {
                             Button {
@@ -341,20 +345,21 @@ pub fn Onboarding() -> Element {
                                     };
                                 },
                                 status: None,
-                                right_icon: rsx!(
-                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 1, fill :
-                                    "var(--white)" }
-                                )
+                                right_icon: rsx! {
+                                    Icon { icon: ArrowRight, height: 32, width: 32, stroke_width: 1, fill: "var(--white)" }
+                                }
                             }
                         }
                     }
                 }
                 div { class: "onboarding__image",
-                    img { src: match *onboarding_step.read() {
+                    img {
+                        src: match *onboarding_step.read() {
                             OnboardingStep::Basics => "images/window.png",
                             OnboardingStep::Management => "images/phone.png",
                             OnboardingStep::Invite => "images/faces.png",
-                        } }
+                        }
+                    }
                 }
             }
         }
