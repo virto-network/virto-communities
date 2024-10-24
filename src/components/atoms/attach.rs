@@ -142,10 +142,14 @@ pub fn Attach(props: AttachProps) -> Element {
                                 variant: IconButtonVariant::Round,
                                 size: ElementSize::Big,
                                 class: "button--avatar bg--transparent",
-                                body: rsx!(
-                                    Icon { icon : Close, height : 28, width : 28, fill :
-                                    "var(--state-destructive-active)" }
-                                ),
+                                body: rsx! {
+                                    Icon {
+                                        icon: Close,
+                                        height: 28,
+                                        width: 28,
+                                        fill: "var(--state-destructive-active)"
+                                    }
+                                },
                                 on_click: move |_| { error.set(None) }
                             }
                         }

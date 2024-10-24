@@ -102,7 +102,9 @@ pub fn Login() -> Element {
                                         width: 36,
                                         fill: "var(--state-primary-active)"
                                     }
-                                    span { class: "icon-text__title", {translate!(i18, "login.opportunities.connect")} }
+                                    span { class: "icon-text__title",
+                                        {translate!(i18, "login.opportunities.connect")}
+                                    }
                                 }
                                 li { class: "icon-text",
                                     Icon {
@@ -141,9 +143,9 @@ pub fn Login() -> Element {
                                     text: translate!(i18, "header.cta.connect"),
                                     status: None,
                                     variant: Variant::Secondary,
-                                    right_icon: rsx!(
-                                        Icon { icon : Polkadot, height : 20, width : 20, fill : "var(--text-primary)" }
-                                    ),
+                                    right_icon: rsx! {
+                                        Icon { icon: Polkadot, height: 20, width: 20, fill: "var(--text-primary)" }
+                                    },
                                     on_click: move |_| {
                                         spawn(
                                             async move {

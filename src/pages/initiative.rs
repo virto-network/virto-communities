@@ -105,21 +105,45 @@ pub fn Initiative(id: u16) -> Element {
                         StepCard {
                             name: translate!(i18, "initiative.steps.info.label"),
                             checked: matches!(*onboarding_step.read(), InitiativeStep::Info),
-                            body: rsx!(
-                                div { class : "step-card__info", span { class : "step-card__title", {
-                                translate!(i18, "initiative.steps.info.label") } } IconButton { variant :
-                                IconButtonVariant::Round, size : ElementSize::Big, class :
-                                "button--drop bg--transparent", body : rsx!(Icon { class : if matches!(*
-                                onboarding_step.read(), InitiativeStep::Info) { "rotate-180" } else { "rotate-0"
-                                }, icon : Arrow, height : 24, width : 24, stroke_width : 2, stroke :
-                                "var(--fill-400)" }), on_click : move | _ | { if matches!(* onboarding_step
-                                .read(), InitiativeStep::Info) { onboarding_step.set(InitiativeStep::None); }
-                                else { onboarding_step.set(InitiativeStep::Info); } } } }
-                            ),
-                            editable: rsx!(
-                                div { class : "step-card__editable", InitiativeInfo { error :
-                                handle_required_inputs() } }
-                            ),
+                            body: rsx! {
+                                div { class: "step-card__info",
+                                    span { class: "step-card__title",
+                                        {
+                                        translate!(i18, "initiative.steps.info.label") }
+                                    }
+                                    IconButton {
+                                        variant: IconButtonVariant::Round,
+                                        size: ElementSize::Big,
+                                        class: "button--drop bg--transparent",
+                                        body: rsx! {
+                                            Icon {
+                                                class: if matches!(*onboarding_step.read(), InitiativeStep::Info) {
+                                                    "rotate-180"
+                                                } else {
+                                                    "rotate-0"
+                                                },
+                                                icon: Arrow,
+                                                height: 24,
+                                                width: 24,
+                                                stroke_width: 2,
+                                                stroke: "var(--fill-400)"
+                                            }
+                                        },
+                                        on_click: move |_| {
+                                            if matches!(*onboarding_step.read(), InitiativeStep::Info) {
+                                                onboarding_step.set(InitiativeStep::None);
+                                            } else {
+                                                onboarding_step.set(InitiativeStep::Info);
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            editable: rsx! {
+                                div { class: "step-card__editable",
+                                    InitiativeInfo { error: handle_required_inputs() }
+                                }
+                            },
                             on_change: move |_| {
                                 onboarding_step.set(InitiativeStep::Info);
                             }
@@ -127,18 +151,43 @@ pub fn Initiative(id: u16) -> Element {
                         StepCard {
                             name: translate!(i18, "initiative.steps.actions.label"),
                             checked: matches!(*onboarding_step.read(), InitiativeStep::Actions),
-                            body: rsx!(
-                                div { class : "step-card__info", span { class : "step-card__title", {
-                                translate!(i18, "initiative.steps.actions.label") } } IconButton { variant :
-                                IconButtonVariant::Round, size : ElementSize::Big, class :
-                                "button--drop  bg--transparent", body : rsx!(Icon { class : if matches!(*
-                                onboarding_step.read(), InitiativeStep::Actions) { "rotate-180" } else {
-                                "rotate-0" }, icon : Arrow, height : 24, width : 24, stroke_width : 2, stroke :
-                                "var(--fill-400)" }), on_click : move | _ | { if matches!(* onboarding_step
-                                .read(), InitiativeStep::Actions) { onboarding_step.set(InitiativeStep::None); }
-                                else { onboarding_step.set(InitiativeStep::Actions); } } } }
-                            ),
-                            editable: rsx!(div { class : "step-card__editable", InitiativeActions {} }),
+                            body: rsx! {
+                                div { class: "step-card__info",
+                                    span { class: "step-card__title",
+                                        {
+                                        translate!(i18, "initiative.steps.actions.label") }
+                                    }
+                                    IconButton {
+                                        variant: IconButtonVariant::Round,
+                                        size: ElementSize::Big,
+                                        class: "button--drop  bg--transparent",
+                                        body: rsx! {
+                                            Icon {
+                                                class: if matches!(*onboarding_step.read(), InitiativeStep::Actions) {
+                                                    "rotate-180"
+                                                } else {
+                                                    "rotate-0"
+                                                },
+                                                icon: Arrow,
+                                                height: 24,
+                                                width: 24,
+                                                stroke_width: 2,
+                                                stroke: "var(--fill-400)"
+                                            }
+                                        },
+                                        on_click: move |_| {
+                                            if matches!(*onboarding_step.read(), InitiativeStep::Actions) {
+                                                onboarding_step.set(InitiativeStep::None);
+                                            } else {
+                                                onboarding_step.set(InitiativeStep::Actions);
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            editable: rsx! {
+                                div { class: "step-card__editable", InitiativeActions {} }
+                            },
                             on_change: move |_| {
                                 onboarding_step.set(InitiativeStep::Actions);
                             }
@@ -320,11 +369,7 @@ pub fn Initiative(id: u16) -> Element {
                                                         .clone()
                                                         .into_iter()
                                                         .filter_map(|transfer| {
-                                                            if transfer.value > 0 {
-                                                                Some(transfer)
-                                                            } else {
-                                                                None
-                                                            }
+                                                            if transfer.value > 0 { Some(transfer) } else { None }
                                                         })
                                                         .collect::<Vec<TransferItem>>(),
                                                 )
@@ -346,11 +391,12 @@ pub fn Initiative(id: u16) -> Element {
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
                                 let community_transfer_action = convert_to_jsvalue(
-                                    &community_transfer_action,
-                                ).map_err(|_| {
-                                    log::warn!("Malformed voting open gov");
-                                    translate!(i18, "errors.form.initiative_creation")
-                                })?;
+                                        &community_transfer_action,
+                                    )
+                                    .map_err(|_| {
+                                        log::warn!("Malformed voting open gov");
+                                        translate!(i18, "errors.form.initiative_creation")
+                                    })?;
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                     .map_err(|_| {
                                         log::warn!("Malformed membership accounts add");
@@ -387,7 +433,7 @@ pub fn Initiative(id: u16) -> Element {
                                         membership_accounts_remove,
                                         treasury_action,
                                         votiong_open_gov_action,
-                                        community_transfer_action
+                                        community_transfer_action,
                                     )
                                     .await
                                     .map_err(|e| {
