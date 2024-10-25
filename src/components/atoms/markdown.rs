@@ -20,9 +20,8 @@ pub struct MarkdownProps {
     on_input: EventHandler<MarkdownEvent>,
 }
 #[wasm_bindgen(inline_js = r#"
-    let tinyEditor;
     export function initMarkdownEditor(editorElement, toolbarElement, onChangeCallback) {       
-        tinyEditor = new TinyMDE.Editor({ element: editorElement });
+        let tinyEditor = new TinyMDE.Editor({ element: editorElement });
         let commandBar = new TinyMDE.CommandBar({
             element: toolbarElement,
             editor: tinyEditor,
@@ -32,17 +31,23 @@ pub struct MarkdownProps {
             let content = tinyEditor.getContent();
             onChangeCallback(content);
         });
+
+        return tinyEditor;
     }
 
-    export function setContentMarkdownEditor(content) {
+    export function setContentMarkdownEditor(tinyEditor, content) {
         tinyEditor.setContent(content);
     }
 "#)]
 extern "C" {
     #[wasm_bindgen(js_name = initMarkdownEditor)]
-    fn init_markdown_editor(editor: HtmlElement, toolbar: HtmlElement, callback: &Function);
+    fn init_markdown_editor(
+        editor: HtmlElement,
+        toolbar: HtmlElement,
+        callback: &Function,
+    ) -> JsValue;
     #[wasm_bindgen(js_name = setContentMarkdownEditor)]
-    fn set_content_markdown_editor(content: String);
+    fn set_content_markdown_editor(tiny_editor: JsValue, content: String);
 }
 pub fn Markdown(props: MarkdownProps) -> Element {
     let i18 = use_i18();
@@ -66,17 +71,18 @@ pub fn Markdown(props: MarkdownProps) -> Element {
             if let (Some(toolbar_ref), Some(editor_ref)) = (toolbar_ref(), editor_ref()) {
                 let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
                     if let Some(text) = new_content.as_string() {
-                        props.on_input.call(MarkdownEvent { value: text })
+                        props.on_input.call(MarkdownEvent { value: text });
                     }
                 }) as Box<dyn FnMut(JsValue)>);
                 let function = closure.as_ref().unchecked_ref::<Function>();
-                init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
-                set_content_markdown_editor(content());
+                let tiny_editor = init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
+                set_content_markdown_editor(tiny_editor, content());
                 closure.forget();
                 is_editor_loaded.set(true);
             }
         }
     });
+    
     rsx!(
         div { class: "markdown",
             div {
