@@ -6,6 +6,7 @@ use dioxus_std::i18n::use_i18;
 use dioxus_std::translate;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
+use web_sys::js_sys;
 use web_sys::js_sys::Function;
 use web_sys::HtmlElement;
 #[derive(PartialEq, Props, Clone)]
@@ -34,10 +35,6 @@ pub struct MarkdownProps {
 
         return tinyEditor;
     }
-
-    export function setContentMarkdownEditor(tinyEditor, content) {
-        tinyEditor.setContent(content);
-    }
 "#)]
 extern "C" {
     #[wasm_bindgen(js_name = initMarkdownEditor)]
@@ -46,9 +43,14 @@ extern "C" {
         toolbar: HtmlElement,
         callback: &Function,
     ) -> JsValue;
-    #[wasm_bindgen(js_name = setContentMarkdownEditor)]
-    fn set_content_markdown_editor(tiny_editor: JsValue, content: String);
 }
+
+fn call_method_reflect(obj: &JsValue, method_name: &str, args: &[JsValue]) -> Result<JsValue, JsValue> {
+    let method = js_sys::Reflect::get(obj, &method_name.into())?;
+    let func: js_sys::Function = method.dyn_into()?;
+    func.apply(obj, &js_sys::Array::from_iter(args))
+}
+
 pub fn Markdown(props: MarkdownProps) -> Element {
     let i18 = use_i18();
     let mut is_editor_loaded = use_signal(|| false);
@@ -76,12 +78,17 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                 }) as Box<dyn FnMut(JsValue)>);
                 let function = closure.as_ref().unchecked_ref::<Function>();
                 let tiny_editor = init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
-                set_content_markdown_editor(tiny_editor, content());
+                let content_value = JsValue::from(content());
+                if let Err(e) = call_method_reflect(&tiny_editor, "setContent", &[content_value]) {
+                    log::warn!("Failed to set content {:?}", e);
+                };
+    
                 closure.forget();
                 is_editor_loaded.set(true);
             }
         }
     });
+    
     
     rsx!(
         div { class: "markdown",
