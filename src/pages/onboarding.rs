@@ -1,7 +1,7 @@
 use crate::{
     components::{
         atoms::{
-            button::Variant, dropdown::ElementSize, ArrowLeft, ArrowRight, Button, Icon, VirtoLogo,
+            button::Variant, dropdown::ElementSize, ArrowLeft, ArrowRight, Button, Icon, IconButton, VirtoLogo
         },
         molecules::{OnboardingBasics, OnboardingInvite, OnboardingManagement},
     },
@@ -100,13 +100,20 @@ pub fn Onboarding() -> Element {
             div { class: "row",
                 div { class: "onboarding__form",
                     div { class: "form__wrapper",
-                        Icon {
-                            icon: VirtoLogo,
-                            height: 64,
-                            width: 64,
-                            stroke_width: 1,
-                            fill: "var(--color-lavanda-400)"
+                    IconButton {
+                        on_click: move |_| {
+                            nav.push(vec![], "/");
+                        },
+                        body: rsx! {
+                            Icon {
+                                icon: VirtoLogo,
+                                height: 64,
+                                width: 64,
+                                stroke_width: 1,
+                                fill: "var(--color-lavanda-400)"
+                            }
                         }
+                    }
                         div { class: "progress progress--steps",
                             button {
                                 class: "step",
@@ -172,10 +179,15 @@ pub fn Onboarding() -> Element {
                                     }
                                 },
                                 status: None,
-                                left_icon: rsx!(
-                                    Icon { icon : ArrowLeft, height : 32, width : 32, stroke_width : 1, fill :
-                                    "var(--text-primary)" }
-                                )
+                                left_icon: rsx! {
+                                    Icon {
+                                        icon: ArrowLeft,
+                                        height: 32,
+                                        width: 32,
+                                        stroke_width: 1,
+                                        fill: "var(--text-primary)"
+                                    }
+                                }
                             }
                         }
                         if !matches!(onboarding_step(), OnboardingStep::Invite) {
@@ -201,10 +213,9 @@ pub fn Onboarding() -> Element {
                                     };
                                 },
                                 status: None,
-                                right_icon: rsx!(
-                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 1, fill :
-                                    "var(--white)" }
-                                )
+                                right_icon: rsx! {
+                                    Icon { icon: ArrowRight, height: 32, width: 32, stroke_width: 1, fill: "var(--white)" }
+                                }
                             }
                         } else {
                             Button {
@@ -341,20 +352,21 @@ pub fn Onboarding() -> Element {
                                     };
                                 },
                                 status: None,
-                                right_icon: rsx!(
-                                    Icon { icon : ArrowRight, height : 32, width : 32, stroke_width : 1, fill :
-                                    "var(--white)" }
-                                )
+                                right_icon: rsx! {
+                                    Icon { icon: ArrowRight, height: 32, width: 32, stroke_width: 1, fill: "var(--white)" }
+                                }
                             }
                         }
                     }
                 }
                 div { class: "onboarding__image",
-                    img { src: match *onboarding_step.read() {
+                    img {
+                        src: match *onboarding_step.read() {
                             OnboardingStep::Basics => "images/window.png",
                             OnboardingStep::Management => "images/phone.png",
                             OnboardingStep::Invite => "images/faces.png",
-                        } }
+                        }
+                    }
                 }
             }
         }
