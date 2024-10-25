@@ -472,7 +472,8 @@
             "title": "⚠️Attention: This information is for you",
             "middleware": {
                 "has_dao": "We're sorry! 😞 You cannot create more organizations associated with this account.",
-                "chain_unavailable": "At this time, it is not possible to complete this action."
+                "chain_unavailable": "At this time, it is not possible to complete this action.",
+                "signer_not_found": "We're sorry! 😞 You cannot perform this action, you must authenticate first."
             }
         },
         "utils": {

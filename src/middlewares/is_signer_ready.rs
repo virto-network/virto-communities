@@ -7,10 +7,10 @@ pub fn is_signer_ready(
 ) -> impl FnOnce() -> Result<(), &'static str> {
     move || {
         if accounts.get_account().is_none() {
-            notification.handle_warning(&translate!(i18, "warnings.middleware.has_dao"));
+            notification.handle_warning(&translate!(i18, "warnings.middleware.signer_not_found"));
             Err("Failed to get account to sign")
         } else {
-            log::warn!("Signer is ready");
+            log::debug!("Signer is ready");
             Ok(())
         }
     }
