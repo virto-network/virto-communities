@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::{
     components::{
         atoms::{
@@ -9,16 +7,7 @@ use crate::{
         molecules::{InitiativeActions, InitiativeInfo},
     },
     hooks::{
-        use_initiative::{
-            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
-            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, TransferItem,
-            VotingOpenGov,
-        },
-        use_notification::use_notification,
-        use_our_navigator::use_our_navigator,
-        use_session::use_session,
-        use_spaces_client::use_spaces_client,
-        use_tooltip::{use_tooltip, TooltipItem},
+        use_initiative::{use_initiative, InitiativeData, InitiativeInfoContent, InitiativeInitContent}, use_notification::use_notification, use_our_navigator::use_our_navigator, use_session::use_session, use_spaces_client::use_spaces_client, use_tooltip::{use_tooltip, TooltipItem}
     },
     pages::onboarding::convert_to_jsvalue,
     services::{
@@ -26,7 +15,6 @@ use crate::{
         kusama::system::number,
     },
 };
-use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::TryFutureExt;
@@ -54,7 +42,7 @@ extern "C" {
         community_transfers: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
-const BLOCK_TIME_IN_SECONDS: i64 = 6;
+
 #[component]
 pub fn Initiative(id: u16) -> Element {
     let i18 = use_i18();
@@ -161,6 +149,7 @@ pub fn Initiative(id: u16) -> Element {
                     class: "",
                     text: translate!(i18, "initiative.cta.continue"),
                     size: ElementSize::Small,
+                    disabled: !initiative.check() || initiative.get_info().name.len() == 0,
                     on_click: move |_| {
                         spawn(
                             async move {
@@ -199,36 +188,6 @@ pub fn Initiative(id: u16) -> Element {
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
                                 let room_id = response_bot.get_id();
-                                let add_members_action = initiative
-                                    .get_actions()
-                                    .into_iter()
-                                    .filter_map(|action| {
-                                        match action {
-                                            ActionItem::AddMembers(add_members_action) => {
-                                                Some(
-                                                    add_members_action
-                                                        .members
-                                                        .clone()
-                                                        .into_iter()
-                                                        .filter_map(|member| {
-                                                            if !member.account.is_empty() {
-                                                                Some(member.account)
-                                                            } else {
-                                                                None
-                                                            }
-                                                        })
-                                                        .collect::<Vec<String>>(),
-                                                )
-                                            }
-                                            _ => None,
-                                        }
-                                    })
-                                    .collect::<Vec<Vec<String>>>();
-                                let add_members_action = add_members_action
-                                    .into_iter()
-                                    .flat_map(|v| v.into_iter())
-                                    .collect::<Vec<String>>();
-                                log::info!("add_members_action: {:?}", add_members_action);
                                 let current_block = number()
                                     .await
                                     .map_err(|_| {
@@ -242,101 +201,17 @@ pub fn Initiative(id: u16) -> Element {
                                         translate!(i18, "errors.form.initiative_creation")
                                     })?;
                                 log::info!("{} {}", current_block, now_kusama);
-                                let treasury_action = initiative
-                                    .get_actions()
-                                    .into_iter()
-                                    .filter_map(|action| {
-                                        match action {
-                                            ActionItem::KusamaTreasury(treasury_action) => {
-                                                Some(
-                                                    treasury_action
-                                                        .periods
-                                                        .clone()
-                                                        .into_iter()
-                                                        .filter_map(|period| {
-                                                            if period.amount > 0 {
-                                                                Some(
-                                                                    convert_treasury_to_period(
-                                                                        period,
-                                                                        current_block,
-                                                                        now_kusama,
-                                                                    ),
-                                                                )
-                                                            } else {
-                                                                None
-                                                            }
-                                                        })
-                                                        .collect::<Vec<KusamaTreasuryPeriod>>(),
-                                                )
-                                            }
-                                            _ => None,
-                                        }
-                                    })
-                                    .collect::<Vec<Vec<KusamaTreasuryPeriod>>>();
-                                let treasury_action = treasury_action
-                                    .into_iter()
-                                    .flat_map(|v| v.into_iter())
-                                    .collect::<Vec<KusamaTreasuryPeriod>>();
+                                let add_members_action = initiative.filter_valid_address_add_members();
+                                log::info!("add_members_action: {:?}", add_members_action);
+                                let treasury_action = initiative.convert_treasury_to_period(current_block, now_kusama);
                                 log::info!("treasury {:?}", treasury_action);
-                                let votiong_open_gov_action = initiative
-                                    .get_actions()
-                                    .into_iter()
-                                    .filter_map(|action| {
-                                        match action {
-                                            ActionItem::VotingOpenGov(votiong_open_gov_action) => {
-                                                Some(
-                                                    votiong_open_gov_action
-                                                        .proposals
-                                                        .clone()
-                                                        .into_iter()
-                                                        .filter_map(|proposal| {
-                                                            if proposal.poll_index > 0 { Some(proposal) } else { None }
-                                                        })
-                                                        .collect::<Vec<VotingOpenGov>>(),
-                                                )
-                                            }
-                                            _ => None,
-                                        }
-                                    })
-                                    .collect::<Vec<Vec<VotingOpenGov>>>();
-                                let votiong_open_gov_action = votiong_open_gov_action
-                                    .into_iter()
-                                    .flat_map(|v| v.into_iter())
-                                    .collect::<Vec<VotingOpenGov>>();
+                                let votiong_open_gov_action = initiative.filter_valid_voting_open_gov();
                                 let votiong_open_gov_action = votiong_open_gov_action
                                     .into_iter()
                                     .map(|v| v.serialize_vote_type())
                                     .collect::<Vec<serde_json::Value>>();
                                 log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
-                                let community_transfer_action = initiative
-                                    .get_actions()
-                                    .into_iter()
-                                    .filter_map(|action| {
-                                        match action {
-                                            ActionItem::CommunityTransfer(community_transfer_action) => {
-                                                Some(
-                                                    community_transfer_action
-                                                        .transfers
-                                                        .clone()
-                                                        .into_iter()
-                                                        .filter_map(|transfer| {
-                                                            if transfer.value > 0 {
-                                                                Some(transfer)
-                                                            } else {
-                                                                None
-                                                            }
-                                                        })
-                                                        .collect::<Vec<TransferItem>>(),
-                                                )
-                                            }
-                                            _ => None,
-                                        }
-                                    })
-                                    .collect::<Vec<Vec<TransferItem>>>();
-                                let community_transfer_action = community_transfer_action
-                                    .into_iter()
-                                    .flat_map(|v| v.into_iter())
-                                    .collect::<Vec<TransferItem>>();
+                                let community_transfer_action = initiative.filter_valid_community_transfer();
                                 log::info!("community_transfer_action {:?}", community_transfer_action);
                                 let votiong_open_gov_action = convert_to_jsvalue(
                                         &votiong_open_gov_action,
@@ -408,49 +283,6 @@ pub fn Initiative(id: u16) -> Element {
                     status: None
                 }
             }
-        }
-    }
-}
-fn calculate_future_block(
-    current_block: u32,
-    current_date_millis: u64,
-    future_date_str: &str,
-) -> u32 {
-    let future_date_naive = NaiveDate::from_str(future_date_str).expect("Invalid future date");
-    let future = future_date_naive
-        .and_hms_opt(0, 0, 0)
-        .expect("Invalid future date");
-    let future_date = DateTime::<Utc>::from_naive_utc_and_offset(future, Utc);
-
-    let x = DateTime::from_timestamp(
-        (current_date_millis / 1000).try_into().unwrap(),
-        ((current_date_millis % 1000) * 1_000_000) as u32,
-    )
-    .expect("");
-
-    let x = NaiveDateTime::from_str(&x.date_naive().to_string()).expect("Invalid calculated date");
-    let current_date = DateTime::from_naive_utc_and_offset(x, Utc);
-
-    let elapsed_time_in_seconds = (future_date - current_date).num_seconds();
-    let blocks_to_add = elapsed_time_in_seconds / BLOCK_TIME_IN_SECONDS;
-    (current_block + blocks_to_add as u32).into()
-}
-fn convert_treasury_to_period(
-    treasury: KusamaTreasury,
-    current_block: u32,
-    current_date_millis: u64,
-) -> KusamaTreasuryPeriod {
-    if treasury.date != "" {
-        let future_block =
-            calculate_future_block(current_block, current_date_millis, &treasury.date);
-        KusamaTreasuryPeriod {
-            blocks: Some(future_block as u64),
-            amount: treasury.amount,
-        }
-    } else {
-        KusamaTreasuryPeriod {
-            blocks: None,
-            amount: treasury.amount,
         }
     }
 }
