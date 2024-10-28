@@ -44,6 +44,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                         },
                                         on_keypress: move |_| {},
                                         on_click: move |_| {},
+                                        on_focus: move |_| {}, on_blur: move |_| {}
                                     }
                                 }
                                 div {

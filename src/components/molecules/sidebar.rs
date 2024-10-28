@@ -7,8 +7,11 @@ use crate::{
         Icon, IconButton, OnOff, Star,
     },
     hooks::{
-        use_accounts::use_accounts, use_communities::use_communities,
-        use_our_navigator::use_our_navigator, use_tooltip::use_tooltip,
+        use_accounts::use_accounts,
+        use_communities::use_communities,
+        use_our_navigator::use_our_navigator,
+        use_tabs::{use_tabs, Tab},
+        use_tooltip::use_tooltip,
     },
 };
 #[component]
@@ -18,6 +21,7 @@ pub fn Sidebar() -> Element {
     let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
     let accounts = use_accounts();
+    let mut tabs = use_tabs();
 
     let mut is_active = use_signal(|| false);
 
@@ -133,7 +137,8 @@ pub fn Sidebar() -> Element {
                                     class: if active_community.id == community.id { "sidebar__item--active" },
                                     onclick: move |_| {
                                         if let Ok(_) = communities.set_community(community_id) {
-                                            let path = format!("/dao/{}/initiatives", community_id);
+                                            let path = format!("/dao/{}/plugins", community_id);
+                                            tabs.push(Tab { name: "Home".to_string(), path: path.clone() });
                                             nav.push(vec![], &path);
                                         };
                                     },

@@ -109,9 +109,11 @@ pub fn Header() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(
-            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
-        ))
+        items.push(rsx!(AccountButton {
+            title: account.name(),
+            description: address.clone(),
+            on_click: move |_| { log::info!("click") }
+        }))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {

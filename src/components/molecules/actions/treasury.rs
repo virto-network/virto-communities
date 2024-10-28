@@ -81,6 +81,7 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                                     },
                                     on_keypress: move |_| {},
                                     on_click: move |_| {},
+                                    on_focus: move |_| {}, on_blur: move |_| {}
                                 }
                                 if index_meta > 0 {
                                     Input {
@@ -97,6 +98,7 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                                         },
                                         on_keypress: move |_| {},
                                         on_click: move |_| {},
+                                        on_focus: move |_| {}, on_blur: move |_| {}
                                     }
                                 }
                             }
