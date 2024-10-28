@@ -17,6 +17,7 @@ use crate::{
         use_tooltip::{use_tooltip, TooltipItem},
         use_withdraw::use_withdraw,
     },
+    middlewares::is_signer_ready::is_signer_ready,
     pages::onboarding::convert_to_jsvalue,
 };
 use wasm_bindgen::prelude::*;
@@ -57,6 +58,12 @@ pub fn Withdraw() -> Element {
     let mut tab_value = use_signal(|| WithdrawKreivoTabs::Accounts);
 
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
+
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        if let Err(_) = is_signer_ready(i18, accounts, notification)() {
+            nav.push(vec![], "/login");
+        };
+    });
 
     let mut items = vec![];
     for account in accounts.get().into_iter() {

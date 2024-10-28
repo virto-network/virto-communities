@@ -7,8 +7,20 @@ use crate::{
         molecules::{InitiativeActions, InitiativeInfo},
     },
     hooks::{
-        use_initiative::{use_initiative, ActionItem, InitiativeData, InitiativeInfoContent, InitiativeInitContent, TransferItem}, use_notification::use_notification, use_our_navigator::use_our_navigator, use_session::use_session, use_spaces_client::use_spaces_client, use_tooltip::{use_tooltip, TooltipItem}
+        use_accounts::use_accounts,
+        use_initiative::{
+            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
+            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, TransferItem,
+            VotingOpenGov,
+        },
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_session::use_session,
+        use_spaces_client::use_spaces_client,
+        use_tooltip::{use_tooltip, TooltipItem},
+
     },
+    middlewares::is_signer_ready::is_signer_ready,
     pages::onboarding::convert_to_jsvalue,
     services::{
         kreivo::{community_referenda::referendum_count, timestamp::now},
@@ -47,6 +59,7 @@ extern "C" {
 pub fn Initiative(id: u16) -> Element {
     let i18 = use_i18();
     let mut initiative = use_initiative();
+    let accounts = use_accounts();
     let session = use_session();
     let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
@@ -56,6 +69,11 @@ pub fn Initiative(id: u16) -> Element {
     let mut handle_required_inputs = use_signal::<bool>(|| false);
     use_before_render(move || {
         initiative.default();
+    });
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        if let Err(_) = is_signer_ready(i18, accounts, notification)() {
+            nav.push(vec![], &format!("/dao/{}/initiatives", id));
+        };
     });
     rsx! {
         div { class: "page--initiative",

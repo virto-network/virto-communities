@@ -7,16 +7,14 @@ use crate::{
         dropdown::{DropdownItem, ElementSize},
         AccountButton, BankCardLine, Button, CheckboxCard, Dropdown, Icon, Input, KusamaLogo,
         PaymentMethod, PaypalLogo, PolygonLogo, Tab, Title,
-    },
-    hooks::{
+    }, hooks::{
         use_accounts::use_accounts,
         use_communities::use_communities,
         use_deposit::{use_deposit, DepositError, DepositTo},
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
         use_tooltip::{use_tooltip, TooltipItem},
-    },
-    pages::onboarding::convert_to_jsvalue,
+    }, middlewares::is_signer_ready::is_signer_ready, pages::onboarding::convert_to_jsvalue
 };
 use wasm_bindgen::prelude::*;
 
@@ -62,6 +60,12 @@ pub fn Deposit() -> Element {
 
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
 
+    use_coroutine(move |_: UnboundedReceiver<()>| async move {
+        if let Err(_) = is_signer_ready(i18, accounts, notification)() {
+            nav.push(vec![], "/login");
+        };
+    });
+    
     let mut items = vec![];
     for account in accounts.get().into_iter() {
         let address = account.address();

@@ -16,6 +16,7 @@ pub mod pages {
 pub mod middlewares {
     pub mod is_chain_available;
     pub mod is_dao_owner;
+    pub mod is_signer_ready;
 }
 pub mod layouts {
     pub mod authenticated;
@@ -34,8 +35,8 @@ pub mod hooks {
     pub mod use_notification;
     pub mod use_onboard;
     pub mod use_our_navigator;
-    pub mod use_session;
     pub mod use_paginator;
+    pub mod use_session;
     pub mod use_spaces_client;
     pub mod use_startup;
     pub mod use_theme;
