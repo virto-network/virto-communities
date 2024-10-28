@@ -58,6 +58,7 @@ pulldown-cmark = "0.11.0"
 blake2 = "0.10.6"
 chrono = "0.4.38"
 wasm-logger = "0.2.0"
+dioxus-charts = "0.2"
 
 [patch.crates-io]
 cookie = { git = "https://github.com/S0c5/cookie-rs.git" }

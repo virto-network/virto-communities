@@ -101,6 +101,30 @@
                 "rights": "Virto PROD V.0.0.1. 2024 All rights reserved"
             }
         },
+        "plugins": {
+            "cta_cards": {
+                "initiatives": {
+                    "title": "Initiatives",
+                    "description": "Effortlessly manage your initiatives: view, add, or remove."
+                },
+                "members": {
+                    "title": "Members",
+                    "description": "Effortlessly manage your members: view, add, or remove."
+                },
+                "settings": {
+                    "title": "Settings",
+                    "description": "Shape the future: propose, vote, and manage decisions in one streamlined hub."
+                },
+                "treasury": {
+                    "title": "Treasury",
+                    "description": "Manage funds: track balances, approve transactions, and view assets."
+                },
+                "discover_plugins": {
+                    "title": "Discover more plugins",
+                    "description": "Soon"
+                }
+            }
+        },
         "withdraw": {
             "payment": {
                 "label": "Define the withdraw method",

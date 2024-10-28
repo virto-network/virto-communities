@@ -2332,6 +2332,125 @@ textarea::placeholder {
     margin-bottom: 48px;
 }
 
+.bill,
+.send,
+.plugins {
+    padding: 16px;
+    height: 100%;
+    min-height: calc(100vh - 140px);
+    width: 100%;
+    position: relative;
+    margin-bottom: 48px;
+    background: var(--base-surface-1);
+}
+
+.treasury {
+    padding: 24px 16px;
+    height: 100%;
+    min-height: calc(100vh - 140px);
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--base-surface-1);
+}
+
+.treasury__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dx-line-path {
+    stroke: var(--state-success-active);
+}
+
+.dx-line-dot {
+    stroke: var(--state-success-active);
+}
+
+.page--ghost .radio-button {
+    display: flex;
+    padding: var(--Spacing-space-5, 8px);
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: var(--Spacing-space-5, 8px);
+    flex: 1 0 0;
+    border-radius: var(--radi-6, 12px);
+    border: var(--stroke-sm, 1px) solid var(--base-border, #89EC96);
+    background: var(--base-surface-1, #F0FDF1);
+    box-shadow: 0px 0.5px var(--blur-1, 3px) 0px var(--colors-alpha-dark-50, rgba(26, 26, 26, 0.08));
+}
+
+.page--ghost .radio-button__header {
+    justify-content: unset;
+    padding: 0;
+}
+
+.page--ghost .radio-button__header span {
+    @extend %text-base-font-medium;
+    color: var(--text-dark-primary);
+}
+
+.page--ghost .input__label {
+    @extend %text-sm-font-regular;
+    color: var(--text-dark-secondary);
+}
+
+.page--ghost .input--help {
+    @extend %text-sm-font-regular;
+    color: var(--text-dark-secondary);
+}
+
+.page--ghost .input-wrapper {
+    display: flex;
+    padding: 0px var(--spacing-6, 10px) 0px var(--spacing-7, 12px);
+    align-items: center;
+    gap: var(--spacing-5, 8px);
+    align-self: stretch;
+    border-radius: var(--radi-6, 12px);
+    border: var(--stroke-sm, 1px) solid var(--base-border, #89EC96);
+    background: var(--base-surface-1, #F0FDF1);
+}
+
+.page--ghost .input {
+    @extend %text-base-font-medium;
+    color: var(--text-dark-secondary);
+}
+
+.page--ghost .dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.page--ghost .dropdown__label {
+    @extend %text-sm-font-regular;
+    color: var(--text-dark-secondary);
+}
+
+.page--ghost .dropdown__container {
+    border-radius: var(--radi-6, 12px);
+    border: var(--stroke-sm, 1px) solid var(--base-border, #89EC96);
+    background: var(--base-surface-1, #F0FDF1);
+}
+
+.page--ghost .dropdown__placeholder {
+    @extend %text-sm-font-medium;
+    color: var(--text-tertiary);
+}
+
+.page--ghost input::placeholder,
+.page--ghost textarea::placeholder {
+    @extend %text-sm-font-medium;
+    color: var(--text-tertiary);
+}
+
+.page--ghost .dropdown__value {
+    @extend %text-base-font-medium;
+    color: var(--text-secondary);
+}
+
 .initiatives {
     padding: 16px;
     height: 100%;

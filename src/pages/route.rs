@@ -1,12 +1,13 @@
-use dioxus::prelude::*;
 use crate::{
-    layouts::{authenticated::Authenticated, onboard::Onboard},
+    layouts::{authenticated::Authenticated, tabs::Tabs, user::User},
     pages::{
-        account::Account, dashboard::Dashboard, explore::Explore, initiative::Initiative,
-        initiatives::Initiatives, login::Login, not_found::PageNotFound, onboarding::Onboarding,
-        vote::Vote, withdraw::Withdraw, deposit::Deposit
+        account::Account, bill::Bill, dashboard::Dashboard, deposit::Deposit, explore::Explore,
+        initiative::Initiative, initiatives::Initiatives, invoice::Invoice, login::Login,
+        not_found::PageNotFound, onboarding::Onboarding, plugins::Plugins, send::Send,
+        treasury::Treasury, vote::Vote, withdraw::Withdraw,
     },
 };
+use dioxus::prelude::*;
 #[derive(Clone, Routable, Debug, PartialEq)]
 #[rustfmt::skip]
 pub enum Route {
@@ -15,23 +16,35 @@ pub enum Route {
     #[route("/login")]
     Login {},
     #[layout(Authenticated)]
-        #[route("/")]
-        Dashboard {},
         #[route("/account")]
         Account {},
         #[route("/withdraw")]
         Withdraw {},
         #[route("/deposit")]
         Deposit {},
-        #[layout(Onboard)]
+        #[layout(User)]
+            #[route("/")]
+            Dashboard {},
             #[route("/explore")]
             Explore {},
+        #[end_layout]
+        #[layout(Tabs)]
             #[nest("/dao")]
                 #[nest("/:id")]
+                    #[route("/plugins")]
+                    Plugins {id: u16},
                     #[route("/initiatives")]
                     Initiatives {id: u16},
                     #[route("/initiative")]
                     Initiative {id: u16},
+                    #[route("/treasury")]
+                    Treasury {id: u16},
+                    #[route("/send")]
+                    Send {id: u16},
+                    #[route("/bill")]
+                    Bill {id: u16},
+                    #[route("/invoice")]
+                    Invoice {id: u16},
                     #[route("/vote/:initiativeid")]
                     Vote {id: u16, initiativeid: u16},
                     #[end_nest]

@@ -10,15 +10,16 @@ pub fn is_chain_available(
     mut notification: UseNotificationState,
 ) -> impl FnOnce() -> Result<(), &'static str> {
     move || {
-        log::info!("timestamp: {:?}", timestamp.get().0);
-        log::info!("now: {:?}", Date::now());
-        log::info!("rest: {:?}", Date::now() as u64 - timestamp.get().0);
-        if Date::now() as u64 - timestamp.get().0 > THRESHOLD {
-            log::warn!("Chain unavailable");
-            notification.handle_warning(&translate!(i18, "warnings.middleware.chain_unavailable"));
-            Err("Chain unavailable")
-        } else {
-            Ok(())
-        }
+        // log::info!("timestamp: {:?}", timestamp.get().0);
+        // log::info!("now: {:?}", Date::now());
+        // log::info!("rest: {:?}", Date::now() as u64 - timestamp.get().0);
+        // if Date::now() as u64 - timestamp.get().0 > THRESHOLD {
+        //     log::warn!("Chain unavailable");
+        //     notification.handle_warning(&translate!(i18, "warnings.middleware.chain_unavailable"));
+        //     Err("Chain unavailable")
+        // } else {
+        //     Ok(())
+        // }
+        Ok(())
     }
 }

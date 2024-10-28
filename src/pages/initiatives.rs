@@ -1,8 +1,8 @@
 use crate::{
     components::{
         atoms::{
-            dropdown::ElementSize, AddPlus, ArrowRight, Badge, CircleCheck,
-            Icon, IconButton, SearchInput, StopSign, Tab, CardSkeleton,
+            dropdown::ElementSize, AddPlus, ArrowLeft, ArrowRight, Badge, CardSkeleton,
+            CircleCheck, Icon, IconButton, SearchInput, StopSign, Tab,
         },
         molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
@@ -22,7 +22,7 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
-static SKIP: usize = 6;
+static SKIP: u8 = 6;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InitiativeWrapper {
     pub id: u16,
@@ -147,12 +147,15 @@ pub fn Initiatives(id: u16) -> Element {
     rsx! {
         div { class: "dashboard grid-main",
             div { class: "dashboard__head",
-                section { class: "tabs",
-                    for item in tab_items.into_iter() {
-                        Tab {
-                            text: item.value,
-                            is_active: if tab_value() == item.k { true } else { false },
-                            on_click: move |_| {}
+                div { class: "head__actions",
+                    h3 { class: "dashboard__head__title", "Initiatives"}
+                    section { class: "tabs",
+                        for item in tab_items.into_iter() {
+                            Tab {
+                                text: item.value,
+                                is_active: if tab_value() == item.k { true } else { false },
+                                on_click: move |_| {}
+                            }
                         }
                     }
                 }
@@ -251,7 +254,7 @@ pub fn Initiatives(id: u16) -> Element {
                                 }
                             }
                         }
-                   
+
                     }
             }
                 section { class: "card card--reverse",

@@ -101,6 +101,30 @@
                 "rights": "Virto PROD V.0.0.1. 2024 Todos los derechos reservados"
             }
         },
+        "plugins": {
+            "cta_cards": {
+                "initiatives": {
+                    "title": "Iniciativas",
+                    "description": "Administra fácilmente a tus iniciativas: visualiza, añade o elimina."
+                },
+                "members": {
+                    "title": "Miembros",
+                    "description": "Administra fácilmente a tus miembros: visualiza, añade o elimina."
+                },
+                "settings": {
+                    "title": "Configuración",
+                    "description": "Moldea el futuro: propone, vota y gestiona decisiones en un centro simplificado."
+                },
+                "treasury": {
+                    "title": "Tesorería",
+                    "description": "Gestiona fondos: sigue saldos, aprueba transacciones y visualiza activos."
+                },
+                "discover_plugins": {
+                    "title": "Descubre más plugins",
+                    "description": ""
+                }
+            }
+        },
         "withdraw": {
             "payment": {
                 "label": "Pago",
