@@ -1,15 +1,18 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use std::str::FromStr;
+
 use crate::{
     components::atoms::{
         combo_input::{ComboInputOption, ComboInputValue},
         dropdown::{DropdownItem, ElementSize},
-        icon_button::Variant, AddPlus, ComboInput, Icon, IconButton, MinusCircle,
+        icon_button::Variant,
+        AddPlus, ComboInput, Icon, IconButton, MinusCircle,
     },
     hooks::use_initiative::{
         use_initiative, ActionItem, AddMembersAction, MediumOptions, MemberItem,
     },
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
@@ -27,7 +30,7 @@ pub fn MembersAction(props: VotingProps) -> Element {
                     }, value: match member.medium.clone() {
                         MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
                     } };
-            
+
                     rsx!(
                         li {
                             ComboInput {
@@ -38,6 +41,12 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                 },
                                 placeholder: match member.medium {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
+                                },
+                                error: {
+                                    match sp_core::sr25519::Public::from_str(&member.account) {
+                                        Ok(_) => None,
+                                        Err(_) => Some(translate!(i18, "onboard.invite.form.error.invalid_address")),
+                                    }
                                 },
                                 on_change: move |event: ComboInputValue| {
                                     let medium = match event.option {
@@ -82,10 +91,14 @@ pub fn MembersAction(props: VotingProps) -> Element {
                 variant: Variant::Round,
                 size: ElementSize::Small,
                 class: "button--avatar",
-                body: rsx!(
-                    Icon { icon : AddPlus, height : 24, width : 24, fill :
-                    "var(--state-primary-active)" }
-                ),
+                body: rsx! {
+                    Icon {
+                        icon: AddPlus,
+                        height: 24,
+                        width: 24,
+                        fill: "var(--state-primary-active)"
+                    }
+                },
                 on_click: move |_| {
                     if let ActionItem::AddMembers(ref mut meta) = initiative.get_action(props.index)
                     {

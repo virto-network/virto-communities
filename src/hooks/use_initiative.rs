@@ -1,6 +1,10 @@
+use std::str::FromStr;
+
 use crate::components::atoms::dropdown::DropdownItem;
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
+const BLOCK_TIME_IN_SECONDS: i64 = 6;
 #[derive(Clone, Default, Deserialize, Serialize, Debug)]
 pub struct InfoForm {
     pub name: String,
@@ -157,7 +161,7 @@ impl VotingOpenGovAction {
 #[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub struct TransferItem {
     pub account: String,
-    pub value: u64
+    pub value: u64,
 }
 pub type Transfers = Vec<TransferItem>;
 #[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
@@ -217,7 +221,9 @@ impl ActionItem {
             "AddMembers" => ActionItem::AddMembers(AddMembersAction::default()),
             "KusamaTreasury" => ActionItem::KusamaTreasury(KusamaTreasuryAction::default()),
             "VotingOpenGov" => ActionItem::VotingOpenGov(VotingOpenGovAction::default()),
-            "CommunityTransfer" => ActionItem::CommunityTransfer(CommunityTransferAction::default()),
+            "CommunityTransfer" => {
+                ActionItem::CommunityTransfer(CommunityTransferAction::default())
+            }
             _ => todo!(),
         }
     }
@@ -301,11 +307,11 @@ pub fn use_initiative() -> UseInitiativeState {
         },
     })
 }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct UseInitiativeState {
     inner: UseInitiativeInner,
 }
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Debug)]
 pub struct UseInitiativeInner {
     info: Signal<InfoForm>,
     actions: Signal<ActionsForm>,
@@ -381,4 +387,277 @@ impl UseInitiativeState {
     pub fn default(&mut self) {
         self.inner = UseInitiativeInner::default();
     }
+    pub fn filter_valid_address_add_members(&self) -> Vec<String> {
+        let add_members_action = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::AddMembers(add_members_action) => Some(
+                    add_members_action
+                        .members
+                        .clone()
+                        .into_iter()
+                        .filter_map(|member| {
+                            if !member.account.is_empty() {
+                                match sp_core::sr25519::Public::from_str(&member.account) {
+                                    Ok(_) => Some(member.account),
+                                    Err(_) => None,
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<String>>(),
+                ),
+                _ => None,
+            })
+            .collect::<Vec<Vec<String>>>();
+        add_members_action
+            .into_iter()
+            .flat_map(|v| v.into_iter())
+            .collect::<Vec<String>>()
+    }
+    pub fn check_add_members(&self) -> bool {
+        let count = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::AddMembers(add_members_action) => {
+                    Some(add_members_action.members.len())
+                }
+                _ => None,
+            })
+            .reduce(|a, b| a + b);
+
+        let Some(count) = count else { return true };
+
+        let has_add_members_actions = self
+            .get_actions()
+            .iter()
+            .any(|action| matches!(action, ActionItem::AddMembers(_)));
+
+        self.filter_valid_address_add_members().len() == count
+            && (has_add_members_actions && count > 0)
+    }
+    pub fn filter_valid_treasury(&self) -> Vec<KusamaTreasury> {
+        let treasury_action = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::KusamaTreasury(treasury_action) => Some(
+                    treasury_action
+                        .periods
+                        .clone()
+                        .into_iter()
+                        .filter_map(|period| {
+                            if period.amount > 0 {
+                                Some(period)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<KusamaTreasury>>(),
+                ),
+                _ => None,
+            })
+            .collect::<Vec<Vec<KusamaTreasury>>>();
+        treasury_action
+            .into_iter()
+            .flat_map(|v| v.into_iter())
+            .collect::<Vec<KusamaTreasury>>()
+    }
+    pub fn convert_treasury_to_period(
+        &self,
+        current_block: u32,
+        now_kusama: u64,
+    ) -> Vec<KusamaTreasuryPeriod> {
+        self.filter_valid_treasury()
+            .into_iter()
+            .map(|period| convert_treasury_to_period(period, current_block, now_kusama))
+            .collect::<Vec<KusamaTreasuryPeriod>>()
+    }
+    pub fn check_treasury(&self) -> bool {
+        let count = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::KusamaTreasury(period) => Some(period.periods.len()),
+                _ => None,
+            })
+            .reduce(|a, b| a + b);
+
+        let Some(count) = count else { return true };
+
+        let has_treasury_actions = self
+            .get_actions()
+            .iter()
+            .any(|action| matches!(action, ActionItem::KusamaTreasury(_)));
+
+        self.filter_valid_treasury().len() == count && (has_treasury_actions && count > 0)
+    }
+    pub fn filter_valid_voting_open_gov(&self) -> Vec<VotingOpenGov> {
+        let votiong_open_gov_action = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::VotingOpenGov(votiong_open_gov_action) => Some(
+                    votiong_open_gov_action
+                        .proposals
+                        .clone()
+                        .into_iter()
+                        .filter_map(|proposal| {
+                            if proposal.poll_index > 0 {
+                                match &proposal.vote {
+                                    VoteType::Standard(standard_vote) => {
+                                        if standard_vote.balance > 0 {
+                                            Some(proposal)
+                                        } else {
+                                            None
+                                        }
+                                    }
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<VotingOpenGov>>(),
+                ),
+                _ => None,
+            })
+            .collect::<Vec<Vec<VotingOpenGov>>>();
+        votiong_open_gov_action
+            .into_iter()
+            .flat_map(|v| v.into_iter())
+            .collect::<Vec<VotingOpenGov>>()
+    }
+    pub fn check_voting_open_gov(&self) -> bool {
+        let count = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::VotingOpenGov(votiong_open_gov_action) => {
+                    Some(votiong_open_gov_action.proposals.len())
+                }
+                _ => None,
+            })
+            .reduce(|a, b| a + b);
+
+        let Some(count) = count else { return true };
+
+        let has_voting_open_gov_actions = self
+            .get_actions()
+            .iter()
+            .any(|action| matches!(action, ActionItem::VotingOpenGov(_)));
+
+        self.filter_valid_voting_open_gov().len() == count
+            && (has_voting_open_gov_actions && count > 0)
+    }
+    pub fn filter_valid_community_transfer(&self) -> Vec<TransferItem> {
+        let community_transfer_action = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::CommunityTransfer(community_transfer_action) => Some(
+                    community_transfer_action
+                        .transfers
+                        .clone()
+                        .into_iter()
+                        .filter_map(|transfer| {
+                            if transfer.value > 0 {
+                                match sp_core::sr25519::Public::from_str(&transfer.account) {
+                                    Ok(_) => Some(transfer),
+                                    Err(_) => None,
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<TransferItem>>(),
+                ),
+                _ => None,
+            })
+            .collect::<Vec<Vec<TransferItem>>>();
+        community_transfer_action
+            .into_iter()
+            .flat_map(|v| v.into_iter())
+            .collect::<Vec<TransferItem>>()
+    }
+    pub fn check_community_transfer(&self) -> bool {
+        let count = self
+            .get_actions()
+            .into_iter()
+            .filter_map(|action| match action {
+                ActionItem::CommunityTransfer(community_transfer_action) => {
+                    Some(community_transfer_action.transfers.len())
+                }
+                _ => None,
+            })
+            .reduce(|a, b| a + b);
+
+        let Some(count) = count else { return true };
+
+        let has_community_transfer_actions = self
+            .get_actions()
+            .iter()
+            .any(|action| matches!(action, ActionItem::CommunityTransfer(_)));
+
+        self.filter_valid_community_transfer().len() == count
+            && (has_community_transfer_actions && count > 0)
+    }
+    pub fn check(&self) -> bool {
+        log::info!("{} {}", self.check_add_members(), self.check_treasury());
+        (self.check_add_members()
+            && self.check_treasury()
+            && self.check_voting_open_gov()
+            && self.check_community_transfer())
+            && (self.filter_valid_address_add_members().len() > 0
+                || self.filter_valid_treasury().len() > 0
+                || self.filter_valid_voting_open_gov().len() > 0
+                || self.filter_valid_community_transfer().len() > 0)
+    }
+}
+
+fn convert_treasury_to_period(
+    treasury: KusamaTreasury,
+    current_block: u32,
+    current_date_millis: u64,
+) -> KusamaTreasuryPeriod {
+    if treasury.date != "" {
+        let future_block =
+            calculate_future_block(current_block, current_date_millis, &treasury.date);
+        KusamaTreasuryPeriod {
+            blocks: Some(future_block as u64),
+            amount: treasury.amount,
+        }
+    } else {
+        KusamaTreasuryPeriod {
+            blocks: None,
+            amount: treasury.amount,
+        }
+    }
+}
+
+fn calculate_future_block(
+    current_block: u32,
+    current_date_millis: u64,
+    future_date_str: &str,
+) -> u32 {
+    let future_date_naive = NaiveDate::from_str(future_date_str).expect("Invalid future date");
+    let future = future_date_naive
+        .and_hms_opt(0, 0, 0)
+        .expect("Invalid future date");
+    let future_date = DateTime::<Utc>::from_naive_utc_and_offset(future, Utc);
+
+    let x = DateTime::from_timestamp(
+        (current_date_millis / 1000).try_into().unwrap(),
+        ((current_date_millis % 1000) * 1_000_000) as u32,
+    )
+    .expect("");
+
+    let x = NaiveDateTime::from_str(&x.date_naive().to_string()).expect("Invalid calculated date");
+    let current_date = DateTime::from_naive_utc_and_offset(x, Utc);
+
+    let elapsed_time_in_seconds = (future_date - current_date).num_seconds();
+    let blocks_to_add = elapsed_time_in_seconds / BLOCK_TIME_IN_SECONDS;
+    (current_block + blocks_to_add as u32).into()
 }

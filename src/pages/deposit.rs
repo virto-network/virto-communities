@@ -70,20 +70,20 @@ pub fn Deposit() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(AccountButton {
-            title: account.name(),
-            description: address.clone(),
-            on_click: move |_| {}
-        }))
+        items.push(rsx!(
+            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
+        ))
     }
 
     let mut community_items = vec![];
     for community in communities.get_communities().into_iter() {
-        community_items.push(rsx!(AccountButton {
-            title: format!("{} ({})", community.name, community.id),
-            description: "".to_string(),
-            on_click: move |_| {}
-        }))
+        community_items.push(rsx!(
+            AccountButton {
+                title: format!("{} ({})", community.name, community.id),
+                description: "".to_string(),
+                on_click: move |_| {}
+            }
+        ))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
@@ -140,18 +140,24 @@ pub fn Deposit() -> Element {
                         div { class: "summary summary--form",
                             div { class: "row deposit__row",
                                 div { class: "summary__wrapper",
-                                    h4 { class: "summary__subtitle", {translate!(i18, "deposit.payment.subtitle")} }
+                                    h4 { class: "summary__subtitle",
+                                        {translate!(i18, "deposit.payment.subtitle")}
+                                    }
                                     div { class: "payment__methods",
                                         CheckboxCard {
                                             id: "a".to_string(),
                                             name: String::from("management"),
                                             checked: matches!(*payment_selected.read(), PaymentMethods::KUSAMA),
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "deposit.payment.methods.kusama.title"),
-                                                fee : translate!(i18, "deposit.payment.methods.kusama.fee"), icon : rsx!(Icon {
-                                                icon : KusamaLogo, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "deposit.payment.methods.kusama.title"),
+                                                    fee: translate!(i18, "deposit.payment.methods.kusama.fee"),
+                                                    icon: rsx! {
+                                                        Icon { icon: KusamaLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::KUSAMA);
                                             }
@@ -162,12 +168,15 @@ pub fn Deposit() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::Card),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "deposit.payment.methods.card.title"),
-                                                fee : translate!(i18, "deposit.payment.methods.card.fee", fee : 5), icon :
-                                                rsx!(Icon { icon : BankCardLine, height : 20, width : 20, fill :
-                                                "var(--fill-600)" }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "deposit.payment.methods.card.title"),
+                                                    fee: translate!(i18, "deposit.payment.methods.card.fee", fee : 5),
+                                                    icon: rsx! {
+                                                        Icon { icon: BankCardLine, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::Card);
                                             }
@@ -178,12 +187,15 @@ pub fn Deposit() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::Paypal),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "deposit.payment.methods.paypal.title"),
-                                                fee : translate!(i18, "deposit.payment.methods.paypal.fee", fee : 5), icon :
-                                                rsx!(Icon { icon : PaypalLogo, height : 20, width : 20, fill : "var(--fill-600)"
-                                                }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "deposit.payment.methods.paypal.title"),
+                                                    fee: translate!(i18, "deposit.payment.methods.paypal.fee", fee : 5),
+                                                    icon: rsx! {
+                                                        Icon { icon: PaypalLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::Paypal);
                                             }
@@ -194,12 +206,15 @@ pub fn Deposit() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::PSE),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "deposit.payment.methods.pse.title"),
-                                                fee : translate!(i18, "deposit.payment.methods.pse.fee", fee : 3), icon :
-                                                rsx!(Icon { icon : PaypalLogo, height : 20, width : 20, fill : "var(--fill-600)"
-                                                }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "deposit.payment.methods.pse.title"),
+                                                    fee: translate!(i18, "deposit.payment.methods.pse.fee", fee : 3),
+                                                    icon: rsx! {
+                                                        Icon { icon: PaypalLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::PSE);
                                             }
@@ -210,11 +225,15 @@ pub fn Deposit() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::ETH),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "deposit.payment.methods.eth.title"),
-                                                fee : translate!(i18, "deposit.payment.methods.eth.fee"), icon : rsx!(Icon {
-                                                icon : PolygonLogo, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "deposit.payment.methods.eth.title"),
+                                                    fee: translate!(i18, "deposit.payment.methods.eth.fee"),
+                                                    icon: rsx! {
+                                                        Icon { icon: PolygonLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::ETH);
                                             }
@@ -223,7 +242,9 @@ pub fn Deposit() -> Element {
                                 }
                                 if !matches!(*payment_selected.read(), PaymentMethods::None) {
                                     div { class: "summary__wrapper",
-                                        h4 { class: "summary__subtitle", {translate!(i18, "deposit.form.title")} }
+                                        h4 { class: "summary__subtitle",
+                                            {translate!(i18, "deposit.form.title")}
+                                        }
                                         div { class: "deposit__form__inputs",
                                             div { class: "account__options",
                                                 Tab {
@@ -300,7 +321,9 @@ pub fn Deposit() -> Element {
                                                     placeholder: translate!(i18, "deposit.form.amount.placeholder"),
                                                     label: translate!(i18, "deposit.form.amount.label"),
                                                     error: None,
-                                                    right_text: rsx!(span { class : "input--right__text", "KSM" }),
+                                                    right_text: rsx! {
+                                                        span { class: "input--right__text", "KSM" }
+                                                    },
                                                     on_input: move |event: Event<FormData>| {
                                                         deposit
                                                             .deposit_mut()
@@ -326,10 +349,17 @@ pub fn Deposit() -> Element {
                                                                 body: translate!(i18, "deposit.tips.loading.description"),
                                                                 show: true,
                                                             });
-                                                        let (destination, amount, to_community) = deposit.get_deposit().to_deposit().map_err(|e| match e {
-                                                            DepositError::MalformedAddress => translate!(i18, "errors.wallet.account_address"),
-                                                            DepositError::InvalidAmount => translate!(i18, "errors.form.invalid_amount"),
-                                                        })?;
+                                                        let (destination, amount, to_community) = deposit
+                                                            .get_deposit()
+                                                            .to_deposit()
+                                                            .map_err(|e| match e {
+                                                                DepositError::MalformedAddress => {
+                                                                    translate!(i18, "errors.wallet.account_address")
+                                                                }
+                                                                DepositError::InvalidAmount => {
+                                                                    translate!(i18, "errors.form.invalid_amount")
+                                                                }
+                                                            })?;
                                                         let destination = convert_to_jsvalue(&destination)
                                                             .map_err(|_| {
                                                                 log::warn!("Malformed dest account");
@@ -342,7 +372,10 @@ pub fn Deposit() -> Element {
                                                                 translate!(i18, "errors.form.deposit_failed")
                                                             })?;
                                                         tooltip.hide();
-                                                        notification.handle_success(&translate!(i18, "deposit.tips.created.description"));
+                                                        notification
+                                                            .handle_success(
+                                                                &translate!(i18, "deposit.tips.created.description"),
+                                                            );
                                                         nav.push(vec![], "/account");
                                                         Ok::<(), String>(())
                                                     }

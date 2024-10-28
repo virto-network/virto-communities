@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{
     components::atoms::{
         dropdown::ElementSize, icon_button::Variant, AddPlus, Icon, IconButton,
@@ -32,7 +34,12 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     message: transfer.account.clone(),
                                     size: ElementSize::Small,
                                     placeholder: translate!(i18, "initiative.steps.actions.community_transfer.dest.placeholder"),
-                                    error: None,
+                                    error: {
+                                        match sp_core::sr25519::Public::from_str(&transfer.account) {
+                                            Ok(_) => None,
+                                            Err(_) => Some(translate!(i18, "initiative.steps.actions.error.invalid_address")),
+                                        }
+                                    },
                                     on_input: move |event: Event<FormData>| {
                                         if let ActionItem::CommunityTransfer(ref mut meta) = initiative.get_action(props.index) {
                                             meta.transfers[index_meta].account = event.value() ;
@@ -46,7 +53,13 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     message: (transfer.value / KUSAMA_PRECISION_DECIMALS).to_string(),
                                     size: ElementSize::Small,
                                     placeholder: translate!(i18, "initiative.steps.actions.community_transfer.amount.placeholder"),
-                                    error: None,
+                                    error: {
+                                        if transfer.value > 0 {
+                                            None
+                                        } else {
+                                            Some(translate!(i18, "initiative.steps.actions.error.amount"))
+                                        }
+                                    },
                                     right_text: {
                                         rsx!(
                                             span { class: "input--right__text",
@@ -94,10 +107,14 @@ pub fn TransferAction(props: VotingProps) -> Element {
                 variant: Variant::Round,
                 size: ElementSize::Small,
                 class: "button--avatar",
-                body: rsx!(
-                    Icon { icon : AddPlus, height : 24, width : 24, fill :
-                    "var(--state-primary-active)" }
-                ),
+                body: rsx! {
+                    Icon {
+                        icon: AddPlus,
+                        height: 24,
+                        width: 24,
+                        fill: "var(--state-primary-active)"
+                    }
+                },
                 on_click: move |_| {
                     if let ActionItem::CommunityTransfer(ref mut meta) = initiative
                         .get_action(props.index)

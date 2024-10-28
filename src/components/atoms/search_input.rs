@@ -45,10 +45,15 @@ pub fn SearchInput(props: SearchInputProps) -> Element {
                 IconButton {
                     class: "button--avatar bg--transparent",
                     size: props.size,
-                    body: rsx!(
-                        Icon { icon : Search, height : 26, width : 26, stroke_width : 1.5, fill :
-                        "var(--text-secondary)" }
-                    ),
+                    body: rsx! {
+                        Icon {
+                            icon: Search,
+                            height: 26,
+                            width: 26,
+                            stroke_width: 1.5,
+                            fill: "var(--text-secondary)"
+                        }
+                    },
                     on_click: move |_| {
                         is_active.toggle();
                     }

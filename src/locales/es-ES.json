@@ -247,6 +247,10 @@
                 },
                 "actions": {
                     "label": "Configuración de ejecución de iniciativa",
+                    "error": {
+                        "amount": "Debe ser mayor a 0",
+                        "invalid_address":"Oops! ✋ Dirección no válida"
+                    },
                     "add_members": {
                         "title": "Agregar Miembros"
                     },
@@ -446,6 +450,9 @@
                     "phone": {
                         "label": "Teléfono",
                         "placeholder": "+57 322 1230000"
+                    },
+                    "error": {
+                        "invalid_address": "Oops! ✋ Dirección no válida"
                     }
                 },
                 "cta": {

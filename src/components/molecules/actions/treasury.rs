@@ -1,15 +1,14 @@
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
 use crate::{
     components::atoms::{
         dropdown::{DropdownItem, ElementSize},
-        icon_button::Variant, input::InputType, AddPlus, Icon, IconButton, Input,
-        MinusCircle,
+        icon_button::Variant,
+        input::InputType,
+        AddPlus, Icon, IconButton, Input, MinusCircle,
     },
-    hooks::use_initiative::{
-        use_initiative, ActionItem, KusamaTreasury, KusamaTreasuryAction,
-    },
+    hooks::use_initiative::{use_initiative, ActionItem, KusamaTreasury, KusamaTreasuryAction},
 };
+use dioxus::prelude::*;
+use dioxus_std::{i18n::use_i18, translate};
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
@@ -62,7 +61,13 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                                     message: (period.amount / KUSAMA_PRECISION_DECIMALS).to_string(),
                                     size: ElementSize::Small,
                                     placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
-                                    error: None,
+                                    error: {
+                                        if period.amount > 0 {
+                                            None
+                                        } else {
+                                            Some(translate!(i18, "initiative.steps.actions.error.amount"))
+                                        }
+                                    },
                                     right_text: {
                                         rsx!(
                                             span { class: "input--right__text",
@@ -127,10 +132,14 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                 variant: Variant::Round,
                 size: ElementSize::Small,
                 class: "button--avatar",
-                body: rsx!(
-                    Icon { icon : AddPlus, height : 24, width : 24, fill :
-                    "var(--state-primary-active)" }
-                ),
+                body: rsx! {
+                    Icon {
+                        icon: AddPlus,
+                        height: 24,
+                        width: 24,
+                        fill: "var(--state-primary-active)"
+                    }
+                },
                 on_click: move |_| {
                     if let ActionItem::KusamaTreasury(ref mut meta) = initiative
                         .get_action(props.index)

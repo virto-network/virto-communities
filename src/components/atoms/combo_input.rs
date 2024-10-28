@@ -1,9 +1,7 @@
+use super::dropdown::ElementSize;
+use crate::components::atoms::{dropdown::DropdownItem, input::InputType, Dropdown, Input};
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use crate::components::atoms::{
-    dropdown::DropdownItem, input::InputType, Dropdown, Input,
-};
-use super::dropdown::ElementSize;
 #[derive(PartialEq, Clone, Debug)]
 pub enum ComboInputOption {
     Dropdown(DropdownItem),
@@ -34,16 +32,12 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
     let mut option_value = use_signal(|| props.value.option.clone());
     let mut input_value = use_signal::<String>(|| props.value.input.clone());
     let mut items = vec![];
-    let dropdown_options = use_signal::<
-        Vec<DropdownItem>,
-    >(|| {
+    let dropdown_options = use_signal::<Vec<DropdownItem>>(|| {
         let Some(options) = props.options else {
-            return vec![
-                DropdownItem {
-                    key: "Wallet".to_string(),
-                    value: translate!(i18, "onboard.invite.form.wallet.label"),
-                },
-            ];
+            return vec![DropdownItem {
+                key: "Wallet".to_string(),
+                value: translate!(i18, "onboard.invite.form.wallet.label"),
+            }];
         };
         options
     });
@@ -61,7 +55,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                         size: props.size.clone(),
                         itype: InputType::Date,
                         placeholder: props.placeholder.clone(),
-                        error: None,
+                        error: props.error.clone(),
                         on_input: move |event: Event<FormData>| {
                             option_value.set(ComboInputOption::Date(event.value().clone()));
                             props.on_change.call(ComboInputValue { option: ComboInputOption::Date(event.value().clone()), input: input_value().clone() })
@@ -93,7 +87,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                 message: props.value.input.clone(),
                 size: props.size,
                 placeholder: props.placeholder,
-                error: None,
+                error: props.error,
                 right_text: props.right_text,
                 on_input: move |event: Event<FormData>| {
                     input_value.set(event.value().clone());

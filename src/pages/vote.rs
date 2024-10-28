@@ -253,10 +253,10 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                 text: format!("{}: ", translate!(i18, "governance.description.details.by")),
                                 size: ElementSize::Medium,
                                 variant: KeyValueVariant::Secondary,
-                                body: rsx!(
+                                body: rsx! {
                                     { let hex_string = hex::encode(& initiative_wrapper.ongoing.submission_deposit
                                     .who); format!("0x{}", hex_string) }
-                                )
+                                }
                             }
                         }
                         div { class: "steps__wrapper",
@@ -278,7 +278,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                             ActionItem::AddMembers(action) => action.members.len(),
                                                             ActionItem::KusamaTreasury(action) => action.periods.len(),
                                                             ActionItem::VotingOpenGov(action) => action.proposals.len(),
-                                                            ActionItem::CommunityTransfer(action) => action.transfers.len()
+                                                            ActionItem::CommunityTransfer(action) => action.transfers.len(),
                                                         }
                                                     })
                                                     .sum::<usize>()
@@ -390,7 +390,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         variant: Variant::Secondary,
                                                         on_click: move |_| { handle_vote(true) },
                                                         status: None,
-                                                        left_icon: rsx!(Icon { icon : CircleCheck, height : 16, width : 16, fill : "#56C95F" })
+                                                        left_icon: rsx! {
+                                                            Icon { icon: CircleCheck, height: 16, width: 16, fill: "#56C95F" }
+                                                        }
                                                     }
                                                     Button {
                                                         class: "vote-cta",
@@ -399,10 +401,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         variant: Variant::Secondary,
                                                         on_click: move |_| { handle_vote(false) },
                                                         status: None,
-                                                        left_icon: rsx!(
-                                                            Icon { icon : StopSign, height : 16, width : 16, stroke_width : 2, stroke :
-                                                            "#f44336bd" }
-                                                        )
+                                                        left_icon: rsx! {
+                                                            Icon { icon: StopSign, height: 16, width: 16, stroke_width: 2, stroke: "#f44336bd" }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -422,13 +423,17 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         class: "key-value--row",
                                                         text: "Threshold",
                                                         size: ElementSize::Medium,
-                                                        body: rsx!({ format!("{:.1}%", approval_threshold()) })
+                                                        body: rsx! {
+                                                            { format!("{:.1}%", approval_threshold()) }
+                                                        }
                                                     }
                                                     KeyValue {
                                                         class: "key-value--row",
                                                         text: "Current approval",
                                                         size: ElementSize::Medium,
-                                                        body: rsx!({ format!("{:.1}%", votes_statistics().percent_aye()) })
+                                                        body: rsx! {
+                                                            { format!("{:.1}%", votes_statistics().percent_aye()) }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -461,16 +466,18 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         class: "key-value--row",
                                                         text: "Paricipation threshold",
                                                         size: ElementSize::Medium,
-                                                        body: rsx!({ format!("{:.1}%", participation_threshold()) })
+                                                        body: rsx! {
+                                                            { format!("{:.1}%", participation_threshold()) }
+                                                        }
                                                     }
                                                     KeyValue {
                                                         class: "key-value--row",
                                                         text: "Current support",
                                                         size: ElementSize::Medium,
-                                                        body: rsx!(
+                                                        body: rsx! {
                                                             { let consumed_percent = 100.0 / members() as f64 * votes_statistics().total() as
                                                             f64; format!("{:.1}%", consumed_percent) }
-                                                        )
+                                                        }
                                                     }
                                                 }
                                             }
