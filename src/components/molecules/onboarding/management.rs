@@ -21,12 +21,15 @@ pub fn OnboardingManagement() -> Element {
                 id: "a".to_string(),
                 name: String::from("management"),
                 checked: matches!(onboard.get_management().value, ManagementOptions::Membership),
-                body: rsx!(
-                    ManagementMethod { title : translate!(i18,
-                    "onboard.management.form.membership.title"), description : translate!(i18,
-                    "onboard.management.form.membership.description"), icon : rsx!(Icon { icon :
-                    TeamFill, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                ),
+                body: rsx! {
+                    ManagementMethod {
+                        title: translate!(i18, "onboard.management.form.membership.title"),
+                        description: translate!(i18, "onboard.management.form.membership.description"),
+                        icon: rsx! {
+                            Icon { icon: TeamFill, height: 20, width: 20, fill: "var(--fill-600)" }
+                        }
+                    }
+                },
                 on_change: move |_| {
                     onboard
                         .management_mut()
@@ -38,12 +41,15 @@ pub fn OnboardingManagement() -> Element {
                 name: String::from("management"),
                 checked: false,
                 soon: true,
-                body: rsx!(
-                    ManagementMethod { title : translate!(i18, "onboard.management.form.rank.title"),
-                    description : translate!(i18, "onboard.management.form.rank.description"), icon :
-                    rsx!(Icon { icon : MedalFill, height : 20, width : 20, fill : "var(--fill-600)"
-                    }), }
-                ),
+                body: rsx! {
+                    ManagementMethod {
+                        title: translate!(i18, "onboard.management.form.rank.title"),
+                        description: translate!(i18, "onboard.management.form.rank.description"),
+                        icon: rsx! {
+                            Icon { icon: MedalFill, height: 20, width: 20, fill: "var(--fill-600)" }
+                        }
+                    }
+                },
                 on_change: move |_| {}
             }
             CheckboxCard {
@@ -51,12 +57,15 @@ pub fn OnboardingManagement() -> Element {
                 name: String::from("management"),
                 checked: false,
                 soon: true,
-                body: rsx!(
-                    ManagementMethod { title : translate!(i18,
-                    "onboard.management.form.native_token.title"), description : translate!(i18,
-                    "onboard.management.form.native_token.description"), icon : rsx!(Icon { icon :
-                    KeyFill, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                ),
+                body: rsx! {
+                    ManagementMethod {
+                        title: translate!(i18, "onboard.management.form.native_token.title"),
+                        description: translate!(i18, "onboard.management.form.native_token.description"),
+                        icon: rsx! {
+                            Icon { icon: KeyFill, height: 20, width: 20, fill: "var(--fill-600)" }
+                        }
+                    }
+                },
                 on_change: move |_| {}
             }
             CheckboxCard {
@@ -64,12 +73,15 @@ pub fn OnboardingManagement() -> Element {
                 name: String::from("management"),
                 checked: false,
                 soon: true,
-                body: rsx!(
-                    ManagementMethod { title : translate!(i18,
-                    "onboard.management.form.own_token.title"), description : translate!(i18,
-                    "onboard.management.form.own_token.description"), icon : rsx!(Icon { icon :
-                    ShieldKeyholeFill, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                ),
+                body: rsx! {
+                    ManagementMethod {
+                        title: translate!(i18, "onboard.management.form.own_token.title"),
+                        description: translate!(i18, "onboard.management.form.own_token.description"),
+                        icon: rsx! {
+                            Icon { icon: ShieldKeyholeFill, height: 20, width: 20, fill: "var(--fill-600)" }
+                        }
+                    }
+                },
                 on_change: move |_| {}
             }
         }

@@ -184,9 +184,9 @@ pub fn Header() -> Element {
                             Button {
                                 text: translate!(i18, "header.cta.connect"),
                                 status: None,
-                                right_icon: rsx!(
-                                    Icon { icon : Polkadot, height : 20, width : 20, fill : "var(--text-primary)" }
-                                ),
+                                right_icon: rsx! {
+                                    Icon { icon: Polkadot, height: 20, width: 20, fill: "var(--text-primary)" }
+                                },
                                 on_click: move |_| {
                                     spawn(
                                         async move {
@@ -237,7 +237,9 @@ pub fn Header() -> Element {
                                 variant: Variant::Round,
                                 size: ElementSize::Big,
                                 class: "button--avatar button--comming-soon bg--fill-600",
-                                body: rsx!(Icon { icon : ArrowUpDown, height : 32, width : 32, fill : "var(--fill-00)" }),
+                                body: rsx! {
+                                    Icon { icon: ArrowUpDown, height: 32, width: 32, fill: "var(--fill-00)" }
+                                },
                                 on_click: move |_| {}
                             }
                         }
@@ -260,35 +262,45 @@ pub fn Header() -> Element {
                             variant: Variant::Round,
                             size: ElementSize::Big,
                             class: "button--avatar bg--fill-50 button--comming-soon",
-                            body: rsx!(Icon { icon : Votes, height : 32, width : 32, fill : "var(--fill-600)" }),
+                            body: rsx! {
+                                Icon { icon: Votes, height: 32, width: 32, fill: "var(--fill-600)" }
+                            },
                             on_click: move |_| {}
                         }
                         IconButton {
                             variant: Variant::Round,
                             size: ElementSize::Big,
                             class: "button--avatar bg--fill-50 button--comming-soon",
-                            body: rsx!(Icon { icon : Messages, height : 32, width : 32, fill : "var(--fill-600)" }),
+                            body: rsx! {
+                                Icon { icon: Messages, height: 32, width: 32, fill: "var(--fill-600)" }
+                            },
                             on_click: move |_| {}
                         }
                         IconButton {
                             variant: Variant::Round,
                             size: ElementSize::Big,
                             class: "button--avatar bg--fill-50 button--comming-soon",
-                            body: rsx!(Icon { icon : Profile, height : 32, width : 32, fill : "var(--fill-600)" }),
+                            body: rsx! {
+                                Icon { icon: Profile, height: 32, width: 32, fill: "var(--fill-600)" }
+                            },
                             on_click: move |_| {}
                         }
                         IconButton {
                             variant: Variant::Round,
                             size: ElementSize::Big,
                             class: "button--avatar bg--fill-50 button--comming-soon",
-                            body: rsx!(Icon { icon : Settings, height : 32, width : 32, fill : "var(--fill-600)" }),
+                            body: rsx! {
+                                Icon { icon: Settings, height: 32, width: 32, fill: "var(--fill-600)" }
+                            },
                             on_click: move |_| {}
                         }
                         IconButton {
                             variant: Variant::Round,
                             size: ElementSize::Big,
                             class: "button--avatar bg--fill-50 mobile",
-                            body: rsx!(Icon { icon : Hamburguer, height : 32, width : 32, fill : "var(--fill-600)" }),
+                            body: rsx! {
+                                Icon { icon: Hamburguer, height: 32, width: 32, fill: "var(--fill-600)" }
+                            },
                             on_click: move |_| {
                                 is_active.toggle();
                             }
@@ -307,7 +319,9 @@ pub fn Header() -> Element {
                                     variant: Variant::Round,
                                     size: ElementSize::Big,
                                     class: "button--avatar bg--transparent",
-                                    body: rsx!(Icon { icon : Close, height : 32, width : 32, fill : "var(--fill-600)" }),
+                                    body: rsx! {
+                                        Icon { icon: Close, height: 32, width: 32, fill: "var(--fill-600)" }
+                                    },
                                     on_click: move |_| {
                                         is_active.toggle();
                                     }
@@ -320,7 +334,9 @@ pub fn Header() -> Element {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
                                         class: "button--avatar bg--fill-50 button--comming-soon",
-                                        body: rsx!(Icon { icon : Votes, height : 32, width : 32, fill : "var(--fill-600)" }),
+                                        body: rsx! {
+                                            Icon { icon: Votes, height: 32, width: 32, fill: "var(--fill-600)" }
+                                        },
                                         on_click: move |_| {}
                                     }
                                 }
@@ -330,7 +346,9 @@ pub fn Header() -> Element {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
                                         class: "button--avatar bg--fill-50 button--comming-soon",
-                                        body: rsx!(Icon { icon : Messages, height : 32, width : 32, fill : "var(--fill-600)" }),
+                                        body: rsx! {
+                                            Icon { icon: Messages, height: 32, width: 32, fill: "var(--fill-600)" }
+                                        },
                                         on_click: move |_| {}
                                     }
                                 }
@@ -340,7 +358,9 @@ pub fn Header() -> Element {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
                                         class: "button--avatar bg--fill-50 button--comming-soon",
-                                        body: rsx!(Icon { icon : Profile, height : 32, width : 32, fill : "var(--fill-600)" }),
+                                        body: rsx! {
+                                            Icon { icon: Profile, height: 32, width: 32, fill: "var(--fill-600)" }
+                                        },
                                         on_click: move |_| {}
                                     }
                                 }
@@ -350,7 +370,9 @@ pub fn Header() -> Element {
                                         variant: Variant::Round,
                                         size: ElementSize::Big,
                                         class: "button--avatar bg--fill-50 button--comming-soon",
-                                        body: rsx!(Icon { icon : Settings, height : 32, width : 32, fill : "var(--fill-600)" }),
+                                        body: rsx! {
+                                            Icon { icon: Settings, height: 32, width: 32, fill: "var(--fill-600)" }
+                                        },
                                         on_click: move |_| {}
                                     }
                                 }

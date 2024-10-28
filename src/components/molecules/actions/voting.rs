@@ -202,10 +202,14 @@ pub fn VotingAction(props: VotingProps) -> Element {
                 variant: Variant::Round,
                 size: ElementSize::Small,
                 class: "button--avatar",
-                body: rsx!(
-                    Icon { icon : AddPlus, height : 24, width : 24, fill :
-                    "var(--state-primary-active)" }
-                ),
+                body: rsx! {
+                    Icon {
+                        icon: AddPlus,
+                        height: 24,
+                        width: 24,
+                        fill: "var(--state-primary-active)"
+                    }
+                },
                 on_click: move |_| {
                     if let ActionItem::VotingOpenGov(ref mut meta) = initiative
                         .get_action(props.index)

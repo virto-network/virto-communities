@@ -62,11 +62,9 @@ pub fn Withdraw() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(AccountButton {
-            title: account.name(),
-            description: address.clone(),
-            on_click: move |_| {}
-        }))
+        items.push(rsx!(
+            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
+        ))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
@@ -109,11 +107,15 @@ pub fn Withdraw() -> Element {
                                             name: String::from("management"),
                                             checked: matches!(*payment_selected.read(), PaymentMethods::KUSAMA),
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.kusama.title"),
-                                                fee : translate!(i18, "withdraw.payment.methods.kusama.fee"), icon : rsx!(Icon {
-                                                icon : KusamaLogo, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "withdraw.payment.methods.kusama.title"),
+                                                    fee: translate!(i18, "withdraw.payment.methods.kusama.fee"),
+                                                    icon: rsx! {
+                                                        Icon { icon: KusamaLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::KUSAMA);
                                             }
@@ -124,12 +126,15 @@ pub fn Withdraw() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::Card),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.card.title"),
-                                                fee : translate!(i18, "withdraw.payment.methods.card.fee", fee : 5), icon :
-                                                rsx!(Icon { icon : BankCardLine, height : 20, width : 20, fill :
-                                                "var(--fill-600)" }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "withdraw.payment.methods.card.title"),
+                                                    fee: translate!(i18, "withdraw.payment.methods.card.fee", fee : 5),
+                                                    icon: rsx! {
+                                                        Icon { icon: BankCardLine, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::Card);
                                             }
@@ -140,12 +145,15 @@ pub fn Withdraw() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::Paypal),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.paypal.title"),
-                                                fee : translate!(i18, "withdraw.payment.methods.paypal.fee", fee : 5), icon :
-                                                rsx!(Icon { icon : PaypalLogo, height : 20, width : 20, fill : "var(--fill-600)"
-                                                }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "withdraw.payment.methods.paypal.title"),
+                                                    fee: translate!(i18, "withdraw.payment.methods.paypal.fee", fee : 5),
+                                                    icon: rsx! {
+                                                        Icon { icon: PaypalLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::Paypal);
                                             }
@@ -156,12 +164,15 @@ pub fn Withdraw() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::PSE),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.pse.title"),
-                                                fee : translate!(i18, "withdraw.payment.methods.pse.fee", fee : 3), icon :
-                                                rsx!(Icon { icon : PaypalLogo, height : 20, width : 20, fill : "var(--fill-600)"
-                                                }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "withdraw.payment.methods.pse.title"),
+                                                    fee: translate!(i18, "withdraw.payment.methods.pse.fee", fee : 3),
+                                                    icon: rsx! {
+                                                        Icon { icon: PaypalLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::PSE);
                                             }
@@ -172,11 +183,15 @@ pub fn Withdraw() -> Element {
                                             checked: matches!(*payment_selected.read(), PaymentMethods::ETH),
                                             soon: true,
                                             class: "checkbox-card--payment",
-                                            body: rsx!(
-                                                PaymentMethod { title : translate!(i18, "withdraw.payment.methods.eth.title"),
-                                                fee : translate!(i18, "withdraw.payment.methods.eth.fee"), icon : rsx!(Icon {
-                                                icon : PolygonLogo, height : 20, width : 20, fill : "var(--fill-600)" }), }
-                                            ),
+                                            body: rsx! {
+                                                PaymentMethod {
+                                                    title: translate!(i18, "withdraw.payment.methods.eth.title"),
+                                                    fee: translate!(i18, "withdraw.payment.methods.eth.fee"),
+                                                    icon: rsx! {
+                                                        Icon { icon: PolygonLogo, height: 20, width: 20, fill: "var(--fill-600)" }
+                                                    }
+                                                }
+                                            },
                                             on_change: move |_| {
                                                 payment_selected.set(PaymentMethods::ETH);
                                             }
@@ -241,7 +256,9 @@ pub fn Withdraw() -> Element {
                                                     placeholder: "Amount",
                                                     label: "Amount",
                                                     error: None,
-                                                    right_text: rsx!(span { class : "input--right__text", "KSM" }),
+                                                    right_text: rsx! {
+                                                        span { class: "input--right__text", "KSM" }
+                                                    },
                                                     on_input: move |event: Event<FormData>| {
                                                         withdraw
                                                             .withdraw_mut()

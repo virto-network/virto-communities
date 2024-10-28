@@ -127,7 +127,9 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                         }
                         IconButton {
                             class: "button--drop bg--transparent",
-                            body: rsx!(Icon { icon : Close, height : 20, width : 20, fill : "var(--fill-400)" }),
+                            body: rsx! {
+                                Icon { icon: Close, height: 20, width: 20, fill: "var(--fill-400)" }
+                            },
                             on_click: move |_| {
                                 new_value.set(tags()[tags().len() - 1].clone());
                             }

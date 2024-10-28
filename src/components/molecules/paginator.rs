@@ -35,7 +35,9 @@ pub fn Paginator(props: PaginatorProps) -> Element {
                     class: "button--avatar button--paginator",
                     disabled: current_page() <= 1,
                     size: ElementSize::Small,
-                    body: rsx!(Icon { icon : ArrowLeft, height : 24, width : 24, fill : "var(--white)" }),
+                    body: rsx! {
+                        Icon { icon: ArrowLeft, height: 24, width: 24, fill: "var(--white)" }
+                    },
                     on_click: move |_| {
                         let current = current_page();
                         current_page.set(current - 1);
@@ -50,7 +52,9 @@ pub fn Paginator(props: PaginatorProps) -> Element {
                     class: "button--avatar button--paginator",
                     size: ElementSize::Small,
                     disabled: current_page() >= props.to,
-                    body: rsx!(Icon { icon : ArrowRight, height : 24, width : 24, fill : "var(--white)" }),
+                    body: rsx! {
+                        Icon { icon: ArrowRight, height: 24, width: 24, fill: "var(--white)" }
+                    },
                     on_click: move |_| {
                         let current = current_page();
                         current_page.set(current + 1);

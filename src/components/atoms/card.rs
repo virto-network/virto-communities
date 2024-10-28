@@ -15,10 +15,14 @@ pub fn Card(props: CardProps) -> Element {
             div { class: "card__container",
                 div { class: "card__head",
                     IconButton {
-                        body: rsx!(
-                            Avatar { name : "{props.community.name}", size : 48, uri : props.community.icon,
-                            variant : Variant::SemiRound }
-                        ),
+                        body: rsx! {
+                            Avatar {
+                                name: "{props.community.name}",
+                                size: 48,
+                                uri: props.community.icon,
+                                variant: Variant::SemiRound
+                            }
+                        },
                         on_click: move |_| {}
                     }
                     h3 { class: "card__title", "{props.community.name}" }
@@ -38,10 +42,15 @@ pub fn Card(props: CardProps) -> Element {
             div { class: "card__cta",
                 IconButton {
                     class: "button--avatar",
-                    body: rsx!(
-                        Icon { icon : ArrowRight, height : 16, width : 16, stroke_width : 2, stroke :
-                        "var(--text-primary)" }
-                    ),
+                    body: rsx! {
+                        Icon {
+                            icon: ArrowRight,
+                            height: 16,
+                            width: 16,
+                            stroke_width: 2,
+                            stroke: "var(--text-primary)"
+                        }
+                    },
                     on_click: move |_| {}
                 }
             }
