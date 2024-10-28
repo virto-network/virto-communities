@@ -1,9 +1,7 @@
+use super::dropdown::ElementSize;
+use crate::components::atoms::{dropdown::DropdownItem, input::InputType, Dropdown, Input};
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use crate::components::atoms::{
-    dropdown::DropdownItem, input::InputType, Dropdown, Input,
-};
-use super::dropdown::ElementSize;
 #[derive(PartialEq, Clone, Debug)]
 pub enum ComboInputOption {
     Dropdown(DropdownItem),
@@ -34,16 +32,12 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
     let mut option_value = use_signal(|| props.value.option.clone());
     let mut input_value = use_signal::<String>(|| props.value.input.clone());
     let mut items = vec![];
-    let dropdown_options = use_signal::<
-        Vec<DropdownItem>,
-    >(|| {
+    let dropdown_options = use_signal::<Vec<DropdownItem>>(|| {
         let Some(options) = props.options else {
-            return vec![
-                DropdownItem {
-                    key: "Wallet".to_string(),
-                    value: translate!(i18, "onboard.invite.form.wallet.label"),
-                },
-            ];
+            return vec![DropdownItem {
+                key: "Wallet".to_string(),
+                value: translate!(i18, "onboard.invite.form.wallet.label"),
+            }];
         };
         options
     });
@@ -68,6 +62,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                         },
                         on_keypress: move |_| {},
                         on_click: move |_| {},
+                        on_focus: move |_| {}, on_blur: move |_| {}
                     }
                 ),
                 ComboInputOption::Dropdown(value) => rsx!(
@@ -105,7 +100,8 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                         })
                 },
                 on_keypress: move |_| {},
-                on_click: move |_| {}
+                on_click: move |_| {},
+                on_focus: move |_| {}, on_blur: move |_| {}
             }
         }
     )

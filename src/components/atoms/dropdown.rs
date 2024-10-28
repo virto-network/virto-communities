@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::components::atoms::{Arrow, Icon};
+use dioxus::prelude::*;
 #[derive(PartialEq, Debug, Clone, Default)]
 pub struct DropdownItem {
     pub key: String,
@@ -14,6 +14,7 @@ pub enum ElementSize {
 #[derive(PartialEq, Props, Clone)]
 pub struct DropdownProps {
     value: Option<DropdownItem>,
+    value_help: Option<String>,
     label: Option<String>,
     on_change: EventHandler<usize>,
     #[props(!optional)]
@@ -23,14 +24,24 @@ pub struct DropdownProps {
     #[props(default = "".to_string())]
     class: String,
     placeholder: String,
+    help: Option<String>,
+    left_icon: Option<Element>,
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
     body: Vec<Element>,
 }
 pub fn Dropdown(props: DropdownProps) -> Element {
     let mut is_active = use_signal::<bool>(|| false);
-    let disabled = if props.disabled { "button--disabled" } else { "" };
-    let placeholder = if let None = props.value { "dropdown__placeholder" } else { "" };
+    let disabled = if props.disabled {
+        "button--disabled"
+    } else {
+        ""
+    };
+    let placeholder = if let None = props.value {
+        "dropdown__placeholder"
+    } else {
+        ""
+    };
     let size = match props.size {
         ElementSize::Big => "dropdown__container--big",
         ElementSize::Medium => "dropdown__container--medium",
@@ -50,11 +61,29 @@ pub fn Dropdown(props: DropdownProps) -> Element {
                             is_active.toggle();
                         }
                     },
+                    onblur: move |_| {
+                        // is_active.set(false);
+                    },
+                    {props.left_icon},
                     span { class: "dropdown__content",
                         span { class: "dropdown__value {placeholder}",
                             match props.value {
-                                Some(v) => {v.value}.to_string(),
-                                None => props.placeholder
+                                Some(v) => {
+                                    match props.value_help {
+                                        Some(value_help) => rsx!(
+                                            div { class: "card-send2__info",
+                                                h5 { class: "card-send3__info__title",
+                                                    {v.value}
+                                                }
+                                                p { class: "card-send3__info__description",
+                                                    {value_help}
+                                                }
+                                            }
+                                        ),
+                                        None => rsx!({v.value}),
+                                    }
+                                },
+                                None => rsx!({props.placeholder})
                             }
                         }
                         Icon {
@@ -72,6 +101,9 @@ pub fn Dropdown(props: DropdownProps) -> Element {
                     (index, item) | { rsx!(li { class : "dropdown__item", onclick : move | _ | {
                     is_active.toggle(); props.on_change.call(index) }, { item } }) }) } }) }
                 }
+            }
+            if let Some(help) = props.help {
+                div { class: "input--help", "{help}" }
             }
         }
     )

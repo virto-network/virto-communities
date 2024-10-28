@@ -8,6 +8,8 @@ pub struct StepProps {
     is_completed: bool,
     #[props(default = false)]
     has_cube: bool,
+    #[props(default = false)]
+    is_column: bool,
     name: Option<String>,
     on_click: EventHandler<MouseEvent>,
 }
@@ -17,6 +19,7 @@ pub fn Step(props: StepProps) -> Element {
             class: "step",
             class: if props.is_active { "step--active" },
             class: if props.is_completed { "step--complete" },
+            class: if props.is_column { "step--column" },
             onclick: move |event| props.on_click.call(event),
             if props.has_cube {
                 div { class: "step__cube",

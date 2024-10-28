@@ -4,6 +4,7 @@ pub struct TextareaInputProps {
     value: String,
     placeholder: String,
     label: Option<String>,
+    help: Option<String>,
     on_input: EventHandler<FormEvent>,
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
@@ -37,6 +38,9 @@ pub fn TextareaInput(props: TextareaInputProps) -> Element {
                         props.on_keypress.call(event)
                     }
                 }
+            }
+            if let Some(help) = props.help {
+                div { class: "input--help", "{help}" }
             }
         }
     )

@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use super::dropdown::ElementSize;
+use dioxus::prelude::*;
 #[derive(PartialEq, Clone)]
 pub enum Variant {
     Primary,
@@ -13,6 +13,8 @@ pub struct KeyValueProps {
     size: ElementSize,
     #[props(default = Variant::Primary)]
     variant: Variant,
+    #[props(default = false)]
+    is_spaced: bool,
     text: String,
     body: Element,
 }
@@ -27,7 +29,9 @@ pub fn KeyValue(props: KeyValueProps) -> Element {
         Variant::Secondary => "key-value--secondary",
     };
     rsx!(
-        span { class: "key-value {props.class} {size} {variant}",
+        span {
+            class: "key-value {props.class} {size} {variant}",
+            class: if props.is_spaced {"row"},
             h4 { class: "key-value__key", "{props.text}" }
             div { class: "key-value__value", {props.body} }
         }

@@ -4,6 +4,9 @@ use super::dropdown::ElementSize;
 pub enum Variant {
     Round,
     SemiRound,
+    Ghost,
+    Secondary,
+    Danger
 }
 #[derive(PartialEq, Props, Clone)]
 pub struct IconButtonProps {
@@ -22,6 +25,9 @@ pub fn IconButton(props: IconButtonProps) -> Element {
     let variant = match props.variant {
         Variant::Round => "icon-button--round",
         Variant::SemiRound => "icon-button--semi-round",
+        Variant::Ghost => "icon-button--ghost",
+        Variant::Secondary => "icon-button--secondary",
+        Variant::Danger => "icon-button--danger",
     };
     let size = match props.size {
         ElementSize::Big => "icon-button--big",

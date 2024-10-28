@@ -40,7 +40,7 @@ pub fn Button(props: ButtonProps) -> Element {
         Some(s) => {
             rsx!(
                 button {
-                    class: "button {props.class} {variant} {size} {loading}",
+                    class: "button {variant} {size} {loading} {props.class}",
                     disabled: true,
                     "{s}"
                 }
