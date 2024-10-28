@@ -6,16 +6,20 @@ use serde::{Deserialize, Serialize};
 use crate::{
     components::{
         atoms::{
-            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus,
-            ArrowRight, Avatar, Badge, CardSkeleton, Compass, DynamicText, Icon, IconButton, SearchInput, Star,
-            Tab, UserAdd, UserGroup,
+            avatar::Variant as AvatarVariant, dropdown::ElementSize, AddPlus, ArrowLeft,
+            ArrowRight, Avatar, Badge, CardSkeleton, Compass, DynamicText, Icon, IconButton,
+            SearchInput, Star, Tab, UserAdd, UserGroup,
         },
         molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
     hooks::{
-        use_accounts::use_accounts, use_communities::{use_communities, CommunitiesError},
-        use_notification::use_notification, use_our_navigator::use_our_navigator,
-        use_timestamp::use_timestamp, use_tooltip::use_tooltip,
+        use_accounts::use_accounts,
+        use_communities::{use_communities, CommunitiesError},
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_tabs::{use_tabs, Tab},
+        use_timestamp::use_timestamp,
+        use_tooltip::use_tooltip,
     },
     middlewares::{is_chain_available::is_chain_available, is_dao_owner::is_dao_owner},
 };
@@ -49,6 +53,7 @@ pub fn Dashboard() -> Element {
     let mut notification = use_notification();
     let accounts = use_accounts();
     let timestamp = use_timestamp();
+    let mut tabs = use_tabs();
 
     let mut current_page = use_signal::<usize>(|| 1);
     let mut search_word = use_signal::<String>(|| String::new());
@@ -221,7 +226,8 @@ pub fn Dashboard() -> Element {
                                            "var(--fill-00)" }
                                        ),
                                        on_click: move |_| {
-                                           let path = format!("/dao/{}/initiatives", community.id);
+                                           let path = format!("/dao/{}/plugins", community.id);
+                                           tabs.push(Tab { name: "Home".to_string(), path: path.clone() });
                                            nav.push(vec![], &path);
                                        }
                                    }

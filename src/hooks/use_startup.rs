@@ -2,7 +2,11 @@ use dioxus::{hooks::use_context_provider, signals::Signal};
 use pjs::PjsExtension;
 
 use crate::{
-    pages::{dashboard::Community, initiatives::InitiativeWrapper}, services::{bot::client::SpacesClient, market::client::MarketClient},
+    components::molecules::treasury::invoice::recipient::RecipientValueKey,
+    pages::{
+        bill::BillStep, dashboard::Community, initiatives::InitiativeWrapper, invoice::InvoiceStep,
+    },
+    services::{bot::client::SpacesClient, market::client::MarketClient},
 };
 
 use super::{
@@ -13,9 +17,16 @@ use super::{
     use_initiative::{ActionsForm, ConfirmationForm, InfoForm, SettingsForm},
     use_notification::NotificationItem,
     use_onboard::{BasicsForm, InvitationForm, ManagementForm},
-    use_paginator::Paginator, use_session::UserSession, use_theme::Theme,
+    use_paginator::Paginator,
+    use_recipient::RecipientForm,
+    use_recipients::Recipients,
+    use_send::SendData,
+    use_session::UserSession,
+    use_tabs::{Tab, TabSelected},
+    use_theme::Theme,
     use_timestamp::{IsTimestampHandled, TimestampValue},
-    use_tooltip::TooltipItem, use_withdraw::WithdrawForm,
+    use_tooltip::TooltipItem,
+    use_withdraw::WithdrawForm,
 };
 const SPACES_CLIENT_URL: &str = "https://bot-api.virto.app";
 const MARKET_CLIENT_URL: &str = "https://sapi.coincarp.com/api/v1";
@@ -23,18 +34,12 @@ const MARKET_CLIENT_URL: &str = "https://sapi.coincarp.com/api/v1";
 pub fn use_startup() {
     use_context_provider::<Signal<Theme>>(|| Signal::new(Theme::default()));
     use_context_provider::<Signal<BasicsForm>>(|| Signal::new(BasicsForm::default()));
-    use_context_provider::<
-        Signal<ManagementForm>,
-    >(|| Signal::new(ManagementForm::default()));
-    use_context_provider::<
-        Signal<InvitationForm>,
-    >(|| Signal::new(InvitationForm::default()));
+    use_context_provider::<Signal<ManagementForm>>(|| Signal::new(ManagementForm::default()));
+    use_context_provider::<Signal<InvitationForm>>(|| Signal::new(InvitationForm::default()));
     use_context_provider::<Signal<Communities>>(|| Signal::new(vec![]));
     use_context_provider::<Signal<Community>>(|| Signal::new(Community::default()));
     use_context_provider::<Signal<Option<AttachFile>>>(|| Signal::new(None));
-    use_context_provider::<
-        Signal<NotificationItem>,
-    >(|| Signal::new(NotificationItem::default()));
+    use_context_provider::<Signal<NotificationItem>>(|| Signal::new(NotificationItem::default()));
     use_context_provider::<Signal<TooltipItem>>(|| Signal::new(TooltipItem::default()));
     use_context_provider::<Signal<Paginator>>(|| Signal::new(Paginator::default()));
     use_context_provider::<Signal<Option<UserSession>>>(|| Signal::new(None));
@@ -48,17 +53,24 @@ pub fn use_startup() {
     use_context_provider::<Signal<Option<InitiativeWrapper>>>(|| Signal::new(None));
     use_context_provider::<Signal<InfoForm>>(|| Signal::new(InfoForm::default()));
     use_context_provider::<Signal<ActionsForm>>(|| Signal::new(ActionsForm::default()));
-    use_context_provider::<
-        Signal<SettingsForm>,
-    >(|| Signal::new(SettingsForm::default()));
-    use_context_provider::<
-        Signal<ConfirmationForm>,
-    >(|| Signal::new(ConfirmationForm::default()));
+    use_context_provider::<Signal<SettingsForm>>(|| Signal::new(SettingsForm::default()));
+    use_context_provider::<Signal<ConfirmationForm>>(|| Signal::new(ConfirmationForm::default()));
     use_context_provider::<Signal<TimestampValue>>(|| Signal::new(TimestampValue(0)));
     use_context_provider::<Signal<IsTimestampHandled>>(|| Signal::new(IsTimestampHandled(false)));
 
     use_context_provider::<Signal<WithdrawForm>>(|| Signal::new(WithdrawForm::default()));
     use_context_provider::<Signal<DepositForm>>(|| Signal::new(DepositForm::default()));
+
+    use_context_provider::<Signal<Vec<Tab>>>(|| Signal::new(Vec::new()));
+    use_context_provider::<Signal<TabSelected>>(|| Signal::new(TabSelected::default()));
+    use_context_provider::<Signal<BillStep>>(|| Signal::new(BillStep::Recipient));
+    use_context_provider::<Signal<InvoiceStep>>(|| Signal::new(InvoiceStep::Recipient));
+
+    use_context_provider::<Signal<RecipientForm>>(|| Signal::new(RecipientForm::default()));
+    use_context_provider::<Signal<Recipients>>(|| Signal::new(vec![]));
+    use_context_provider::<Signal<RecipientValueKey>>(|| Signal::new(RecipientValueKey::default()));
+
+    use_context_provider::<Signal<SendData>>(|| Signal::new(SendData::default()));
 
     // Clients
 

@@ -157,7 +157,7 @@ impl VotingOpenGovAction {
 #[derive(PartialEq, Clone, Default, Deserialize, Serialize, Debug)]
 pub struct TransferItem {
     pub account: String,
-    pub value: u64
+    pub value: u64,
 }
 pub type Transfers = Vec<TransferItem>;
 #[derive(PartialEq, Clone, Debug, Deserialize, Serialize, Default)]
@@ -217,7 +217,9 @@ impl ActionItem {
             "AddMembers" => ActionItem::AddMembers(AddMembersAction::default()),
             "KusamaTreasury" => ActionItem::KusamaTreasury(KusamaTreasuryAction::default()),
             "VotingOpenGov" => ActionItem::VotingOpenGov(VotingOpenGovAction::default()),
-            "CommunityTransfer" => ActionItem::CommunityTransfer(CommunityTransferAction::default()),
+            "CommunityTransfer" => {
+                ActionItem::CommunityTransfer(CommunityTransferAction::default())
+            }
             _ => todo!(),
         }
     }
