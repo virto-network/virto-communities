@@ -41,6 +41,7 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     },
                                     on_keypress: move |_| {},
                                     on_click: move |_| {},
+                                    on_focus: move |_| {}, on_blur: move |_| {}
                                 }
                                 Input {
                                     message: (transfer.value / KUSAMA_PRECISION_DECIMALS).to_string(),
@@ -65,6 +66,7 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     },
                                     on_keypress: move |_| {},
                                     on_click: move |_| {},
+                                    on_focus: move |_| {}, on_blur: move |_| {}
                                 }
                             }
                             IconButton {

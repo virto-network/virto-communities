@@ -65,7 +65,8 @@ pub fn OnboardingBasics(error: bool) -> Element {
                     }
                 },
                 on_keypress: move |_| {},
-                on_click: move |_| {}
+                on_click: move |_| {},
+                on_focus: move |_| {}, on_blur: move |_| {}
             }
             TextareaInput {
                 value: onboard.get_basics().description,
@@ -94,7 +95,8 @@ pub fn OnboardingBasics(error: bool) -> Element {
                     onboard.basics_mut().with_mut(|basics| basics.industry = event.value());
                 },
                 on_keypress: move |_| {},
-                on_click: move |_| {}
+                on_click: move |_| {},
+                on_focus: move |_| {}, on_blur: move |_| {}
             }
         }
     )
