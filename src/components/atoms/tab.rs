@@ -10,7 +10,8 @@ pub struct TabProps {
     #[props(default = ElementSize::Medium)]
     size: ElementSize,
     on_click: EventHandler<MouseEvent>,
-    icon: Option<Element>,
+    left_icon: Option<Element>,
+    right_icon: Option<Element>,
 }
 pub fn Tab(props: TabProps) -> Element {
     let size = match props.size {
@@ -23,8 +24,9 @@ pub fn Tab(props: TabProps) -> Element {
             class: "tab {size} {props.class}",
             class: if props.is_active { "tab--active" },
             onclick: move |event| props.on_click.call(event),
-            {props.icon},
+            {props.left_icon},
             "{props.text}"
+            { props.right_icon }
         }
     )
 }

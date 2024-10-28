@@ -6,6 +6,8 @@ pub enum Variant {
 }
 #[derive(PartialEq, Props, Clone)]
 pub struct AvatarProps {
+    #[props(default = "".to_string())]
+    class: String,
     name: String,
     size: u8,
     #[props(!optional)]
@@ -21,10 +23,10 @@ pub fn Avatar(props: AvatarProps) -> Element {
         Variant::SemiRound => "avatar--semi-round",
     };
     rsx! {
-        match & props.uri { Some(uri) => rsx!(img { class : "avatar {variant}", style :
+        match & props.uri { Some(uri) => rsx!(img { class : "avatar {variant} {props.class}", style :
         "{avatar_style}", src : "{uri}" }), None => { let initial : Vec < char > = props
         .name.chars().collect(); let initial = initial[0].to_uppercase(); rsx!(div {
-        class : "avatar {variant}", style : "{avatar_style}", span { class :
+        class : "avatar {variant} {props.class}", style : "{avatar_style}", span { class :
         "avatar--initial", "{initial}" } }) } }
     }
 }

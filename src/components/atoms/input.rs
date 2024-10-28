@@ -1,8 +1,8 @@
+use super::dropdown::ElementSize;
+use crate::components::atoms::{Icon, IconButton, Search, WarningSign};
 use dioxus::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use crate::components::atoms::{Icon, IconButton, Search, WarningSign};
-use super::dropdown::ElementSize;
 #[derive(PartialEq, Clone)]
 pub enum InputType {
     Text,
@@ -25,13 +25,20 @@ pub struct InputProps {
     label: Option<String>,
     #[props(default = false)]
     required: bool,
+    #[props(default = false)]
+    autofocus: bool,
+    #[props(default = false)]
+    focus: bool,
     #[props(default = 100)]
     maxlength: u8,
+    label_help: Option<Element>,
     left_text: Option<Element>,
     right_text: Option<Element>,
     on_input: EventHandler<FormEvent>,
     on_keypress: EventHandler<KeyboardEvent>,
     on_click: EventHandler<MouseEvent>,
+    on_focus: EventHandler<FocusEvent>,
+    on_blur: EventHandler<FocusEvent>,
 }
 pub fn Input(props: InputProps) -> Element {
     let mut input_ref = use_signal::<Option<Box<HtmlInputElement>>>(|| None);
@@ -58,12 +65,26 @@ pub fn Input(props: InputProps) -> Element {
         ""
     };
     let mut is_active = use_signal::<bool>(|| false);
+    use_effect(use_reactive(&props.focus, move |f| {
+        if f {
+            if let Some(input_element) = input_ref.read().as_ref() {
+                if let Err(e) = input_element.focus() {
+                    log::warn!("Failed to focus input {:?}", e)
+                };
+            }
+        }
+    }));
     rsx!(
         section {
             class: "input__wrapper {is_search}",
             class: if is_active() { "input__wrapper--active" },
             if let Some(value) = props.label {
-                label { class: "input__label", "{value}" }
+                label { class: "input__label",
+                    "{value}"
+                    if let Some(label_help) = props.label_help {
+                        {label_help}
+                    }
+                }
             }
             div { class: "input-wrapper {size} {input_error_container}",
                 {props.left_text},
@@ -82,18 +103,21 @@ pub fn Input(props: InputProps) -> Element {
                             }
                         }
                     },
-                    onfocus: move |_| {
+                    onfocus: move |event| {
                         if let Some(input_element) = input_ref() {
                             input_element.set_type(input_type)
                         }
+                        props.on_focus.call(event);
                     },
-                    onblur: move |_| {
+                    onblur: move |event| {
                         if let Some(input_element) = input_ref() {
                             input_element.set_type("text")
                         }
+                        props.on_blur.call(event);
                     },
                     value: props.message,
                     required: props.required,
+                    autofocus: props.autofocus,
                     maxlength: i64::from(props.maxlength),
                     placeholder: if props.required {
                         format!("{}*", props.placeholder)
@@ -101,7 +125,7 @@ pub fn Input(props: InputProps) -> Element {
                         format!("{}", props.placeholder)
                     },
                     oninput: move |event| props.on_input.call(event),
-                    onkeypress: move |event| props.on_keypress.call(event)
+                    onkeypress: move |event| props.on_keypress.call(event),
                 }
                 {props.right_text},
                 if matches!(props.itype, InputType::Search) {
