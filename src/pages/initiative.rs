@@ -7,7 +7,7 @@ use crate::{
         molecules::{InitiativeActions, InitiativeInfo},
     },
     hooks::{
-        use_initiative::{use_initiative, InitiativeData, InitiativeInfoContent, InitiativeInitContent}, use_notification::use_notification, use_our_navigator::use_our_navigator, use_session::use_session, use_spaces_client::use_spaces_client, use_tooltip::{use_tooltip, TooltipItem}
+        use_initiative::{use_initiative, ActionItem, InitiativeData, InitiativeInfoContent, InitiativeInitContent, TransferItem}, use_notification::use_notification, use_our_navigator::use_our_navigator, use_session::use_session, use_spaces_client::use_spaces_client, use_tooltip::{use_tooltip, TooltipItem}
     },
     pages::onboarding::convert_to_jsvalue,
     services::{
