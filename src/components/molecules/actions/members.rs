@@ -31,6 +31,8 @@ pub fn MembersAction(props: VotingProps) -> Element {
                         MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
                     } };
 
+                    let prueba = translate!(i18, "onboard.invite.form.error.wallet.label");
+
                     rsx!(
                         li {
                             ComboInput {
@@ -51,8 +53,8 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                 on_change: move |event: ComboInputValue| {
                                     let medium = match event.option {
                                         ComboInputOption::Dropdown(value) => {
-                                            match value.key.as_str() {
-                                                "Wallet" => MediumOptions::Wallet,
+                                            match value.key {
+                                                prueba => MediumOptions::Wallet,
                                                 _ => todo!()
                                             }
                                         },
