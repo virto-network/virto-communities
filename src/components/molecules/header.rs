@@ -116,6 +116,18 @@ pub fn Header() -> Element {
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
         while let Some(event) = rx.next().await {
+            let accounts_list = accounts.get();
+
+            if accounts_list.is_empty() {
+                log::warn!("Accounts list is empty");
+                return notification.handle_warning(&translate!(i18, "warnings.middlewares.not_account"));
+            }
+
+            if (event as usize) >= accounts_list.len() {
+                log::warn!("The index is out of bounds");
+                return;
+            }
+
             let account = &accounts.get()[event as usize];
 
             let Ok(serialized_session) = serde_json::to_string(&UserSession {
