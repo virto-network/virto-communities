@@ -59,14 +59,15 @@ pub fn OnboardingInvite() -> Element {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
                                 },
                                 on_change: move |event: ComboInputValue| {
-                                    let medium = match event.option {
-                                        ComboInputOption::Dropdown(value) => {
-                                            match value.key.as_str() {
-                                                "Wallet" => MediumOptions::Wallet,
-                                                _ => todo!()
-                                            }
-                                        },
-                                        _ => todo!()
+                                    let ComboInputOption::Dropdown(value) = event.option else {
+                                        return;
+                                    };
+                                
+                                    let invite_wallet = translate!(i18, "onboard.invite.form.wallet.label");
+                                    let medium = if value.key == invite_wallet {
+                                        MediumOptions::Wallet
+                                    } else {
+                                        return;
                                     };
             
                                     onboard.update_invitation(index, InvitationItem { medium, account: event.input });

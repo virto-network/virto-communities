@@ -49,14 +49,15 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                     }
                                 },
                                 on_change: move |event: ComboInputValue| {
-                                    let medium = match event.option {
-                                        ComboInputOption::Dropdown(value) => {
-                                            match value.key.as_str() {
-                                                "Wallet" => MediumOptions::Wallet,
-                                                _ => todo!()
-                                            }
-                                        },
-                                        _ => todo!()
+                                    let ComboInputOption::Dropdown(value) = event.option else {
+                                        return;
+                                    };
+                                
+                                    let invite_wallet = translate!(i18, "onboard.invite.form.wallet.label");
+                                    let medium = if value.key == invite_wallet {
+                                        MediumOptions::Wallet
+                                    } else {
+                                        return;
                                     };
                                     if let ActionItem::AddMembers(ref mut meta) = initiative.get_action(props.index) {
                                         meta.members[index_meta] = MemberItem { medium, account: event.input };
