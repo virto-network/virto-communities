@@ -99,7 +99,7 @@ pub fn Account() -> Element {
 
                 Ok::<(), String>(())
             }
-            .unwrap_or_else(move |e: String| notification.handle_warning(&e))
+            .unwrap_or_else(move |e: String| notification.handle_warning(&translate!(i18, "warnings.title"), &e))
         });
     };
 

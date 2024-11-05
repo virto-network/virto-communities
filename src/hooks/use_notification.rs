@@ -70,9 +70,9 @@ impl UseNotificationState {
             },
         });
     }
-    pub fn handle_warning(&mut self, body: &str) {
+    pub fn handle_warning(&mut self, title: &str, body: &str) {
         self.handle_notification(NotificationItem {
-            title: translate!(use_i18(), "warnings.title"),
+            title: String::from(title),
             body: String::from(body),
             variant: NotificationVariant::Warning,
             show: true,
