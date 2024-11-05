@@ -93,7 +93,7 @@ pub fn Header() -> Element {
 
                 Ok::<(), String>(())
             }
-            .unwrap_or_else(move |e: String| notification.handle_warning(&e))
+            .unwrap_or_else(move |e: String| notification.handle_warning(&translate!(i18, "warnings.title"), &e))
         });
     };
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| {
@@ -116,7 +116,12 @@ pub fn Header() -> Element {
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
         while let Some(event) = rx.next().await {
-            let account = &accounts.get()[event as usize];
+            let account_list = accounts.get();
+            
+            let Some(account) = account_list.get(event as usize) else {
+               // return;
+               return notification.handle_warning(&translate!(i18, "warnings.title"), &translate!(i18, "warnings.middleware.not_account"));
+            };
 
             let Ok(serialized_session) = serde_json::to_string(&UserSession {
                 name: account.name(),

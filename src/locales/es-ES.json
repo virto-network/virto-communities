@@ -492,7 +492,8 @@
             "middleware": {
                 "has_dao": "¡Lo sentimos! 😞 No puedes crear más organizaciones asociadas a esta cuenta.",
                 "chain_unavailable": "En este momento no es posible completar está acción.",
-                "signer_not_found": "¡Lo sentimos! 😞 No puedes realizar esta acción, primero debes autenticarte."
+                "signer_not_found": "¡Lo sentimos! 😞 No puedes realizar esta acción, primero debes autenticarte.",
+                "not_account": "No estás conectado a una cuenta. Conéctate para acceder a más funciones y gestionar tus activos de manera sencilla."
             }
         },
         "errors": {
