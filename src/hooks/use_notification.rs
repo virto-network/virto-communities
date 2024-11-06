@@ -43,7 +43,7 @@ impl UseNotificationState {
     pub fn handle_notification(&mut self, item: NotificationItem) {
         let mut inner = self.inner.clone();
         *inner.write() = item;
-        spawn(async move {
+        spawn_forever(async move {
             TimeoutFuture::new(3000).await;
             *inner.write() = NotificationItem::default();
         });
