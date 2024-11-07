@@ -262,6 +262,7 @@ pub fn Dashboard() -> Element {
                                     h3 { class: "card__title",
                                     {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
                                     span {
+                                        class: "animated-text",
                                         DynamicText { words },
                                     },
                                     {translate!(i18, "dashboard.cta_cards.create.title_part_two")}

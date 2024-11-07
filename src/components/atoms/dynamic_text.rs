@@ -7,7 +7,7 @@ pub struct DynamicTextProps {
 
 pub fn DynamicText(props: DynamicTextProps) -> Element {
     rsx! {
-        div { class: "animated-text",
+        {
             {
                 props.words.iter().enumerate().map(|(index, word)| {
                     rsx! {
