@@ -114,7 +114,7 @@ pub fn Account() -> Element {
 
     rsx! {
         div { class: "page--vote",
-            div { class: "account",
+            div { class: "account grid-main",
                 div { class: "account__options",
                     Tab {
                         text: translate!(i18, "account.tabs.wallet.tab"),
