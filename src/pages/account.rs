@@ -113,8 +113,8 @@ pub fn Account() -> Element {
     let mut profile_value = use_signal(|| ProfileTabs::Wallet);
 
     rsx! {
-        div { class: "page--vote",
-            div { class: "account grid-main",
+        div { class: "page--vote grid-main",
+            div { class: "account",
                 div { class: "account__options",
                     Tab {
                         text: translate!(i18, "account.tabs.wallet.tab"),
