@@ -216,7 +216,8 @@ pub fn Explore() -> Element {
                                         h3 { class: "card__title",
                                             {translate!(i18, "dashboard.cta_cards.create.title_part_one")}
                                             span {
-                                                DynamicText { words: words }
+                                                class: "animated-text",
+                                                DynamicText { words: words },
                                             }
                                             {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
                                         }
