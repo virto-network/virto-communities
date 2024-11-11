@@ -1760,7 +1760,6 @@ textarea::placeholder {
 
 .sidebar__action-label {
     @extend %text-xs-font-regular;
-    width: 70px;
     font-size: 0.8rem;
     color: var(--color-green-100);
     text-align: center;
@@ -3462,11 +3461,10 @@ small.summary__item__value {
         flex-direction: row;
         align-items: flex-start;
         position: relative;
-        gap: 16px;
     }
 
     .sidebar__item {
-        min-width: fit-content;
+        min-width: 60px;
 }
 
     .sidebar__divider {
@@ -3474,7 +3472,6 @@ small.summary__item__value {
     }
 
     .sidebar__action-label {
-        width: 76px;
         word-break: break-word;
         white-space: normal;
     }
