@@ -649,7 +649,7 @@ $fw-bold: 700;
 .notification {
     background: var(--background-modal);
     color: var(--text-primary);
-    border: 1px solid transparent;
+    border: 0px;
     padding: var(--size-1);
     text-align: left;
     position: absolute;
@@ -673,6 +673,38 @@ $fw-bold: 700;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: var(--size-0);
+}
+
+.notification__progress {
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 6px;
+    width: 0%;
+    animation: fill-progress 2500ms ease-out forwards;
+}
+
+@keyframes fill-progress {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+.notification--success .notification__progress {
+    background-color: #4caf50;
+}
+
+.notification--error .notification__progress {
+    background-color: #f44336;
+}
+
+.notification--warning .notification__progress {
+    background-color: #ff9800;
 }
 
 .notification--error {
