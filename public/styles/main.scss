@@ -3259,10 +3259,13 @@ small.summary__item__value {
         @extend %text-lg-font-medium;
     }
 
+    .tag {
+        padding: 0 12px;
+    }
+
     .button,
     .tab {
         @extend %text-sm-font-semibold;
-        padding: 0 12px;
     }
 
     .input {
