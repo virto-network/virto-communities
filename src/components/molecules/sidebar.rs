@@ -64,7 +64,7 @@ pub fn Sidebar() -> Element {
                                         nav.push(vec![], "/account")
                                     }
                                 }
-                                span { class: "sidebar__action-label", "{account.name()}" }
+                                span { class: "sidebar__action-label__not-displayed", "{account.name()}" }
                             }
                         ),
                         None => rsx!(
@@ -87,7 +87,7 @@ pub fn Sidebar() -> Element {
                                         nav.push(vec![], "/login");
                                     }
                                 }
-                                span { class: "sidebar__action-label", {translate!(i18, "sidebar.dashboard")} }
+                                span { class: "sidebar__action-label__not-displayed", {translate!(i18, "sidebar.dashboard")} }
                             }
                         ),
                     },
@@ -103,7 +103,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/");
                             }
                         }
-                        span { class: "sidebar__action-label", {translate!(i18, "sidebar.dashboard")} }
+                        span { class: "sidebar__action-label__not-displayed", {translate!(i18, "sidebar.dashboard")} }
                     }
                     li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
@@ -124,7 +124,7 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/explore");
                             }
                         }
-                        span { class: "sidebar__action-label", {translate!(i18, "sidebar.explore")} }
+                        span { class: "sidebar__action-label__not-displayed", {translate!(i18, "sidebar.explore")} }
                     }
                     hr { class: "sidebar__divider" }
 
