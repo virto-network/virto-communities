@@ -3248,7 +3248,7 @@ small.summary__item__value {
         height: 100vh;
         width: 100vw;
         position: absolute;
-        background: rgba(0, 0, 0, 0.3);
+        background: #0000004d;
         top: 0;
         left: 0;
         z-index: 20;
@@ -3259,13 +3259,14 @@ small.summary__item__value {
         @extend %text-lg-font-medium;
     }
 
-    .tag {
-        padding: 0 12px;
+    .button.button-favorite {
+        padding: 0;
     }
 
     .button,
     .tab {
         @extend %text-sm-font-semibold;
+        padding: 0 12px;
     }
 
     .input {

@@ -149,7 +149,7 @@ pub fn Explore() -> Element {
                                         if !community.has_membership {
                                             div { class: "card__favorite",
                                                 IconButton {
-                                                    class: "button--drop bg--transparent",
+                                                    class: "button-favorite button--drop bg--transparent",
                                                     body: rsx!(
                                                         Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
                                                         "var(--state-primary-active)" } else { "var(--state-base-background)" } }
