@@ -1726,6 +1726,7 @@ textarea::placeholder {
     background: var(--text-primary);
     box-shadow: 1px 2px 8px var(--border--rgba);
     height: 100%;
+    width: 100%;
 }
 
 .sidebar__scream {
@@ -1758,6 +1759,7 @@ textarea::placeholder {
     align-items: center;
     gap: 12px;
     position: relative;
+    flex-direction: column;
 }
 
 .sidebar__item--uncomplete {
@@ -1784,8 +1786,20 @@ textarea::placeholder {
     border-radius: 0 8px 8px 0;
 }
 
-.sidebar__list>li>span {
-    display: none;
+.sidebar__action-label__not-displayed {
+    display: none
+}
+
+.sidebar__action-label {
+    @extend %text-xs-font-regular;
+    font-size: 0.8rem;
+    color: var(--color-green-100);
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.sidebar__item--active .sidebar__action-label {
+    color: var(--state-primary-active);
 }
 
 .textarea {
@@ -3448,11 +3462,6 @@ small.summary__item__value {
     }
 
     .page {
-        grid-template-areas:
-            "header"
-            "main"
-            "footer"
-            "sidebar";
         grid-template-rows: 80px auto 1fr 80px;
     }
 
@@ -3462,25 +3471,41 @@ small.summary__item__value {
 
     .sidebar {
         width: 100%;
-        height: 80px;
+        height: 120px;
         position: fixed;
         bottom: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
     }
 
     .sidebar__container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
         display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
+        flex-direction: column;
     }
 
     .sidebar__list {
+        display: flex;
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
+        position: relative;
     }
+
+    .sidebar__item {
+        min-width: 60px;
+}
 
     .sidebar__divider {
         display: none;
+    }
+
+    .sidebar__action-label {
+        word-break: break-word;
+        white-space: normal;
     }
 
     .dashboard {

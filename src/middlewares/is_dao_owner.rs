@@ -8,7 +8,7 @@ pub fn is_dao_owner(
     move || {
         if accounts.is_active_account_an_admin() {
             log::warn!("User is DAO owner");
-            notification.handle_warning(&translate!(i18, "warnings.middleware.has_dao"));
+            notification.handle_warning(&translate!(i18, "warnings.title"), &translate!(i18, "warnings.middleware.has_dao"));
             Err("User is DAO owner")
         } else {
             Ok(())
