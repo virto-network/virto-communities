@@ -19,6 +19,7 @@ pub fn Notification(props: NotificationProps) -> Element {
             onclick: move |event| props.on_click.call(event),
             h3 { class: "notification__title", "{props.title}" }
             p { class: "notification__body", "{props.body}" }
+            div { class: "notification__progress" }
         }
     )
 }
