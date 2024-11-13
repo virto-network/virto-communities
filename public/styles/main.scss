@@ -3248,7 +3248,7 @@ small.summary__item__value {
         height: 100vh;
         width: 100vw;
         position: absolute;
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.302);
         top: 0;
         left: 0;
         z-index: 20;
@@ -3257,6 +3257,10 @@ small.summary__item__value {
     .header .dropdown__placeholder,
     .dropdown__value {
         @extend %text-lg-font-medium;
+    }
+
+    .button.button-favorite {
+        padding: 0;
     }
 
     .button,
