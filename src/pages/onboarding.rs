@@ -340,7 +340,7 @@ pub fn Onboarding() -> Element {
                                                                 value: NotificationHandler::None,
                                                             },
                                                         });
-                                                    nav.push(Vec::new(), "/");
+                                                    nav.push(Vec::new(), "/vos");
                                                     Ok::<(), String>(())
                                                 }
                                                     .unwrap_or_else(move |e: String| {

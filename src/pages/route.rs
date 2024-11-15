@@ -1,12 +1,12 @@
-use dioxus::prelude::*;
 use crate::{
     layouts::{authenticated::Authenticated, onboard::Onboard},
     pages::{
-        account::Account, dashboard::Dashboard, explore::Explore, initiative::Initiative,
-        initiatives::Initiatives, login::Login, not_found::PageNotFound, onboarding::Onboarding,
-        vote::Vote, withdraw::Withdraw, deposit::Deposit
+        account::Account, dashboard::Dashboard, deposit::Deposit, explore::Explore,
+        initiative::Initiative, initiatives::Initiatives, login::Login, not_found::PageNotFound,
+        onboarding::Onboarding, vos_intro::VOSIntro, vote::Vote, withdraw::Withdraw,
     },
 };
+use dioxus::prelude::*;
 #[derive(Clone, Routable, Debug, PartialEq)]
 #[rustfmt::skip]
 pub enum Route {
@@ -23,6 +23,8 @@ pub enum Route {
         Withdraw {},
         #[route("/deposit")]
         Deposit {},
+        #[route("/vos")]
+        VOSIntro {},
         #[layout(Onboard)]
             #[route("/explore")]
             Explore {},

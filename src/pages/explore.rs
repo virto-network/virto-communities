@@ -265,7 +265,9 @@ pub fn Explore() -> Element {
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
+                    from: 1,
                     to: (communities.get_communities().len() + SKIP - 1).saturating_div(SKIP).max(1),
+                    value: current_page(),
                     on_change: move |event: PaginatorValue| {
                         current_page.set(event.value());
                         on_handle_paginator.send(current_page())

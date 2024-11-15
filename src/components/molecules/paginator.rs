@@ -16,52 +16,72 @@ impl PaginatorValue {
 
 #[derive(PartialEq, Props, Clone)]
 pub struct PaginatorProps {
-    #[props(default = 1)]
+    #[props(default = 0)]
+    from: usize,
+    #[props(default = 0)]
     to: usize,
+    #[props(default = 0)]
+    value: usize,
+    #[props(default = false)]
+    is_dot: bool,
     on_change: EventHandler<PaginatorValue>,
 }
 
 pub fn Paginator(props: PaginatorProps) -> Element {
     let i18 = use_i18();
-    let mut current_page = use_signal::<usize>(|| 1);
 
     rsx!(
         div { class: "paginator",
-            span { class: "paginator__range",
-                {translate!(i18, "dashboard.footer.paginator", from: current_page(), to: props.to)}
+            if !props.is_dot {
+                span { class: "paginator__range",
+                {translate!(i18, "dashboard.footer.paginator", from: props.value, to: props.to)}
+            }
             }
             div { class: "paginator__jumpers",
                 IconButton {
                     class: "button--avatar button--paginator",
-                    disabled: current_page() <= 1,
+                    disabled: props.value <= props.from,
                     size: ElementSize::Small,
                     body: rsx! {
                         Icon { icon: ArrowLeft, height: 24, width: 24, fill: "var(--white)" }
                     },
                     on_click: move |_| {
-                        let current = current_page();
-                        current_page.set(current - 1);
                         props
                             .on_change
                             .call(PaginatorValue {
-                                value: current_page(),
+                                value: props.value - 1
                             });
+                    }
+                }
+                if props.is_dot {
+                    div { class: "paginator__dots",
+                        for i in 0..=props.to {
+                            button {
+                                class: "paginator__dot",
+                                class: if props.value == i { "paginator__dot--active" },
+                                onclick: move |_| {
+                                    props
+                                        .on_change
+                                        .call(PaginatorValue {
+                                            value: i,
+                                        });
+                                }
+                            }
+                        }
                     }
                 }
                 IconButton {
                     class: "button--avatar button--paginator",
                     size: ElementSize::Small,
-                    disabled: current_page() >= props.to,
+                    disabled: props.value >= props.to,
                     body: rsx! {
                         Icon { icon: ArrowRight, height: 24, width: 24, fill: "var(--white)" }
                     },
                     on_click: move |_| {
-                        let current = current_page();
-                        current_page.set(current + 1);
                         props
                             .on_change
                             .call(PaginatorValue {
-                                value: current_page(),
+                                value: props.value + 1
                             });
                     }
                 }

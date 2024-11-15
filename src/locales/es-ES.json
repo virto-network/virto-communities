@@ -471,6 +471,32 @@
                 }
             }
         },
+        "vos_intro": {
+            "name": "Asistente de IA Virto",
+            "description_p1": "Control sin esfuerzo\ncon ",
+            "description_p2": "Vos",
+            "cards": {
+                "management": {
+                    "title": "Gestión Fácil de Miembros",
+                    "description": "Crea tu empresa en menos de 15 minutos, sin complicaciones."
+                },
+                "payments": {
+                    "title": "Recepción y Ejecución de Pagos Sin Esfuerzo",
+                    "description": "Transacciones globales seguras y rápidas al alcance de tu mano"
+                },
+                "governance": {
+                    "title": "Gestión y Gobernanza Avanzada de Fondos",
+                    "description": "Toma decisiones financieras inteligentes y gestiona recursos con confianza"
+                },
+                "wallet": {
+                    "title": "Acceso Fácil a tu Billetera Organizacional",
+                    "description": "Administra los recursos de tu organización y mueve fondos cuando lo necesites"
+                }
+            },
+            "continue": "¡Llévame allí!",
+            "tour": "Ver qué hay de nuevo",
+            "skip": "Omitir"
+        },
         "utils": {
             "markdown": {
                 "cta": {

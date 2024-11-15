@@ -303,7 +303,9 @@ pub fn Initiatives(id: u16) -> Element {
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
+                    from: 1,
                     to: (initiatives_ids.len() + SKIP - 1).saturating_div(SKIP).max(1),
+                    value: current_page(),
                     on_change: move |event: PaginatorValue| {
                         current_page.set(event.value());
                     }
