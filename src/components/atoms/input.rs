@@ -74,7 +74,10 @@ pub fn Input(props: InputProps) -> Element {
                         if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
-                            .and_then(|element| element.clone().dyn_into::<HtmlInputElement>().ok()) { input_ref.set(Some(Box::new(html_element.clone()))) }
+                            .and_then(|element| element.clone().dyn_into::<HtmlInputElement>().ok())
+                        {
+                            input_ref.set(Some(Box::new(html_element.clone())))
+                        }
                         if input_type == "date" {
                             if let Some(input_element) = input_ref() {
                                 input_element.set_type("text")

@@ -187,7 +187,10 @@ pub fn Attach(props: AttachProps) -> Element {
                     if let Some(html_element) = event
                         .data
                         .downcast::<web_sys::Element>()
-                        .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) { textarea_ref.set(Some(Box::new(html_element.clone()))) }
+                        .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
+                    {
+                        textarea_ref.set(Some(Box::new(html_element.clone())))
+                    }
                 },
                 oninput: on_handle_input
             }

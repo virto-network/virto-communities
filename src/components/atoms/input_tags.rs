@@ -141,11 +141,7 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                     class: "input",
                     value: new_value,
                     required: props.required,
-                    placeholder: if props.required {
-                        format!("{}*", props.placeholder)
-                    } else {
-                        props.placeholder
-                    },
+                    placeholder: if props.required { format!("{}*", props.placeholder) } else { props.placeholder },
                     oninput: move |event| {
                         if let Some(index) = is_editing_tag() {
                             tags.with_mut(|t| t[index] = event.value());

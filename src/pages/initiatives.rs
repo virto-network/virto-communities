@@ -146,11 +146,7 @@ pub fn Initiatives(id: u16) -> Element {
             div { class: "dashboard__head",
                 section { class: "tabs",
                     for item in tab_items.into_iter() {
-                        Tab {
-                            text: item.value,
-                            is_active: tab_value() == item.k,
-                            on_click: move |_| {}
-                        }
+                        Tab { text: item.value, is_active: tab_value() == item.k, on_click: move |_| {} }
                     }
                 }
                 div { class: "head__actions",

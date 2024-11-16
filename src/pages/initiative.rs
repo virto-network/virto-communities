@@ -267,7 +267,8 @@ pub fn Initiative(id: u16) -> Element {
                                 log::info!("{} {}", current_block, now_kusama);
                                 let add_members_action = initiative.filter_valid_address_add_members();
                                 log::info!("add_members_action: {:?}", add_members_action);
-                                let treasury_action = initiative.convert_treasury_to_period(current_block, now_kusama);
+                                let treasury_action = initiative
+                                    .convert_treasury_to_period(current_block, now_kusama);
                                 log::info!("treasury {:?}", treasury_action);
                                 let votiong_open_gov_action = initiative.filter_valid_voting_open_gov();
                                 let votiong_open_gov_action = votiong_open_gov_action
@@ -275,7 +276,8 @@ pub fn Initiative(id: u16) -> Element {
                                     .map(|v| v.serialize_vote_type())
                                     .collect::<Vec<serde_json::Value>>();
                                 log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
-                                let community_transfer_action = initiative.filter_valid_community_transfer();
+                                let community_transfer_action = initiative
+                                    .filter_valid_community_transfer();
                                 log::info!("community_transfer_action {:?}", community_transfer_action);
                                 let votiong_open_gov_action = convert_to_jsvalue(
                                         &votiong_open_gov_action,

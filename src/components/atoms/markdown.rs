@@ -100,16 +100,22 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                         if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
-                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) { toolbar_ref.set(Some(Box::new(html_element.clone()))) }
-                    },
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
+                        {
+                            toolbar_ref.set(Some(Box::new(html_element.clone())))
+                        }
+                    }
                 }
                 div {
                     onmounted: move |event| {
                         if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
-                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) { editor_ref.set(Some(Box::new(html_element.clone()))) }
-                    },
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
+                        {
+                            editor_ref.set(Some(Box::new(html_element.clone())))
+                        }
+                    }
                 }
             }
             div {

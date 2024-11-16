@@ -100,20 +100,20 @@ pub fn Onboarding() -> Element {
             div { class: "row",
                 div { class: "onboarding__form",
                     div { class: "form__wrapper",
-                    IconButton {
-                        on_click: move |_| {
-                            nav.push(vec![], "/");
-                        },
-                        body: rsx! {
-                            Icon {
-                                icon: VirtoLogo,
-                                height: 64,
-                                width: 64,
-                                stroke_width: 1,
-                                fill: "var(--color-lavanda-400)"
+                        IconButton {
+                            on_click: move |_| {
+                                nav.push(vec![], "/");
+                            },
+                            body: rsx! {
+                                Icon {
+                                    icon: VirtoLogo,
+                                    height: 64,
+                                    width: 64,
+                                    stroke_width: 1,
+                                    fill: "var(--color-lavanda-400)"
+                                }
                             }
                         }
-                    }
                         div { class: "progress progress--steps",
                             button {
                                 class: "step",

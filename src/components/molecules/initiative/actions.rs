@@ -54,9 +54,9 @@ pub fn InitiativeActions() -> Element {
                                     default: None,
                                     on_change: move |event: usize| {
                                         let options = initiative.get_actions_options();
-
+            
                                         let to_assign = &options[event];
-
+            
                                         initiative.update_action(index, initiative.to_action_option(to_assign.key.clone()));
                                     },
                                     body: items.clone()
@@ -110,10 +110,8 @@ pub fn InitiativeActions() -> Element {
                         default: None,
                         on_change: move |event: usize| {
                             let options = initiative.get_actions_options();
-
                             let to_assign = &options[event];
                             let action = initiative.to_action_option(to_assign.key.clone());
-
                             initiative.push_action(action);
                         },
                         body: items
