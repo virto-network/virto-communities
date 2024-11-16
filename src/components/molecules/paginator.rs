@@ -23,7 +23,7 @@ pub struct PaginatorProps {
     #[props(default = 0)]
     value: usize,
     #[props(default = false)]
-    is_dot: bool,
+    is_item_dotted: bool,
     on_change: EventHandler<PaginatorValue>,
 }
 
@@ -32,7 +32,7 @@ pub fn Paginator(props: PaginatorProps) -> Element {
 
     rsx!(
         div { class: "paginator",
-            if !props.is_dot {
+            if !props.is_item_dotted {
                 span { class: "paginator__range",
                 {translate!(i18, "dashboard.footer.paginator", from: props.value, to: props.to)}
             }
@@ -53,7 +53,7 @@ pub fn Paginator(props: PaginatorProps) -> Element {
                             });
                     }
                 }
-                if props.is_dot {
+                if props.is_item_dotted {
                     div { class: "paginator__dots",
                         for i in 0..=props.to {
                             button {

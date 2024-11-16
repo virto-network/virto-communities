@@ -154,7 +154,7 @@ pub fn VOSIntro() -> Element {
                 if show_cards() {
                     Paginator {
                         to: intro_cards.len().saturating_sub(1).max(0),
-                        is_dot: true,
+                        is_item_dotted: true,
                         value: current_card(),
                         on_change: move |event: PaginatorValue| {
                             log::info!("{:?}", event.value());
