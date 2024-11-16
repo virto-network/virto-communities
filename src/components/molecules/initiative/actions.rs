@@ -122,7 +122,7 @@ pub fn InitiativeActions() -> Element {
                         variant: Variant::Round,
                         size: ElementSize::Small,
                         class: "button--action",
-                        disabled: actions_lock.len() == 0,
+                        disabled: actions_lock.is_empty(),
                         body: rsx! {
                             Icon { icon: AddPlus, height: 24, width: 24, fill: "var(--fill-00)" }
                         },

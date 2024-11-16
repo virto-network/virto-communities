@@ -95,10 +95,10 @@ pub fn ActionRequestList(props: ActionRequestListProps) -> Element {
         for request in props.actions.iter() {
             div { class: "requests",
                 match request {
-                ActionItem::AddMembers(action) => render_add_members(& action),
-                ActionItem::KusamaTreasury(action) => render_kusama_treasury(& action),
-                ActionItem::VotingOpenGov(action) => render_voting_open_gov(& action) ,
-                ActionItem::CommunityTransfer(action) => render_community_transfer(& action) }
+                ActionItem::AddMembers(action) => render_add_members(action),
+                ActionItem::KusamaTreasury(action) => render_kusama_treasury(action),
+                ActionItem::VotingOpenGov(action) => render_voting_open_gov(action) ,
+                ActionItem::CommunityTransfer(action) => render_community_transfer(action) }
             }
         }
     )

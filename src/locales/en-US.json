@@ -509,7 +509,8 @@
                 "connection_failed": "Oops! The connection has failed 🔴 Contact us if the problem persists"
             },
             "communities": {
-                "query_failed": "We're sorry! 😞 We couldn't load the information correctly. Please try again! 🤲"
+                "query_failed": "We're sorry! 😞 We couldn't load the information correctly. Please try again! 🤲",
+                "favorite_pick_failed": "Failed to update favorite"
             },
             "initiatives": {
                 "query_failed": "We're sorry! 😞 We couldn't load the information correctly. Please try again! 🤲"

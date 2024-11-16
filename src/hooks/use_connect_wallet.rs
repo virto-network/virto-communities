@@ -22,7 +22,7 @@ pub async fn use_connect_wallet() -> Result<(), PjsError> {
     let mut pjs = use_context::<Signal<Option<pjs::PjsExtension>>>();
 
     let mut vault = pjs::PjsExtension::connect(APP_NAME).await.map_err(|_| {
-        if let Err(_) = session.persist_session_file("") {
+        if session.persist_session_file("").is_err() {
             log::warn!("Failed to persist session")
         };
 

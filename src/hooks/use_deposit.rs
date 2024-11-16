@@ -23,11 +23,11 @@ impl DepositForm {
     pub fn is_valid(&self) -> bool {
         let has_info = match &self.dest {
             // Check if is a valid address
-            DepositTo::Address(addrs) => addrs.len() > 0,
+            DepositTo::Address(addrs) => !addrs.is_empty(),
             DepositTo::Community(_) => true,
         };
 
-        has_info && self.amount.len() > 0
+        has_info && !self.amount.is_empty()
     }
 
     pub fn address(&self) -> String {
@@ -45,7 +45,7 @@ impl DepositForm {
         let amount = (amount * 1_000_000_000_000.0) as u64;
         match &self.dest {
             DepositTo::Address(addrs) => {
-                let address = sp_core::sr25519::Public::from_str(&addrs)
+                let address = sp_core::sr25519::Public::from_str(addrs)
                     .map_err(|_| DepositError::MalformedAddress)?;
                 let hex_address = format!("0x{}", hex::encode(address.0));
                 Ok((hex_address, amount, false))
@@ -81,7 +81,7 @@ pub struct UseDepositInner {
 
 impl UseDepositState {
     pub fn get(&self) -> UseDepositInner {
-        self.inner.clone()
+        self.inner
     }
 
     pub fn get_deposit(&self) -> DepositForm {
@@ -94,7 +94,7 @@ impl UseDepositState {
     }
 
     pub fn deposit_mut(&mut self) -> Signal<DepositForm> {
-        self.inner.deposit.clone()
+        self.inner.deposit
     }
 
     pub fn is_form_complete(&self) -> bool {

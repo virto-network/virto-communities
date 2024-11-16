@@ -13,7 +13,7 @@ pub async fn track_queue(item: u16) -> Result<Vec<TrackInfo>, ChainStateError> {
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
     let Value::Array(track_infos) = value else {
@@ -26,12 +26,11 @@ pub async fn track_queue(item: u16) -> Result<Vec<TrackInfo>, ChainStateError> {
     Ok(track_infos)
 }
 pub async fn referendum_count() -> Result<u16, ChainStateError> {
-    let query = format!("wss://kreivo.io/communityReferenda/referendumCount");
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!("wss://kreivo.io/communityReferenda/referendumCount").await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
     let count = serde_json::from_value::<u16>(value)
@@ -93,7 +92,7 @@ pub async fn referendum_info_for(id: u16) -> Result<OngoingWrapper, ChainStateEr
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
     let initiative = serde_json::from_value::<OngoingWrapper>(value)
@@ -106,7 +105,7 @@ pub async fn metadata_of(id: u16) -> Result<Vec<u8>, ChainStateError> {
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
     let preimage_hash = serde_json::from_value::<Vec<u8>>(value)

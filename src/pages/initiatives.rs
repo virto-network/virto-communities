@@ -1,8 +1,8 @@
 use crate::{
     components::{
         atoms::{
-            dropdown::ElementSize, AddPlus, ArrowRight, Badge, CircleCheck,
-            Icon, IconButton, SearchInput, StopSign, Tab, CardSkeleton,
+            dropdown::ElementSize, AddPlus, ArrowRight, Badge, CardSkeleton, CircleCheck, Icon,
+            IconButton, SearchInput, StopSign, Tab,
         },
         molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
     },
@@ -40,24 +40,21 @@ pub fn Initiatives(id: u16) -> Element {
 
     let mut initiative_wrapper = consume_context::<Signal<Option<InitiativeWrapper>>>();
     let mut current_page = use_signal::<usize>(|| 1);
-    let mut search_word = use_signal::<String>(|| String::new());
+    let mut search_word = use_signal::<String>(String::new);
     let tab_items = vec![TabItem {
         k: String::from("all"),
         value: translate!(i18, "dao.tabs.all"),
     }];
     let tab_value = use_signal::<String>(|| String::from("all"));
-    let initiatives_ids = use_signal::<Vec<u32>>(|| vec![]);
-    let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
-    let mut filtered_initiatives = use_signal::<Vec<InitiativeWrapper>>(|| vec![]);
+    let initiatives_ids = use_signal::<Vec<u32>>(Vec::new);
+    let mut initiatives = use_signal::<Vec<InitiativeWrapper>>(Vec::new);
+    let mut filtered_initiatives = use_signal::<Vec<InitiativeWrapper>>(Vec::new);
 
     use_effect(use_reactive(
         (&communities.get_communities().len(),),
         move |(len,)| {
-            if len > 0 {
-                if let Err(_) = communities.set_community(id) {
-                    let path = format!("/");
-                    nav.push(vec![], &path);
-                };
+            if len > 0 && communities.set_community(id).is_err() {
+                nav.push(vec![], "/");
             }
         },
     ));
@@ -151,7 +148,7 @@ pub fn Initiatives(id: u16) -> Element {
                     for item in tab_items.into_iter() {
                         Tab {
                             text: item.value,
-                            is_active: if tab_value() == item.k { true } else { false },
+                            is_active: tab_value() == item.k,
                             on_click: move |_| {}
                         }
                     }
@@ -256,7 +253,6 @@ pub fn Initiatives(id: u16) -> Element {
                                     }
                                 }
                             }
-                    
                         }
                 },
                 section { class: "card card--reverse",

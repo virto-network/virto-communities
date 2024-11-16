@@ -56,7 +56,7 @@ pub fn Attach(props: AttachProps) -> Element {
             async move {
                 let files = &event.files().ok_or(AttachError::NotFound)?;
                 let fs = files.files();
-                let existing_file = fs.get(0).ok_or(AttachError::NotFound)?;
+                let existing_file = fs.first().ok_or(AttachError::NotFound)?;
                 let content = files
                     .read_file(existing_file)
                     .await
@@ -81,7 +81,7 @@ pub fn Attach(props: AttachProps) -> Element {
                     }
                     _ => gloo::file::Blob::new(content.deref()),
                 };
-                let size = blob.size().clone();
+                let size = blob.size();
                 if size > MAX_FILE_SIZE {
                     return Err(AttachError::Size);
                 }
@@ -184,11 +184,10 @@ pub fn Attach(props: AttachProps) -> Element {
                 r#type: "file",
                 class: "attach__input",
                 onmounted: move |event| {
-                    event
+                    if let Some(html_element) = event
                         .data
                         .downcast::<web_sys::Element>()
-                        .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
-                        .map(|html_element| textarea_ref.set(Some(Box::new(html_element.clone()))));
+                        .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) { textarea_ref.set(Some(Box::new(html_element.clone()))) }
                 },
                 oninput: on_handle_input
             }

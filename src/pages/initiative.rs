@@ -9,16 +9,13 @@ use crate::{
     hooks::{
         use_accounts::use_accounts,
         use_initiative::{
-            use_initiative, ActionItem, InitiativeData, InitiativeInfoContent,
-            InitiativeInitContent, KusamaTreasury, KusamaTreasuryPeriod, TransferItem,
-            VotingOpenGov,
+            use_initiative, InitiativeData, InitiativeInfoContent, InitiativeInitContent,
         },
         use_notification::use_notification,
         use_our_navigator::use_our_navigator,
         use_session::use_session,
         use_spaces_client::use_spaces_client,
         use_tooltip::{use_tooltip, TooltipItem},
-
     },
     middlewares::is_signer_ready::is_signer_ready,
     pages::onboarding::convert_to_jsvalue,
@@ -71,7 +68,7 @@ pub fn Initiative(id: u16) -> Element {
         initiative.default();
     });
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if let Err(_) = is_signer_ready(i18, accounts, notification)() {
+        if is_signer_ready(i18, accounts, notification)().is_err() {
             nav.push(vec![], &format!("/dao/{}/initiatives", id));
         };
     });
@@ -216,7 +213,7 @@ pub fn Initiative(id: u16) -> Element {
                     class: "",
                     text: translate!(i18, "initiative.cta.continue"),
                     size: ElementSize::Small,
-                    disabled: !initiative.check() || initiative.get_info().name.len() == 0,
+                    disabled: !initiative.check() || initiative.get_info().name.is_empty(),
                     on_click: move |_| {
                         spawn(
                             async move {
@@ -278,31 +275,6 @@ pub fn Initiative(id: u16) -> Element {
                                     .map(|v| v.serialize_vote_type())
                                     .collect::<Vec<serde_json::Value>>();
                                 log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
-                                let community_transfer_action = initiative
-                                    .get_actions()
-                                    .into_iter()
-                                    .filter_map(|action| {
-                                        match action {
-                                            ActionItem::CommunityTransfer(community_transfer_action) => {
-                                                Some(
-                                                    community_transfer_action
-                                                        .transfers
-                                                        .clone()
-                                                        .into_iter()
-                                                        .filter_map(|transfer| {
-                                                            if transfer.value > 0 { Some(transfer) } else { None }
-                                                        })
-                                                        .collect::<Vec<TransferItem>>(),
-                                                )
-                                            }
-                                            _ => None,
-                                        }
-                                    })
-                                    .collect::<Vec<Vec<TransferItem>>>();
-                                let community_transfer_action = community_transfer_action
-                                    .into_iter()
-                                    .flat_map(|v| v.into_iter())
-                                    .collect::<Vec<TransferItem>>();
                                 let community_transfer_action = initiative.filter_valid_community_transfer();
                                 log::info!("community_transfer_action {:?}", community_transfer_action);
                                 let votiong_open_gov_action = convert_to_jsvalue(

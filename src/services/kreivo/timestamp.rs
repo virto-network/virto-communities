@@ -1,8 +1,7 @@
 use sube::{sube, Response};
 use super::community_track::ChainStateError;
 pub async fn now() -> Result<u64, ChainStateError> {
-    let query = format!("wss://kreivo.io/timestamp/now");
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!("wss://kreivo.io/timestamp/now").await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
     };

@@ -13,7 +13,7 @@ pub struct UseTimestampState {
 }
 impl UseTimestampState {
     pub fn get(&self) -> TimestampValue {
-        self.timestamp.read().clone()
+        *self.timestamp.read()
     }
     pub fn set(&mut self, timestamp: TimestampValue) {
         let mut inner = self.timestamp.write();

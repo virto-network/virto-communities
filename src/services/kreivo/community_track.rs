@@ -12,8 +12,7 @@ pub enum ChainStateError {
     FailedDecode,
 }
 pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
-    let query = format!("wss://kreivo.io/communityTracks/tracksIds");
-    let response = sube!(& query)
+    let response = sube!("wss://kreivo.io/communityTracks/tracksIds")
         .await
         .map_err(|e| {
             log::warn!("{:?}", e);

@@ -18,7 +18,7 @@ impl UseTooltipState {
         self.inner.read().clone()
     }
     pub fn handle_tooltip(&mut self, item: TooltipItem) {
-        let mut inner = self.inner.clone();
+        let mut inner = self.inner;
         *inner.write() = item;
     }
     pub fn hide(&mut self) {

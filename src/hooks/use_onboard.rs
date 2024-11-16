@@ -55,7 +55,7 @@ pub struct UseOnboardInner {
 }
 impl UseOnboardState {
     pub fn get(&self) -> UseOnboardInner {
-        self.inner.clone()
+        self.inner
     }
     pub fn get_basics(&self) -> BasicsForm {
         self.inner.basics.read().clone()
@@ -65,7 +65,7 @@ impl UseOnboardState {
         *inner = basics;
     }
     pub fn basics_mut(&mut self) -> Signal<BasicsForm> {
-        self.inner.basics.clone()
+        self.inner.basics
     }
     pub fn get_management(&self) -> ManagementForm {
         self.inner.management.read().clone()

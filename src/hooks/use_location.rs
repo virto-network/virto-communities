@@ -19,7 +19,7 @@ pub fn use_location() -> UseLocationState {
     let mut error = use_signal(|| None);
 
     use_coroutine(move |_:UnboundedReceiver<()>| async move {
-        if let Some(stored_location) = LocalStorage::get("user_location").ok() {
+        if let Ok(stored_location) = LocalStorage::get("user_location") {
                     location.set(Some(stored_location));
                     log::info!("{}", "Location loaded from storage");
                 } else {

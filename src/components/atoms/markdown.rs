@@ -55,7 +55,7 @@ pub fn Markdown(props: MarkdownProps) -> Element {
     let i18 = use_i18();
     let mut is_editor_loaded = use_signal(|| false);
     let content = use_signal(|| {
-        if props.content.len() > 0 {
+        if !props.content.is_empty() {
             props.content.clone()
         } else {
             translate!(i18, "utils.markdown.value")
@@ -97,20 +97,18 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                 class: if !is_markdown_visible() { "hide" } else { "markdown__wrapper--editor" },
                 div {
                     onmounted: move |event| {
-                        event
+                        if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
-                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
-                            .map(|html_element| toolbar_ref.set(Some(Box::new(html_element.clone()))));
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) { toolbar_ref.set(Some(Box::new(html_element.clone()))) }
                     },
                 }
                 div {
                     onmounted: move |event| {
-                        event
+                        if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
-                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
-                            .map(|html_element| editor_ref.set(Some(Box::new(html_element.clone()))));
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) { editor_ref.set(Some(Box::new(html_element.clone()))) }
                     },
                 }
             }

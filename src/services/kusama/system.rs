@@ -1,8 +1,7 @@
 use sube::{sube, Response};
 use crate::services::kreivo::communities::ChainStateError;
 pub async fn number() -> Result<u32, ChainStateError> {
-    let query = format!("wss://kusama-rpc.dwellir.com/system/number");
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!("wss://kusama-rpc.dwellir.com/system/number").await.map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
     };
