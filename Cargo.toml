@@ -27,6 +27,7 @@ web-sys = { version = "0.3.69", features = [
     "Location",
     "Navigator",
     "DomRect",
+    "ScrollToOptions"
 ] }
 gloo = { version = "0.11.0", features = ["timers", "futures"] }
 infer = "0.15.0"

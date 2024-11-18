@@ -308,6 +308,7 @@ pub fn Dashboard() -> Element {
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
+                    from: 1,
                     to: ((communities
                         .get_communities_by_filters(
                             Some(()),
@@ -317,6 +318,7 @@ pub fn Dashboard() -> Element {
                         .len() + SKIP - 1)
                         .saturating_div(SKIP))
                         .max(1),
+                    value: current_page(),
                     on_change: move |event: PaginatorValue| {
                         current_page.set(event.value());
                         on_handle_paginator.send(current_page())

@@ -10,6 +10,7 @@ pub mod pages {
     pub mod not_found;
     pub mod onboarding;
     pub mod route;
+    pub mod vos_intro;
     pub mod vote;
     pub mod withdraw;
 }

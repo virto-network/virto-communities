@@ -474,6 +474,32 @@
                 }
             }
         },
+        "vos_intro": {
+            "name": "Virto AI assistant",
+            "description_p1": "Effortless control\nwith ",
+            "description_p2": "Vos",
+            "cards": {
+                "management": {
+                    "title": "Easy Members Management",
+                    "description": "Create your company in less than 15 minutes, no hassle."
+                },
+                "payments": {
+                    "title": "Seamless Payment Reception and Execution",
+                    "description": "Secure and Fast Global Transactions at Your Fingertips"
+                },
+                "governance": {
+                    "title": "Advanced Fund Management and Governance",
+                    "description": "Make Smart Financial Decisions and Manage Resources with Confidence"
+                },
+                "wallet": {
+                    "title": "Easy Access to Your Organizational Wallet",
+                    "description": "Manage Your Organization’s Resources and Move Funds When You Need To"
+                }
+            },
+            "continue": "Take me there!",
+            "tour": "See what's new",
+            "skip": "Skip"
+        },
         "warnings": {
             "title": "⚠️Attention: This information is for you",
             "middleware": {
