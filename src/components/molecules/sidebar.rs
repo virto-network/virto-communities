@@ -103,7 +103,9 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/");
                             }
                         }
-                        span { class: "sidebar__action-label__not-displayed", {translate!(i18, "sidebar.dashboard")} }
+                        span { class: "sidebar__action-label__not-displayed",
+                            {translate!(i18, "sidebar.dashboard")}
+                        }
                     }
                     li { class: "sidebar__item", onclick: move |_| {},
                         IconButton {
@@ -124,21 +126,22 @@ pub fn Sidebar() -> Element {
                                 nav.push(vec![], "/explore");
                             }
                         }
-                        span { class: "sidebar__action-label__not-displayed", {translate!(i18, "sidebar.explore")} }
+                        span { class: "sidebar__action-label__not-displayed",
+                            {translate!(i18, "sidebar.explore")}
+                        }
                     }
                     hr { class: "sidebar__divider" }
 
                     for community in communities.get_communities_by_filters(Some(()), None, None) {
                         {
                             let active_community = communities.get_community();
-                            let community_id = community.id.clone();
                             rsx!(
                                 li {
                                     class: "sidebar__item",
                                     class: if active_community.id == community.id { "sidebar__item--active" },
                                     onclick: move |_| {
-                                        if let Ok(_) = communities.set_community(community_id) {
-                                            let path = format!("/dao/{}/initiatives", community_id);
+                                        if communities.set_community(community.id).is_ok() {
+                                            let path = format!("/dao/{}/initiatives", community.id);
                                             nav.push(vec![], &path);
                                         };
                                     },

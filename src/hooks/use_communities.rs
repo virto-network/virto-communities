@@ -36,7 +36,7 @@ pub fn use_communities() -> UseCommunitiesState {
         let cached_communities = get_cached_communities();
         communities.set(cached_communities.clone());
 
-        if cached_communities.len() == 0 {
+        if cached_communities.is_empty() {
             is_loading.set(true);
         } else {
             tooltip.hide();
@@ -44,7 +44,7 @@ pub fn use_communities() -> UseCommunitiesState {
 
         let public_address = session
             .get()
-            .map(
+            .and_then(
                 |session| match sp_core::sr25519::Public::from_str(&session.address) {
                     Ok(public_address) => Some(public_address.0),
                     Err(_) => {
@@ -54,8 +54,7 @@ pub fn use_communities() -> UseCommunitiesState {
                         None
                     }
                 },
-            )
-            .flatten();
+            );
 
         let Ok(mut community_tracks) = get_communities().await else {
             log::warn!("error here by member");
@@ -142,7 +141,7 @@ impl UseCommunitiesState {
         filter_by_name: Option<&str>,
         filter_by_pagination: Option<(usize, usize)>,
     ) -> Vec<Community> {
-        if self.is_loading.read().clone() {
+        if *self.is_loading.read() {
             return vec![];
         }
 
@@ -162,7 +161,7 @@ impl UseCommunitiesState {
         match filter_by_name {
             Some(name) => communities
                 .into_iter()
-                .filter(|community| community.name.to_lowercase().contains(&name))
+                .filter(|community| community.name.to_lowercase().contains(name))
                 .collect::<Vec<Community>>(),
             None => {
                 if let Some((from, to)) = filter_by_pagination {
@@ -237,8 +236,7 @@ impl UseCommunitiesState {
             return Err(CommunitiesError::FailedUpdatingFavorites);
         };
 
-        if let Err(_) =
-            <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities)
+        if <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities).is_err()
         {
             log::warn!("Failed to persist communities");
         };

@@ -26,7 +26,7 @@ pub struct UseWithdrawInner {
 
 impl UseWithdrawState {
     pub fn get(&self) -> UseWithdrawInner {
-        self.inner.clone()
+        self.inner
     }
 
     pub fn get_withdraw(&self) -> WithdrawForm {
@@ -39,13 +39,13 @@ impl UseWithdrawState {
     }
 
     pub fn withdraw_mut(&mut self) -> Signal<WithdrawForm> {
-        self.inner.withdraw.clone()
+        self.inner.withdraw
     }
 
     pub fn is_form_complete(&self) -> bool {
         let withdraw = self.inner.withdraw.read();
 
-        withdraw.address.len() > 0 && withdraw.amount.len() > 0
+        !withdraw.address.is_empty() && !withdraw.amount.is_empty()
     }
 
     pub fn default(&mut self) {

@@ -321,13 +321,13 @@ pub struct UseInitiativeInner {
 }
 impl UseInitiativeState {
     pub fn is_loading(&self) -> bool {
-        self.inner.is_loading.read().clone()
+        *self.inner.is_loading.read()
     }
     pub fn set_loading(&mut self, loading: bool) {
         self.inner.is_loading.set(loading);
     }
     pub fn get(&self) -> UseInitiativeInner {
-        self.inner.clone()
+        self.inner
     }
     pub fn get_info(&self) -> InfoForm {
         self.inner.info.read().clone()
@@ -337,7 +337,7 @@ impl UseInitiativeState {
         *inner = info;
     }
     pub fn info_mut(&mut self) -> Signal<InfoForm> {
-        self.inner.info.clone()
+        self.inner.info
     }
     pub fn get_actions(&self) -> Vec<ActionItem> {
         self.inner.actions.read().value.clone()
@@ -610,10 +610,10 @@ impl UseInitiativeState {
             && self.check_treasury()
             && self.check_voting_open_gov()
             && self.check_community_transfer())
-            && (self.filter_valid_address_add_members().len() > 0
-                || self.filter_valid_treasury().len() > 0
-                || self.filter_valid_voting_open_gov().len() > 0
-                || self.filter_valid_community_transfer().len() > 0)
+            && (!self.filter_valid_address_add_members().is_empty()
+                || !self.filter_valid_treasury().is_empty()
+                || !self.filter_valid_voting_open_gov().is_empty()
+                || !self.filter_valid_community_transfer().is_empty())
     }
 }
 
@@ -622,7 +622,7 @@ fn convert_treasury_to_period(
     current_block: u32,
     current_date_millis: u64,
 ) -> KusamaTreasuryPeriod {
-    if treasury.date != "" {
+    if !treasury.date.is_empty() {
         let future_block =
             calculate_future_block(current_block, current_date_millis, &treasury.date);
         KusamaTreasuryPeriod {
@@ -648,16 +648,17 @@ fn calculate_future_block(
         .expect("Invalid future date");
     let future_date = DateTime::<Utc>::from_naive_utc_and_offset(future, Utc);
 
-    let x = DateTime::from_timestamp(
+    let date = DateTime::from_timestamp(
         (current_date_millis / 1000).try_into().unwrap(),
         ((current_date_millis % 1000) * 1_000_000) as u32,
     )
     .expect("");
 
-    let x = NaiveDateTime::from_str(&x.date_naive().to_string()).expect("Invalid calculated date");
-    let current_date = DateTime::from_naive_utc_and_offset(x, Utc);
+    let calculated_date =
+        NaiveDateTime::from_str(&date.date_naive().to_string()).expect("Invalid calculated date");
+    let current_date = DateTime::from_naive_utc_and_offset(calculated_date, Utc);
 
     let elapsed_time_in_seconds = (future_date - current_date).num_seconds();
     let blocks_to_add = elapsed_time_in_seconds / BLOCK_TIME_IN_SECONDS;
-    (current_block + blocks_to_add as u32).into()
+    current_block + blocks_to_add as u32
 }

@@ -30,7 +30,7 @@ pub fn MembersAction(props: VotingProps) -> Element {
                     }, value: match member.medium.clone() {
                         MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
                     } };
-
+            
                     rsx!(
                         li {
                             ComboInput {

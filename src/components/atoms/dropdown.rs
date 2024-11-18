@@ -30,7 +30,7 @@ pub struct DropdownProps {
 pub fn Dropdown(props: DropdownProps) -> Element {
     let mut is_active = use_signal::<bool>(|| false);
     let disabled = if props.disabled { "button--disabled" } else { "" };
-    let placeholder = if let None = props.value { "dropdown__placeholder" } else { "" };
+    let placeholder = if props.value.is_none() { "dropdown__placeholder" } else { "" };
     let size = match props.size {
         ElementSize::Big => "dropdown__container--big",
         ElementSize::Medium => "dropdown__container--medium",

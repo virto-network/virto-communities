@@ -78,7 +78,7 @@ pub fn Onboarding() -> Element {
 
     let to_pay = consume_context::<Signal<f64>>();
 
-    let mut id_number = use_signal::<String>(|| String::new());
+    let mut id_number = use_signal::<String>(String::new);
     let mut onboarding_step = use_signal::<OnboardingStep>(|| OnboardingStep::Basics);
 
     let mut handle_required_inputs = use_signal::<bool>(|| false);
@@ -91,7 +91,7 @@ pub fn Onboarding() -> Element {
             nav.push(vec![], "/");
         };
 
-        if let Err(_) = is_chain_available(i18, timestamp, notification)() {
+        if is_chain_available(i18, timestamp, notification)().is_err() {
             nav.push(vec![], "/");
         };
     });
@@ -100,20 +100,20 @@ pub fn Onboarding() -> Element {
             div { class: "row",
                 div { class: "onboarding__form",
                     div { class: "form__wrapper",
-                    IconButton {
-                        on_click: move |_| {
-                            nav.push(vec![], "/");
-                        },
-                        body: rsx! {
-                            Icon {
-                                icon: VirtoLogo,
-                                height: 64,
-                                width: 64,
-                                stroke_width: 1,
-                                fill: "var(--color-lavanda-400)"
+                        IconButton {
+                            on_click: move |_| {
+                                nav.push(vec![], "/");
+                            },
+                            body: rsx! {
+                                Icon {
+                                    icon: VirtoLogo,
+                                    height: 64,
+                                    width: 64,
+                                    stroke_width: 1,
+                                    fill: "var(--color-lavanda-400)"
+                                }
                             }
                         }
-                    }
                         div { class: "progress progress--steps",
                             button {
                                 class: "step",

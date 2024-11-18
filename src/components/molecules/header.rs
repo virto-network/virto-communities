@@ -41,9 +41,7 @@ pub fn Header() -> Element {
     let mut connect_handled = use_signal(|| false);
 
     let get_account = move || {
-        let Some(user_session) = session.get() else {
-            return None;
-        };
+        let user_session = session.get()?;
         accounts.get_one(user_session.account_id)
     };
     let get_balance = move || {
@@ -79,8 +77,8 @@ pub fn Header() -> Element {
                 let usdt_value = unscaled_value * KSM_PRICE;
                 let usdt_value = usdt_value.to_string();
                 let unscaled_value = unscaled_value.to_string();
-                let usdt_value = usdt_value.split(".").collect::<Vec<&str>>();
-                let unscaled_value = unscaled_value.split(".").collect::<Vec<&str>>();
+                let usdt_value = usdt_value.split('.').collect::<Vec<&str>>();
+                let unscaled_value = unscaled_value.split('.').collect::<Vec<&str>>();
 
                 ksm_balance.set((
                     unscaled_value[0].to_string(),
@@ -93,17 +91,16 @@ pub fn Header() -> Element {
 
                 Ok::<(), String>(())
             }
-            .unwrap_or_else(move |e: String| notification.handle_warning(&translate!(i18, "warnings.title"), &e))
+            .unwrap_or_else(move |e: String| {
+                notification.handle_warning(&translate!(i18, "warnings.title"), &e)
+            })
         });
     };
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| {
-        let account = get_account().and_then(|account| {
-            Some(DropdownItem {
-                key: account.address().clone(),
-                value: account.name(),
-            })
-        });
-        account
+        get_account().map(|account| DropdownItem {
+            key: account.address().clone(),
+            value: account.name(),
+        })
     });
     let mut items = vec![];
     for account in accounts.get().into_iter() {
@@ -117,10 +114,13 @@ pub fn Header() -> Element {
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
         while let Some(event) = rx.next().await {
             let account_list = accounts.get();
-            
+
             let Some(account) = account_list.get(event as usize) else {
-               // return;
-               return notification.handle_warning(&translate!(i18, "warnings.title"), &translate!(i18, "warnings.middleware.not_account"));
+                // return;
+                return notification.handle_warning(
+                    &translate!(i18, "warnings.title"),
+                    &translate!(i18, "warnings.middleware.not_account"),
+                );
             };
 
             let Ok(serialized_session) = serde_json::to_string(&UserSession {
@@ -142,11 +142,9 @@ pub fn Header() -> Element {
             accounts.set_account(Some(account.clone()));
             set_signer(account.address().clone());
 
-            let account = get_account().and_then(|account| {
-                Some(DropdownItem {
-                    key: account.address().clone(),
-                    value: account.name(),
-                })
+            let account = get_account().map(|account| DropdownItem {
+                key: account.address().clone(),
+                value: account.name(),
             });
 
             dropdown_value.set(account);

@@ -47,8 +47,8 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let nav = use_our_navigator();
     let mut notification = use_notification();
     let mut tooltip = use_tooltip();
-    let mut votes_statistics = use_signal(|| VoteDigest::default());
-    let mut content = use_signal(|| String::new());
+    let mut votes_statistics = use_signal(VoteDigest::default);
+    let mut content = use_signal(String::new);
     let mut can_vote = use_signal(|| false);
     let mut show_requests = use_signal(|| false);
     let mut show_vote = use_signal(|| true);
@@ -64,7 +64,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let mut html_buf = String::new();
     pulldown_cmark::html::push_html(&mut html_buf, parser);
     let on_handle_vote = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
+        while (rx.next().await).is_some() {
             let Some(account) = session.get() else {
                 log::info!("error here by account");
                 notification
@@ -87,11 +87,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
 
             // get community members
             let response_item = item(id).await;
-            let item_details = match response_item {
-                Ok(items) => items,
-                Err(_) => 0u16,
-            };
-            members.set(item_details);
+            members.set(response_item.unwrap_or(0));
             let Ok(block) = number().await else {
                 log::warn!("Failed to get last block kusama");
                 continue;
@@ -122,13 +118,13 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     );
             }
             let threshold = get_approval_threshold(
-                &*track_info.read(),
+                &track_info.read(),
                 &initiative_wrapper.unwrap().ongoing.deciding,
                 current_block(),
             );
             approval_threshold.set(threshold);
             let threshold = get_participation_threshold(
-                &*track_info.read(),
+                &track_info.read(),
                 &initiative_wrapper.unwrap().ongoing.deciding,
                 current_block(),
             );

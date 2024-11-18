@@ -51,7 +51,7 @@ pub fn Dashboard() -> Element {
     let timestamp = use_timestamp();
 
     let mut current_page = use_signal::<usize>(|| 1);
-    let mut search_word = use_signal::<String>(|| String::new());
+    let mut search_word = use_signal::<String>(String::new);
     let tab_items = vec![TabItem {
         k: String::from("all"),
         value: translate!(i18, "dashboard.tabs.owned"),
@@ -85,11 +85,7 @@ pub fn Dashboard() -> Element {
             div { class: "dashboard__head",
                 section { class: "tabs",
                     for item in tab_items.into_iter() {
-                        Tab {
-                            text: item.value,
-                            is_active: if tab_value() == item.k { true } else { false },
-                            on_click: move |_| {}
-                        }
+                        Tab { text: item.value, is_active: tab_value() == item.k, on_click: move |_| {} }
                     }
                 }
                 div { class: "head__actions",
@@ -169,25 +165,25 @@ pub fn Dashboard() -> Element {
                                             Icon { icon: Star, height: 24, width: 24, fill: "var(--state-primary-active)" }
                                         }
                                     } else {
-                                            div { class: "card__favorite",
-                                                IconButton {
-                                                    class: "button-favorite button--drop bg--transparent",
-                                                    body: rsx!(
-                                                        Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
-                                                        "var(--state-primary-active)" } else { "var(--state-base-background)" } }
-                                                    ),
-                                                    on_click: move |_| {
-                                                        if let Err(e) = communities.handle_favorite(community.id) {
-                                                            let message = match e {
-                                                                CommunitiesError::NotFound => "Failed to update favorite",
-                                                                CommunitiesError::FailedUpdatingFavorites => "Failed to update favorite",
-                                                                CommunitiesError::NotFoundFavorite => "Failed to update favorite",
-                                                            };
-                                                            notification.handle_error(&message);
-                                                        }
+                                        div { class: "card__favorite",
+                                            IconButton {
+                                                class: "button-favorite button--drop bg--transparent",
+                                                body: rsx!(
+                                                    Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
+                                                    "var(--state-primary-active)" } else { "var(--state-base-background)" } }
+                                                ),
+                                                on_click: move |_| {
+                                                    if let Err(e) = communities.handle_favorite(community.id) {
+                                                        let message = match e {
+                                                            CommunitiesError::NotFound => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                            CommunitiesError::FailedUpdatingFavorites => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                            CommunitiesError::NotFoundFavorite => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                        };
+                                                        notification.handle_error(&message);
                                                     }
                                                 }
                                             }
+                                        }
                                     }
                                     div { class: "card__metrics",
                                         span { class: "card__metric",

@@ -85,8 +85,8 @@ pub fn Account() -> Element {
                 let usdt_value = usdt_value.to_string();
                 let unscaled_value = unscaled_value.to_string();
 
-                let usdt_value = usdt_value.split(".").collect::<Vec<&str>>();
-                let unscaled_value = unscaled_value.split(".").collect::<Vec<&str>>();
+                let usdt_value = usdt_value.split('.').collect::<Vec<&str>>();
+                let unscaled_value = unscaled_value.split('.').collect::<Vec<&str>>();
 
                 ksm_balance.set((
                     unscaled_value[0].to_string(),
@@ -118,7 +118,7 @@ pub fn Account() -> Element {
                 div { class: "account__options",
                     Tab {
                         text: translate!(i18, "account.tabs.wallet.tab"),
-                        is_active: if *profile_value.read() == ProfileTabs::Wallet { true } else { false },
+                        is_active: matches!(*profile_value.read(), ProfileTabs::Wallet),
                         on_click: move |_| {
                             profile_value.set(ProfileTabs::Wallet);
                         }

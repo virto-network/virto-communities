@@ -61,7 +61,7 @@ pub fn Deposit() -> Element {
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if let Err(_) = is_signer_ready(i18, accounts, notification)() {
+        if is_signer_ready(i18, accounts, notification)().is_err() {
             nav.push(vec![], "/login");
         };
     });
@@ -249,21 +249,21 @@ pub fn Deposit() -> Element {
                                             div { class: "account__options",
                                                 Tab {
                                                     text: translate!(i18, "deposit.tabs.accounts"),
-                                                    is_active: if *tab_value.read() == DepositKreivoTabs::Accounts { true } else { false },
+                                                    is_active: matches!(*tab_value.read(), DepositKreivoTabs::Accounts),
                                                     on_click: move |_| {
                                                         tab_value.set(DepositKreivoTabs::Accounts);
                                                     }
                                                 }
                                                 Tab {
                                                     text: translate!(i18, "deposit.tabs.others"),
-                                                    is_active: if *tab_value.read() == DepositKreivoTabs::Wallet { true } else { false },
+                                                    is_active: matches!(*tab_value.read(), DepositKreivoTabs::Wallet),
                                                     on_click: move |_| {
                                                         tab_value.set(DepositKreivoTabs::Wallet);
                                                     }
                                                 }
                                                 Tab {
                                                     text: translate!(i18, "deposit.tabs.communities"),
-                                                    is_active: if *tab_value.read() == DepositKreivoTabs::Community { true } else { false },
+                                                    is_active: matches!(*tab_value.read(), DepositKreivoTabs::Community),
                                                     on_click: move |_| {
                                                         tab_value.set(DepositKreivoTabs::Community);
                                                     }

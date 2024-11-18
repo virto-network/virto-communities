@@ -39,7 +39,7 @@ pub fn InitiativeSettings() -> Element {
                     size: ElementSize::Small,
                     default: None,
                     on_change: move |event: usize| {
-                        let dropdown_options = vec![
+                        let dropdown_options = [
                             DropdownItem {
                                 key: "Admin".to_string(),
                                 value: "Admin".to_string(),

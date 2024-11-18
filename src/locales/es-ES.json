@@ -510,7 +510,8 @@
                 "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲"
             },
             "initiatives": {
-                "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲"
+                "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲",
+                "favorite_pick_failed": "No se pudo actualizar el favorito"
             },
             "vote": {
                 "persist_failed": "No se ha podido guardar el voto",

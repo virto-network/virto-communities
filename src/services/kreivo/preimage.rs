@@ -6,7 +6,7 @@ pub async fn preimage_for(hash: &str, len: u32) -> Result<String, ChainStateErro
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
     let response = serde_json::from_value::<Vec<u8>>(value)
@@ -21,7 +21,7 @@ pub async fn request_status_for(hash: &str) -> Result<u32, ChainStateError> {
     let Response::Value(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
     let response = value.get("Unrequested").ok_or(ChainStateError::FailedDecode)?;
