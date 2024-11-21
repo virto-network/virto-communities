@@ -3,8 +3,10 @@ use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
     components::atoms::{
-        avatar::Variant, dropdown::ElementSize, icon_button, Avatar, Compass, Hamburguer, Home,
-        Icon, IconButton, OnOff, Star,
+        avatar::Variant,
+        dropdown::ElementSize,
+        icon_button::{self, Variant as IconButtonVariant},
+        Avatar, Close, Compass, Hamburguer, Home, Icon, IconButton, OnOff, Star,
     },
     hooks::{
         use_accounts::use_accounts, use_communities::use_communities,
@@ -24,15 +26,9 @@ pub fn Sidebar() -> Element {
     rsx!(
         section { class: "sidebar", class: if is_active() { "sidebar--active" },
             IconButton {
-                class: "button--hamburguer",
+                class: "button--hamburguer mobile bg--fill-50",
                 body: rsx! {
-                    Icon {
-                        icon: Hamburguer,
-                        height: 30,
-                        width: 30,
-                        stroke_width: 2,
-                        stroke: "var(--text-1)"
-                    }
+                    Icon { icon: Hamburguer, height: 28, width: 28, fill: "var(--fill-600)" }
                 },
                 on_click: move |_| {
                     is_active.toggle();
@@ -46,6 +42,19 @@ pub fn Sidebar() -> Element {
                     }
                 }
                 ul { class: "sidebar__list",
+                    div { class: "sidebar__close mobile",
+                        IconButton {
+                            variant: IconButtonVariant::Round,
+                            size: ElementSize::Big,
+                            class: "button--avatar bg--transparent",
+                            body: rsx! {
+                                Icon { icon: Close, height: 32, width: 32, fill: "var(--fill-00)" }
+                            },
+                            on_click: move |_| {
+                                is_active.toggle();
+                            }
+                        }
+                    }
                     match accounts.get_account() {
                         Some(account) => rsx!(
                             li { class: "sidebar__item",
@@ -61,6 +70,7 @@ pub fn Sidebar() -> Element {
                                         }
                                     ),
                                     on_click: move |_| {
+                                        is_active.set(false);
                                         nav.push(vec![], "/account")
                                     }
                                 }
@@ -84,6 +94,7 @@ pub fn Sidebar() -> Element {
                                         }
                                     ),
                                     on_click: move |_| {
+                                        is_active.set(false);
                                         nav.push(vec![], "/login");
                                     }
                                 }
@@ -100,6 +111,7 @@ pub fn Sidebar() -> Element {
                                 Icon { icon: Home, height: 32, width: 32, stroke_width: 1, fill: "var(--fill-00)" }
                             },
                             on_click: move |_| {
+                                is_active.set(false);
                                 nav.push(vec![], "/");
                             }
                         }
@@ -123,6 +135,7 @@ pub fn Sidebar() -> Element {
                             },
                             on_click: move |_| {
                                 tooltip.hide();
+                                is_active.set(false);
                                 nav.push(vec![], "/explore");
                             }
                         }
@@ -141,6 +154,7 @@ pub fn Sidebar() -> Element {
                                     class: if active_community.id == community.id { "sidebar__item--active" },
                                     onclick: move |_| {
                                         if communities.set_community(community.id).is_ok() {
+                                            is_active.set(false);
                                             let path = format!("/dao/{}/initiatives", community.id);
                                             nav.push(vec![], &path);
                                         };
