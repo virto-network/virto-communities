@@ -48,7 +48,7 @@ pub fn Login() -> Element {
             let Ok(_) = session.update_session_file(&UserSession {
                 name: selected_account.name(),
                 address: selected_account.address(),
-                account_id: event as u8,
+                account_id: event,
             }) else {
                 return notification.handle_error(&translate!(i18, "errors.session.persist"));
             };

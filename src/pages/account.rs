@@ -114,7 +114,7 @@ pub fn Account() -> Element {
     };
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while let Some(_) = rx.next().await {
+        while rx.next().await.is_some() {
             on_account();
         }
     });
