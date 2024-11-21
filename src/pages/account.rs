@@ -90,17 +90,17 @@ pub fn Account() -> Element {
 
                     let usdt_value = balance * KSM_PRICE;
                     let usdt_value = usdt_value.to_string();
-                    let unscaled_value = balance.to_string();
-                    let usdt_value = usdt_value.split('.').collect::<Vec<&str>>();
-                    let unscaled_value = unscaled_value.split('.').collect::<Vec<&str>>();
+                    let ksm_value = balance.to_string();
+                    let (usdt_units, usdt_decimals) = usdt_value.split_once('.').unwrap_or((&usdt_value, ""));
+                    let (ksm_units, ksm_decimals) = ksm_value.split_once('.').unwrap_or((&ksm_value, ""));
 
                     ksm_balance.set((
-                        unscaled_value[0].to_string(),
-                        format!("{:.2}", unscaled_value.get(1).unwrap_or(&"00")),
+                        ksm_units.to_string(),
+                        format!("{:.2}", ksm_decimals),
                     ));
                     usdt_balance.set((
-                        usdt_value[0].to_string(),
-                        format!("{:.2}", usdt_value.get(1).unwrap_or(&"00")),
+                        usdt_units.to_string(),
+                        format!("{:.2}", usdt_decimals),
                     ));
                 }
                 Ok::<(), String>(())
