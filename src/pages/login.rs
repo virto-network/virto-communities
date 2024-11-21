@@ -63,8 +63,6 @@ pub fn Login() -> Element {
         }
     });
 
-    use_before_render(move || {});
-
     rsx! {
         div { class: "page page--onboarding",
             div { class: "login",
