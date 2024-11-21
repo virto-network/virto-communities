@@ -521,6 +521,12 @@
                 "chain_unavailable": "En este momento no es posible completar está acción.",
                 "signer_not_found": "¡Lo sentimos! 😞 No puedes realizar esta acción, primero debes autenticarte.",
                 "not_account": "No estás conectado a una cuenta. Conéctate para acceder a más funciones y gestionar tus activos de manera sencilla."
+            },
+            "wallet": {
+                "balance_not_found": "¡Revisa la información ingresada!⚠️ No hemos encontrado saldo para la cuenta proporcionada"
+            },
+            "market": {
+                "query_failed": "No se pudo consultar el precio"
             }
         },
         "errors": {

@@ -32,25 +32,22 @@ impl UseSessionState {
             .map_err(|_| SessionError::SaveFailed)
     }
     pub fn update_account(&mut self, account_id: u8) -> Result<(), SessionError> {
-        let serialized_session: Result<String, StorageError> = <LocalStorage as gloo::storage::Storage>::get(
-            "session_file",
-        );
-        let serialized_session = serialized_session
-            .map_err(|_| SessionError::GetFailed)?;
-        let mut full_session: UserSession = serde_json::from_str(&serialized_session)
-            .map_err(|_| SessionError::GetFailed)?;
+        let serialized_session: Result<String, StorageError> =
+            <LocalStorage as gloo::storage::Storage>::get("session_file");
+        let serialized_session = serialized_session.map_err(|_| SessionError::GetFailed)?;
+        let mut full_session: UserSession =
+            serde_json::from_str(&serialized_session).map_err(|_| SessionError::GetFailed)?;
         full_session.account_id = account_id;
         self.set(&full_session);
-        let serialized_session = serde_json::to_string(&full_session)
-            .map_err(|_| SessionError::GetFailed)?;
+        let serialized_session =
+            serde_json::to_string(&full_session).map_err(|_| SessionError::GetFailed)?;
         <LocalStorage as gloo::storage::Storage>::set("session_file", serialized_session)
             .map_err(|_| SessionError::SaveFailed)?;
         Ok(())
     }
     pub fn is_logged(&self) -> bool {
-        let serialized_session: Result<String, StorageError> = <LocalStorage as gloo::storage::Storage>::get(
-            "session_file",
-        );
+        let serialized_session: Result<String, StorageError> =
+            <LocalStorage as gloo::storage::Storage>::get("session_file");
         let Ok(serialized_session) = serialized_session else {
             return false;
         };
@@ -58,5 +55,15 @@ impl UseSessionState {
             return false;
         };
         true
+    }
+    pub fn update_session_file(&mut self, user_session: &UserSession) -> Result<(), String> {
+        let serialized_session = serde_json::to_string(user_session)
+            .map_err(|_| "errors.session.persist".to_string())?;
+        self.persist_session_file(&serialized_session)
+            .map_err(|_| "errors.session.persist".to_string())?;
+        self.update_account(user_session.account_id)
+            .map_err(|_| "errors.session.persist".to_string())?;
+
+        Ok(())
     }
 }

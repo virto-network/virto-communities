@@ -2,12 +2,9 @@ use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 
 use crate::{
-    components::{
-        atoms::{
-            button::Variant, dropdown::ElementSize, AccountButton, Button,
-            CircleCheck, Dropdown, Icon, Polkadot, VirtoLogo,
-        },
-        molecules::header::set_signer,
+    components::atoms::{
+        button::Variant, dropdown::ElementSize, AccountButton, Button, CircleCheck, Dropdown, Icon,
+        Polkadot, VirtoLogo,
     },
     hooks::{
         use_accounts::use_accounts,
@@ -23,7 +20,7 @@ use futures_util::{StreamExt, TryFutureExt};
 pub fn Login() -> Element {
     let i18 = use_i18();
     let mut notification = use_notification();
-    let mut accounts = use_accounts();
+    let accounts = use_accounts();
     let mut session = use_session();
     let mut connect_handled = use_signal(|| false);
     let nav = use_our_navigator();
@@ -32,33 +29,29 @@ pub fn Login() -> Element {
     for account in accounts.get().into_iter() {
         let address = account.address();
 
-        items.push(rsx!(
-            AccountButton { title: account.name(), description: address.clone(), on_click: move |_| {} }
-        ))
+        items.push(rsx!(AccountButton {
+            title: account.name(),
+            description: address.clone(),
+            on_click: move |_| {}
+        }))
     }
 
     let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<u8>| async move {
         while let Some(event) = rx.next().await {
-            let account = &accounts.get()[event as usize];
+            let Some(selected_account) = &accounts.get_one(event as usize) else {
+                return notification.handle_warning(
+                    &translate!(i18, "warnings.title"),
+                    &translate!(i18, "warnings.middleware.not_account"),
+                );
+            };
 
-            let Ok(serialized_session) = serde_json::to_string(&UserSession {
-                name: account.name(),
-                address: account.address(),
-                account_id: event,
+            let Ok(_) = session.update_session_file(&UserSession {
+                name: selected_account.name(),
+                address: selected_account.address(),
+                account_id: event as u8,
             }) else {
                 return notification.handle_error(&translate!(i18, "errors.session.persist"));
             };
-
-            if let Err(e) = session.persist_session_file(&serialized_session) {
-                log::warn!("Failed to persist session {:?}", e)
-            };
-            if let Err(e) = session.update_account(event) {
-                log::warn!("Failed to update account {:?}", e)
-            };
-
-            log::info!("{:?}", account);
-            accounts.set_account(Some(account.clone()));
-            set_signer(account.address().clone());
 
             nav.push(vec![], "/");
         }
@@ -70,9 +63,7 @@ pub fn Login() -> Element {
         }
     });
 
-    use_before_render(move || {
-
-    });
+    use_before_render(move || {});
 
     rsx! {
         div { class: "page page--onboarding",

@@ -300,7 +300,6 @@ $fw-bold: 700;
     background: var(--fill-00);
     display: grid;
     grid-template-areas:
-        "sidebar header"
         "sidebar main"
         "sidebar footer";
     grid-template-columns: auto 1fr;
@@ -2324,19 +2323,6 @@ textarea::placeholder {
     text-overflow: ellipsis;
 }
 
-.header {
-    width: calc(100vw - 120px);
-    padding: 40px 80px;
-    display: flex;
-    justify-content: space-between;
-    box-shadow: 0px 1px 8px 2px var(--border--rgba);
-    align-items: center;
-}
-
-.header__memberships {
-    width: 200px;
-}
-
 .layout {
     position: relative;
     z-index: 10;
@@ -2387,7 +2373,7 @@ textarea::placeholder {
 .dashboard {
     padding: 16px;
     height: 100%;
-    min-height: calc(100vh - 140px);
+    min-height: 100vh;
     width: 100%;
     position: relative;
     margin-bottom: 48px;
@@ -2512,11 +2498,6 @@ textarea::placeholder {
 
 .balance__subtitle>.balance__asset {
     @extend %text-base-font-medium;
-}
-
-.header__cta {
-    display: flex;
-    gap: 8px;
 }
 
 .dashboard__head {
@@ -3490,78 +3471,7 @@ small.summary__item__value {
         width: 50%;
     }
 
-    .header__cta> :not(.mobile) {
-        display: none;
-    }
-
-    .header__cta .mobile {
-        display: inherit;
-    }
-
-    .header--active>.header__menu {
-        display: inherit;
-        width: 100vw;
-        height: 100vh;
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
-
-    .header__close {
-        height: fit-content;
-        width: fit-content;
-        margin-left: auto;
-    }
-
-    .header__close button {
-        padding: 6px 0;
-        min-width: fit-content;
-    }
-
-    .header__menu__list {
-        height: 100vh;
-        width: 40%;
-        padding: 16px;
-        background: var(--fill-00);
-        position: absolute;
-        right: 0;
-        z-index: 100;
-    }
-
-    .header__menu__list>ul {
-        gap: 16px;
-        display: flex;
-        flex-direction: column;
-        margin: 0;
-        padding: 0;
-    }
-
-    .header__menu__list li {
-        display: flex;
-        flex-direction: row-reverse;
-        align-items: center;
-        list-style-type: none;
-        gap: 8px;
-        margin-right: auto;
-    }
-
-    .header__menu__list>li span {
-        @extend %text-base-font-semibold;
-        color: var(--text-primary);
-    }
-
-    .header__scream {
-        display: block;
-        height: 100vh;
-        width: 100vw;
-        position: absolute;
-        background: rgba(0, 0, 0, 0.302);
-        top: 0;
-        left: 0;
-        z-index: 20;
-    }
-
-    .header .dropdown__placeholder,
+    .dropdown__placeholder,
     .dropdown__value {
         @extend %text-lg-font-medium;
     }
@@ -3751,16 +3661,6 @@ small.summary__item__value {
         height: var(--element-size-medium);
         width: var(--element-size-medium);
         min-width: var(--element-size-medium);
-    }
-
-    .header__cta .mobile {
-        height: var(--element-size-medium);
-        width: var(--element-size-medium);
-        min-width: var(--element-size-medium);
-    }
-
-    .header__menu__list {
-        width: 60%;
     }
 
     .balance__container {
@@ -3975,48 +3875,6 @@ small.summary__item__value {
     .welcome--positioned {
         position: absolute;
         left: 0;
-    }
-
-    .header__wallet * {
-        border: none;
-        outline: none;
-    }
-
-    .header__wallet .dropdown__value {
-        display: none;
-    }
-
-    .header__wallet .dropdown__placeholder {
-        display: none;
-    }
-
-    .header__wallet {
-        width: calc(54px + 30px);
-    }
-
-    .header__wallet .dropdown__container {
-        height: var(--element-size-medium);
-        justify-content: flex-end;
-    }
-
-    .header__wallet .dropdown__wrapper {
-        width: max-content;
-    }
-
-    .header__wallet .rotate-180 {
-        transform: rotate(90deg);
-        transition-duration: 0.3s;
-        transition-property: transform;
-    }
-
-    .header__wallet .rotate-0 {
-        transform: rotate(270deg);
-        transition-duration: 0.3s;
-        transition-property: transform;
-    }
-
-    .header__menu__list {
-        width: 80%;
     }
 
     .balance__title {

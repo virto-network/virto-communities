@@ -507,6 +507,12 @@
                 "chain_unavailable": "At this time, it is not possible to complete this action.",
                 "signer_not_found": "We're sorry! 😞 You cannot perform this action, you must authenticate first.",
                 "not_account": "You are not connected to an account. Connect to access more features and easily manage your assets."
+            },
+            "wallet": {
+                "balance_not_found": "Check the entered information!⚠️ We couldn't find balance for provided account"
+            },
+            "market": {
+                "query_failed": "The price could not be consulted"
             }
         },
         "utils": {
