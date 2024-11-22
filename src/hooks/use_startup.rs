@@ -6,7 +6,7 @@ use crate::{
 };
 
 use super::{
-    use_accounts::{Account, IsDaoOwner},
+    use_accounts::{Account, AreAccountsInitialized, IsDaoOwner},
     use_attach::AttachFile,
     use_communities::Communities,
     use_deposit::DepositForm,
@@ -56,6 +56,7 @@ pub fn use_startup() {
     >(|| Signal::new(ConfirmationForm::default()));
     use_context_provider::<Signal<TimestampValue>>(|| Signal::new(TimestampValue(0)));
     use_context_provider::<Signal<IsTimestampHandled>>(|| Signal::new(IsTimestampHandled(false)));
+    use_context_provider::<Signal<AreAccountsInitialized>>(|| Signal::new(AreAccountsInitialized(false)));
 
     use_context_provider::<Signal<WithdrawForm>>(|| Signal::new(WithdrawForm::default()));
     use_context_provider::<Signal<DepositForm>>(|| Signal::new(DepositForm::default()));
