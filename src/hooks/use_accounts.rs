@@ -5,7 +5,7 @@ use dioxus_std::{i18n::use_i18, translate};
 use pjs::Account as PjsAccount;
 use wasm_bindgen::prelude::*;
 
-use crate::services::kreivo::balances::account;
+use crate::services::kreivo::{balances::account, communities::is_admin};
 
 use super::{
     use_connect_wallet::{use_connect_wallet, PjsError},
@@ -34,7 +34,7 @@ pub fn use_accounts() -> UseAccountsState {
     let mut notification = use_notification();
     let accounts = consume_context::<Signal<Vec<Account>>>();
     let mut account = consume_context::<Signal<Option<Account>>>();
-    let is_dao_owner = consume_context::<Signal<Option<IsDaoOwner>>>();
+    let mut is_dao_owner = consume_context::<Signal<Option<IsDaoOwner>>>();
     let mut are_accounts_initialized = consume_context::<Signal<AreAccountsInitialized>>();
     let pjs = use_context::<Signal<Option<pjs::PjsExtension>>>();
 
@@ -61,6 +61,22 @@ pub fn use_accounts() -> UseAccountsState {
 
                         account.set(Some(selected_account.clone()));
                         set_signer(selected_account.address().clone());
+
+                        let Ok(address) =
+                            sp_core::sr25519::Public::from_str(&selected_account.address())
+                        else {
+                            log::warn!("Not found public address");
+                            return notification
+                                .handle_error(&translate!(i18, "errors.wallet.account_address"));
+                        };
+
+                        let Ok(is_owner) = is_admin(&address.0).await else {
+                            log::warn!("Failed to get is admin");
+                            return notification
+                                .handle_error(&translate!(i18, "errors.wallet.account_address"));
+                        };
+
+                        is_dao_owner.set(Some(IsDaoOwner(is_owner)));
                     }
                 }
             };
