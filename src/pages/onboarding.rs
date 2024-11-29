@@ -88,7 +88,7 @@ pub fn Onboarding() -> Element {
     use_drop(move || attach.reset());
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         if accounts.is_active_account_an_admin() {
-            nav.push(vec![], "/");
+            nav.push(vec![], "/dashboard");
         };
 
         if is_chain_available(i18, timestamp, notification)().is_err() {

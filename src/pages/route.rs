@@ -15,7 +15,7 @@ pub enum Route {
     #[route("/login")]
     Login {},
     #[layout(Authenticated)]
-        #[route("/")]
+        #[route("/dashboard")]
         Dashboard {},
         #[route("/account")]
         Account {},
@@ -26,7 +26,7 @@ pub enum Route {
         #[route("/vos")]
         VOSIntro {},
         #[layout(Onboard)]
-            #[route("/explore")]
+            #[route("/")]
             Explore {},
             #[nest("/dao")]
                 #[nest("/:id")]

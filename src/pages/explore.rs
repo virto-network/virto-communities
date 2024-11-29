@@ -206,59 +206,59 @@ pub fn Explore() -> Element {
                                     }
                                 }
                             }
-                            section { class: "card card--reverse",
-                                div { class: "card__container",
-                                    div { class: "card__head",
-                                        h3 { class: "card__title",
-                                            {translate!(i18, "dashboard.cta_cards.create.title_part_one")}
-                                            span {
-                                                class: "animated-text",
-                                                DynamicText { words: words },
-                                            }
-                                            {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
-                                        }
-                                    }
-                                    p { class: "card__description",
-                                        { translate!(i18,
-                                        "dashboard.cta_cards.create.description") }
-                                    }
-                                    div { class: "card__head",
-                                        a { class: "card__learn",
-                                            { translate!(i18, "dashboard.cta_cards.create.cta") }
-                                        }
-                                        Icon {
-                                            icon: ArrowRight,
-                                            height: 20,
-                                            width: 20,
-                                            stroke_width: 1,
-                                            fill: "var(--text-tertiary)"
-                                        }
-                                    }
-                                }
-                                div { class: "card__cta",
-                                    IconButton {
-                                        class: "button--avatar",
-                                        size: ElementSize::Big,
-                                        body: rsx!(
-                                            Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                            "var(--fill-00)" }
-                                        ),
-                                        on_click: move |_| {
-                                            tooltip.hide();
-                                            nav.push(
-                                                vec![
-                                                    Box::new(is_chain_available(i18, timestamp, notification)),
-                                                    Box::new(is_dao_owner(i18, accounts, notification)),
-                                                ],
-                                                "/onboarding",
-                                            );
-                                        }
-                                    }
-                                }
-                            }
                         }
                     }
                 }
+                section { class: "card card--reverse",
+                div { class: "card__container",
+                    div { class: "card__head",
+                        h3 { class: "card__title",
+                            {translate!(i18, "dashboard.cta_cards.create.title_part_one")}
+                            span {
+                                class: "animated-text",
+                                DynamicText { words: words },
+                            }
+                            {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
+                        }
+                    }
+                    p { class: "card__description",
+                        { translate!(i18,
+                        "dashboard.cta_cards.create.description") }
+                    }
+                    div { class: "card__head",
+                        a { class: "card__learn",
+                            { translate!(i18, "dashboard.cta_cards.create.cta") }
+                        }
+                        Icon {
+                            icon: ArrowRight,
+                            height: 20,
+                            width: 20,
+                            stroke_width: 1,
+                            fill: "var(--text-tertiary)"
+                        }
+                    }
+                }
+                div { class: "card__cta",
+                    IconButton {
+                        class: "button--avatar",
+                        size: ElementSize::Big,
+                        body: rsx!(
+                            Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
+                            "var(--fill-00)" }
+                        ),
+                        on_click: move |_| {
+                            tooltip.hide();
+                            nav.push(
+                                vec![
+                                    Box::new(is_chain_available(i18, timestamp, notification)),
+                                    Box::new(is_dao_owner(i18, accounts, notification)),
+                                ],
+                                "/onboarding",
+                            );
+                        }
+                    }
+                }
+            }
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
