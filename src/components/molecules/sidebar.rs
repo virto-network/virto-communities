@@ -136,7 +136,7 @@ pub fn Sidebar() -> Element {
                             on_click: move |_| {
                                 tooltip.hide();
                                 is_active.set(false);
-                                nav.push(vec![], "/explore");
+                                nav.push(vec![], "/dashboard");
                             }
                         }
                         span { class: "sidebar__action-label__not-displayed",

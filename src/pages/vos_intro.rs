@@ -136,7 +136,7 @@ pub fn VOSIntro() -> Element {
                         size: ElementSize::Medium,
                         status: None,
                         on_click: move |_| {
-                            nav.push(vec![], "/explore");
+                            nav.push(vec![], "/");
                         },
                     }
                 } else {
@@ -147,7 +147,7 @@ pub fn VOSIntro() -> Element {
                         variant: Variant::Tertiary,
                         status: None,
                         on_click: move |_| {
-                            nav.push(vec![], "/explore");
+                            nav.push(vec![], "/");
                         },
                     }
                 }
