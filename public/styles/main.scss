@@ -1489,7 +1489,7 @@ $fw-bold: 700;
     width: max-content;
     max-width: 80vw;
     background: var(--fill-50);
-    padding: 20px 20px;
+    padding: 12px;
     border-radius: 12px;
     list-style: none;
     z-index: 10;
@@ -1504,25 +1504,22 @@ $fw-bold: 700;
 
 .dropdown__item {
     text-align: left;
-    border-bottom: 2px solid #4BAA54;
-
+    padding: 12px;
+    border-radius: 12px;
     &:hover {
         background: var(--fill-200);
     }
 }
 
 .dropdown__item * {
-    @extend %text-xl-font-medium;
+    @extend %text-base-font-medium;
     width: 100%;
 }
 
 .dropdown__item>button {
     width: 100%;
     text-align: left;
-    padding: 12px 0;
-}
-
-.dropdown__item>button {
+    padding: 12px;
     border-radius: 12px;
     transition: background-color 0.2s ease-in;
 }
