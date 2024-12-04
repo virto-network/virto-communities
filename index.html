@@ -218,14 +218,28 @@
     import {
       XcmProgramsExecutor,
       globallyInjectPrograms,
-    } from "https://unpkg.com/@virtonetwork/xcm-programs@latest/dist/xcm-programs.js";
+      Pass
+    } from "http://127.0.0.1:8080/dist/xcm-programs.js";
+    // } from "https://unpkg.com/@virtonetwork/xcm-programs@latest/dist/xcm-programs.js";
     import init from "/{base_path}/assets/dioxus/{app_name}.js";
 
     const executor = new XcmProgramsExecutor({
       kusama: ["wss://kusama-rpc.dwellir.com", "wss://kusama-rpc-tn.dwellir.com", "wss://kusama-public-rpc.blockops.network/ws"],
-      kreivo: ["wss://kreivo.io", "wss://kreivo.kippu.rocks/"],
+      kreivo: ["ws://localhost:12281"],
       kusamaPeople: ["wss://people-kusama-rpc.dwellir.com", "wss://ksm-rpc.stakeworld.io/people", "wss://kusama-people-rpc.polkadot.io"],
     });
+
+    // const executor = new XcmProgramsExecutor({
+    //   kusama: ["ws://localhost:10000"],
+    //   kreivo: ["ws://localhost:12281"],
+    //   kusamaPeople: ["ws://localhost:11004"],
+    // });
+
+    // const executor = new XcmProgramsExecutor({
+    //   kusama: ["wss://kusama-rpc.dwellir.com", "wss://kusama-rpc-tn.dwellir.com", "wss://kusama-public-rpc.blockops.network/ws"],
+    //   kreivo: ["wss://kreivo.io", "wss://kreivo.kippu.rocks/"],
+    //   kusamaPeople: ["wss://people-kusama-rpc.dwellir.com", "wss://ksm-rpc.stakeworld.io/people", "wss://kusama-people-rpc.polkadot.io"],
+    // });
 
     globallyInjectPrograms(executor);
     globalThis.initExecutor = async () => {
@@ -237,6 +251,69 @@
 
     init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(
       async (wasm) => {
+        let kreivo_api = await executor.getKreivoAPI();
+        console.log({ kreivo_api })
+        const [challenge, blockNumber] = await Pass.generateChallenge(kreivo_api);
+        let hashedUserId = new Uint8Array(
+          await crypto.subtle.digest(
+            "SHA-256",
+            new TextEncoder().encode("testuser@example.com")
+          )
+        );
+
+        const user = {
+          id: hashedUserId,
+          name: "testuser",
+          displayName: "Test User",
+        };
+
+        const attestationOptions = {
+          publicKey: {
+            rp: {
+              name: "Example RP",
+            },
+            user: {
+              id: user.id,
+              name: user.name,
+              displayName: user.displayName,
+            },
+            challenge,
+            pubKeyCredParams: [
+              {
+                type: "public-key",
+                alg: -7, // ES256 algorithm
+              },
+            ],
+            authenticatorSelection: {
+              userVerification: "preferred",
+            },
+            timeout: 60_000,
+            attestation: "none",
+          },
+        };
+
+        let attestationResponse = await navigator.credentials.create(attestationOptions);
+        console.log({ attestationResponse })
+
+        console.log(attestationResponse.rawId)
+        console.log(attestationResponse.response.getAuthenticatorData())
+        console.log(attestationResponse.response.clientDataJSON)
+        console.log(attestationResponse.response.getPublicKey())
+
+        const pass = new Pass(kreivo_api);
+
+        console.log("here after create pass")
+
+        const tx = await pass.register(
+          blockNumber,
+          hashedUserId,
+          new Uint8Array(attestationResponse.rawId),
+          new Uint8Array(attestationResponse.response.getAuthenticatorData()),
+          new Uint8Array(attestationResponse.response.clientDataJSON)
+        );
+
+        console.log("here after tx", tx.to)
+
         if (wasm.__wbindgen_start == undefined) {
           wasm.main();
         }
