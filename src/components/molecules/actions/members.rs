@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use crate::{
     components::atoms::{
@@ -43,7 +43,7 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
                                 },
                                 error: {
-                                    match sp_core::sr25519::Public::from_str(&member.account) {
+                                    match sp_core::sr25519::Public::from_ss58check(&member.account) {
                                         Ok(_) => None,
                                         Err(_) => Some(translate!(i18, "onboard.invite.form.error.invalid_address")),
                                     }

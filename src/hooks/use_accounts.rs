@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -63,7 +63,7 @@ pub fn use_accounts() -> UseAccountsState {
                         set_signer(selected_account.address().clone());
 
                         let Ok(address) =
-                            sp_core::sr25519::Public::from_str(&selected_account.address())
+                            sp_core::sr25519::Public::from_ss58check(&selected_account.address())
                         else {
                             log::warn!("Not found public address");
                             return notification
@@ -131,8 +131,8 @@ impl UseAccountsState {
             .get_account()
             .ok_or("errors.wallet.accounts_not_found")?;
         let account_address = pjs_account.address();
-        let address = sp_core::sr25519::Public::from_str(&account_address).map_err(|e| {
-            log::warn!("Not found public address: {}", e);
+        let address = sp_core::sr25519::Public::from_ss58check(&account_address).map_err(|e| {
+            log::warn!("Not found public address: {:?}", e);
             "errors.wallet.account_address".to_string()
         })?;
         let hex_address = hex::encode(address.0);
