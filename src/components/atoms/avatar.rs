@@ -15,7 +15,7 @@ pub struct AvatarProps {
 }
 pub fn Avatar(props: AvatarProps) -> Element {
     let size_avatar = format!("--avatar-size: {}px;", props.size);
-    let avatar_style = format!("{}", size_avatar);
+    let avatar_style = size_avatar.to_string();
     let variant = match props.variant {
         Variant::Round => "avatar--round",
         Variant::SemiRound => "avatar--semi-round",

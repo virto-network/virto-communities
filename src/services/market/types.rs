@@ -13,7 +13,7 @@ pub enum Error {
 
 impl Response {
     pub fn get_price(&self) -> f64 {
-        let data = self.data.get(self.data.len() - 1).expect("Should get data");
+        let data = self.data.last().expect("Should get data");
         let price = *data.get(1).expect("Should get price");
         price
     }

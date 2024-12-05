@@ -15,7 +15,7 @@ pub fn is_chain_available(
         log::info!("rest: {:?}", Date::now() as u64 - timestamp.get().0);
         if Date::now() as u64 - timestamp.get().0 > THRESHOLD {
             log::warn!("Chain unavailable");
-            notification.handle_warning(&translate!(i18, "warnings.middleware.chain_unavailable"));
+            notification.handle_warning(&translate!(i18, "warnings.title"), &translate!(i18, "warnings.middleware.chain_unavailable"));
             Err("Chain unavailable")
         } else {
             Ok(())

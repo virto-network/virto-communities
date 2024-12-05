@@ -52,7 +52,8 @@
             }
         },
         "sidebar": {
-            "cta": "Agregar comunidad"
+            "explore": "Explorar",
+            "dashboard": "Mis Comunidades"
         },
         "header": {
             "cta": {
@@ -471,6 +472,32 @@
                 }
             }
         },
+        "vos_intro": {
+            "name": "Asistente de IA Virto",
+            "description_p1": "Control sin esfuerzo\ncon ",
+            "description_p2": "Vos",
+            "cards": {
+                "management": {
+                    "title": "Gestión Fácil de Miembros",
+                    "description": "Crea tu empresa en menos de 15 minutos, sin complicaciones."
+                },
+                "payments": {
+                    "title": "Recepción y Ejecución de Pagos Sin Esfuerzo",
+                    "description": "Transacciones globales seguras y rápidas al alcance de tu mano"
+                },
+                "governance": {
+                    "title": "Gestión y Gobernanza Avanzada de Fondos",
+                    "description": "Toma decisiones financieras inteligentes y gestiona recursos con confianza"
+                },
+                "wallet": {
+                    "title": "Acceso Fácil a tu Billetera Organizacional",
+                    "description": "Administra los recursos de tu organización y mueve fondos cuando lo necesites"
+                }
+            },
+            "continue": "¡Llévame allí!",
+            "tour": "Ver qué hay de nuevo",
+            "skip": "Omitir"
+        },
         "utils": {
             "markdown": {
                 "cta": {
@@ -492,7 +519,14 @@
             "middleware": {
                 "has_dao": "¡Lo sentimos! 😞 No puedes crear más organizaciones asociadas a esta cuenta.",
                 "chain_unavailable": "En este momento no es posible completar está acción.",
-                "signer_not_found": "¡Lo sentimos! 😞 No puedes realizar esta acción, primero debes autenticarte."
+                "signer_not_found": "¡Lo sentimos! 😞 No puedes realizar esta acción, primero debes autenticarte.",
+                "not_account": "No estás conectado a una cuenta. Conéctate para acceder a más funciones y gestionar tus activos de manera sencilla."
+            },
+            "wallet": {
+                "balance_not_found": "¡Revisa la información ingresada!⚠️ No hemos encontrado saldo para la cuenta proporcionada"
+            },
+            "market": {
+                "query_failed": "No se pudo consultar el precio"
             }
         },
         "errors": {
@@ -508,7 +542,8 @@
                 "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲"
             },
             "initiatives": {
-                "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲"
+                "query_failed": "¡Lo sentimos! 😞 No hemos logrado cargar la información correctamente. ¡Inténtalo de nuevo! 🤲",
+                "favorite_pick_failed": "No se pudo actualizar el favorito"
             },
             "vote": {
                 "persist_failed": "No se ha podido guardar el voto",

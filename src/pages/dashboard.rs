@@ -51,10 +51,10 @@ pub fn Dashboard() -> Element {
     let timestamp = use_timestamp();
 
     let mut current_page = use_signal::<usize>(|| 1);
-    let mut search_word = use_signal::<String>(|| String::new());
+    let mut search_word = use_signal::<String>(String::new);
     let tab_items = vec![TabItem {
         k: String::from("all"),
-        value: translate!(i18, "dashboard.tabs.all"),
+        value: translate!(i18, "dashboard.tabs.owned"),
     }];
     let tab_value = use_signal::<String>(|| String::from("all"));
 
@@ -85,11 +85,7 @@ pub fn Dashboard() -> Element {
             div { class: "dashboard__head",
                 section { class: "tabs",
                     for item in tab_items.into_iter() {
-                        Tab {
-                            text: item.value,
-                            is_active: if tab_value() == item.k { true } else { false },
-                            on_click: move |_| {}
-                        }
+                        Tab { text: item.value, is_active: tab_value() == item.k, on_click: move |_| {} }
                     }
                 }
                 div { class: "head__actions",
@@ -169,25 +165,25 @@ pub fn Dashboard() -> Element {
                                             Icon { icon: Star, height: 24, width: 24, fill: "var(--state-primary-active)" }
                                         }
                                     } else {
-                                            div { class: "card__favorite",
-                                                IconButton {
-                                                    class: "button--drop bg--transparent",
-                                                    body: rsx!(
-                                                        Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
-                                                        "var(--state-primary-active)" } else { "var(--state-base-background)" } }
-                                                    ),
-                                                    on_click: move |_| {
-                                                        if let Err(e) = communities.handle_favorite(community.id) {
-                                                            let message = match e {
-                                                                CommunitiesError::NotFound => "Failed to update favorite",
-                                                                CommunitiesError::FailedUpdatingFavorites => "Failed to update favorite",
-                                                                CommunitiesError::NotFoundFavorite => "Failed to update favorite",
-                                                            };
-                                                            notification.handle_error(&message);
-                                                        }
+                                        div { class: "card__favorite",
+                                            IconButton {
+                                                class: "button-favorite button--drop bg--transparent",
+                                                body: rsx!(
+                                                    Icon { icon : Star, height : 24, width : 24, fill : if community.favorite {
+                                                    "var(--state-primary-active)" } else { "var(--state-base-background)" } }
+                                                ),
+                                                on_click: move |_| {
+                                                    if let Err(e) = communities.handle_favorite(community.id) {
+                                                        let message = match e {
+                                                            CommunitiesError::NotFound => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                            CommunitiesError::FailedUpdatingFavorites => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                            CommunitiesError::NotFoundFavorite => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                        };
+                                                        notification.handle_error(&message);
                                                     }
                                                 }
                                             }
+                                        }
                                     }
                                     div { class: "card__metrics",
                                         span { class: "card__metric",
@@ -233,84 +229,86 @@ pub fn Dashboard() -> Element {
                                 }
                             }
                         }
-                        section { class: "card card--reverse",
-                            div { class: "card__container",
-                                div { class: "card__head",
-                                    h3 { class: "card__title",
-                                        { translate!(i18,
-                                        "dashboard.cta_cards.explore.title") }
-                                    }
-                                }
-                                p { class: "card__description",
-                                    {
-                                    translate!(i18, "dashboard.cta_cards.explore.description") }
-                                }
+                        }
+                    }
+                }
+                section { class: "card card--reverse",
+                div { class: "card__container",
+                    div { class: "card__head",
+                        h3 { class: "card__title",
+                            { translate!(i18,
+                            "dashboard.cta_cards.explore.title") }
+                        }
+                    }
+                    p { class: "card__description",
+                        {
+                        translate!(i18, "dashboard.cta_cards.explore.description") }
+                    }
+                }
+                div { class: "card__cta",
+                    IconButton {
+                        class: "button--avatar",
+                        body: rsx!(Icon { icon : Compass, height : 32, width : 32, fill : "var(--fill-00)" }),
+                        on_click: move |_| {
+                            nav.push(vec![], "/");
+                        }
+                    }
+                }
+            }
+                section { class: "card card--reverse",
+                    div { class: "card__container",
+                        div { class: "card__head",
+                            h3 { class: "card__title",
+                            {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
+                            span {
+                                class: "animated-text",
+                                DynamicText { words },
+                            },
+                            {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
+                            },
+                        }
+                        p { class: "card__description",
+                            { translate!(i18,
+                            "dashboard.cta_cards.create.description") }
+                        }
+                        div { class: "card__head",
+                            a { class: "card__learn",
+                                { translate!(i18, "dashboard.cta_cards.create.cta") }
                             }
-                            div { class: "card__cta",
-                                IconButton {
-                                    class: "button--avatar",
-                                    body: rsx!(Icon { icon : Compass, height : 32, width : 32, fill : "var(--fill-00)" }),
-                                    on_click: move |_| {
-                                        nav.push(vec![], "/explore");
-                                    }
-                                }
+                            Icon {
+                                icon: ArrowRight,
+                                height: 20,
+                                width: 20,
+                                stroke_width: 1,
+                                fill: "var(--text-tertiary)"
                             }
                         }
-                        section { class: "card card--reverse",
-                            div { class: "card__container",
-                                div { class: "card__head",
-                                    h3 { class: "card__title",
-                                    {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
-                                    span {
-                                        DynamicText { words },
-                                    },
-                                    {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
-                                    },
-                                }
-                                p { class: "card__description",
-                                    { translate!(i18,
-                                    "dashboard.cta_cards.create.description") }
-                                }
-                                div { class: "card__head",
-                                    a { class: "card__learn",
-                                        { translate!(i18, "dashboard.cta_cards.create.cta") }
-                                    }
-                                    Icon {
-                                        icon: ArrowRight,
-                                        height: 20,
-                                        width: 20,
-                                        stroke_width: 1,
-                                        fill: "var(--text-tertiary)"
-                                    }
-                                }
+                    }
+                    div { class: "card__cta",
+                        IconButton {
+                            class: "button--avatar",
+                            size: ElementSize::Big,
+                            body: rsx!(
+                                Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
+                                "var(--fill-00)" }
+                            ),
+                            on_click: move |_| {
+                                tooltip.hide();
+                                nav.push(
+                                    vec![
+                                        Box::new(is_chain_available(i18, timestamp, notification)),
+                                        Box::new(is_dao_owner(i18, accounts, notification)),
+                                    ],
+                                    "/onboarding",
+                                );
                             }
-                            div { class: "card__cta",
-                                IconButton {
-                                    class: "button--avatar",
-                                    size: ElementSize::Big,
-                                    body: rsx!(
-                                        Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                        "var(--fill-00)" }
-                                    ),
-                                    on_click: move |_| {
-                                        tooltip.hide();
-                                        nav.push(
-                                            vec![
-                                                Box::new(is_chain_available(i18, timestamp, notification)),
-                                                Box::new(is_dao_owner(i18, accounts, notification)),
-                                            ],
-                                            "/onboarding",
-                                        );
-                                    }
-                                }
-                            }
-                        }
                         }
                     }
                 }
             }
             div { class: "dashboard__footer grid-footer",
                 Paginator {
+                    from: 1,
                     to: ((communities
                         .get_communities_by_filters(
                             Some(()),
@@ -320,6 +318,7 @@ pub fn Dashboard() -> Element {
                         .len() + SKIP - 1)
                         .saturating_div(SKIP))
                         .max(1),
+                    value: current_page(),
                     on_change: move |event: PaginatorValue| {
                         current_page.set(event.value());
                         on_handle_paginator.send(current_page())

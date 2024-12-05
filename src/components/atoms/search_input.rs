@@ -1,6 +1,6 @@
-use dioxus::prelude::*;
-use crate::components::atoms::{Icon, IconButton, Search};
 use super::dropdown::ElementSize;
+use crate::components::atoms::{Icon, IconButton, Search};
+use dioxus::prelude::*;
 #[derive(PartialEq, Props, Clone)]
 pub struct SearchInputProps {
     message: String,
@@ -15,7 +15,7 @@ pub struct SearchInputProps {
     on_click: EventHandler<MouseEvent>,
 }
 pub fn SearchInput(props: SearchInputProps) -> Element {
-    let input_error_container = if let Some(_) = props.error {
+    let input_error_container = if props.error.is_some() {
         "input--error-container"
     } else {
         ""

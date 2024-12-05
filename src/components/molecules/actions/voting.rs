@@ -146,7 +146,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                         RadioButton {
                                                             title: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.aye"),
                                                             name: "Aye",
-                                                            checked: vote.aye.clone(),
+                                                            checked: vote.aye,
                                                             on_change: move |_| {
                                                                 if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
                                                                     vote_b.aye = true;
@@ -158,7 +158,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                         RadioButton {
                                                             title: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.nay"),
                                                             name: "Nay",
-                                                            checked: !vote.aye.clone(),
+                                                            checked: !vote.aye,
                                                             on_change: move |_| {
                                                                 if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
                                                                     vote_c.aye = false;

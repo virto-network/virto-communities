@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use crate::{
     components::atoms::{
@@ -30,7 +30,7 @@ pub fn MembersAction(props: VotingProps) -> Element {
                     }, value: match member.medium.clone() {
                         MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
                     } };
-
+            
                     rsx!(
                         li {
                             ComboInput {
@@ -43,20 +43,21 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                     MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
                                 },
                                 error: {
-                                    match sp_core::sr25519::Public::from_str(&member.account) {
+                                    match sp_core::sr25519::Public::from_ss58check(&member.account) {
                                         Ok(_) => None,
                                         Err(_) => Some(translate!(i18, "onboard.invite.form.error.invalid_address")),
                                     }
                                 },
                                 on_change: move |event: ComboInputValue| {
-                                    let medium = match event.option {
-                                        ComboInputOption::Dropdown(value) => {
-                                            match value.key.as_str() {
-                                                "Wallet" => MediumOptions::Wallet,
-                                                _ => todo!()
-                                            }
-                                        },
-                                        _ => todo!()
+                                    let ComboInputOption::Dropdown(value) = event.option else {
+                                        return;
+                                    };
+                                
+                                    let invite_wallet = translate!(i18, "onboard.invite.form.wallet.label");
+                                    let medium = if value.key == invite_wallet {
+                                        MediumOptions::Wallet
+                                    } else {
+                                        return;
                                     };
                                     if let ActionItem::AddMembers(ref mut meta) = initiative.get_action(props.index) {
                                         meta.members[index_meta] = MemberItem { medium, account: event.input };

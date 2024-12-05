@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -60,9 +60,9 @@ pub fn Withdraw() -> Element {
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if let Err(_) = is_signer_ready(i18, accounts, notification)() {
+        if is_signer_ready(i18, accounts, notification)().is_err() {
             nav.push(vec![], "/login");
-        };
+        }
     });
 
     let mut items = vec![];
@@ -212,14 +212,14 @@ pub fn Withdraw() -> Element {
                                             div { class: "account__options",
                                                 Tab {
                                                     text: "My accounts",
-                                                    is_active: if *tab_value.read() == WithdrawKreivoTabs::Accounts { true } else { false },
+                                                    is_active: matches!(*tab_value.read(), WithdrawKreivoTabs::Accounts),
                                                     on_click: move |_| {
                                                         tab_value.set(WithdrawKreivoTabs::Accounts);
                                                     }
                                                 }
                                                 Tab {
                                                     text: "Others",
-                                                    is_active: if *tab_value.read() == WithdrawKreivoTabs::Wallet { true } else { false },
+                                                    is_active: matches!(*tab_value.read(), WithdrawKreivoTabs::Wallet),
                                                     on_click: move |_| {
                                                         tab_value.set(WithdrawKreivoTabs::Wallet);
                                                     }
@@ -307,11 +307,11 @@ pub fn Withdraw() -> Element {
                                                     body: "This could take a moment".to_string(),
                                                     show: true,
                                                 });
-                                            let address = sp_core::sr25519::Public::from_str(
+                                            let address = sp_core::sr25519::Public::from_ss58check(
                                                     &withdraw.get_withdraw().address,
                                                 )
                                                 .map_err(|e| {
-                                                    log::warn!("Not found public address: {}", e);
+                                                    log::warn!("Not found public address: {:?}", e);
                                                     translate!(i18, "errors.wallet.account_address")
                                                 })?;
                                             let hex_address = hex::encode(address.0);

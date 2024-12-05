@@ -8,7 +8,7 @@ impl IconShape for Hamburguer {
     }
     fn child_elements(&self) -> Element {
         rsx!(
-            path { d: "M3.5 4.66666H24.5V6.99999H3.5V4.66666ZM3.5 12.8333H24.5V15.1667H3.5V12.8333ZM3.5 21H24.5V23.3333H3.5V21Z" }
+            path { d: "M3.5 4.66699H24.5V7.00033H3.5V4.66699ZM3.5 12.8337H24.5V15.167H3.5V12.8337ZM3.5 21.0003H24.5V23.3337H3.5V21.0003Z" }
         )
     }
 }

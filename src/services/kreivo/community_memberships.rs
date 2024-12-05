@@ -1,10 +1,8 @@
+use super::community_track::{tracks, tracksIds};
+use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
 use codec::Decode;
 use serde::Deserialize;
 use sube::{sube, Response};
-use crate::{
-    pages::dashboard::Community, services::kreivo::community_track::ChainStateError,
-};
-use super::community_track::{tracks, tracksIds};
 #[derive(Decode, Debug, Deserialize)]
 pub struct CollectionDetails {
     pub items: u16,
@@ -17,7 +15,9 @@ pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainState
         "wss://kreivo.io/communityMemberships/collection/{}",
         collection,
     );
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!(&query)
+        .await
+        .map_err(|_| ChainStateError::FailedQuery)?;
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
     };
@@ -29,42 +29,44 @@ pub async fn collection(collection: u16) -> Result<CollectionDetails, ChainState
 
 pub async fn item(item: u16) -> Result<u16, ChainStateError> {
     let query = format!("wss://kreivo.io/communityMemberships/item/{}", item);
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!(&query)
+        .await
+        .map_err(|_| ChainStateError::FailedQuery)?;
     let Response::ValueSet(value) = response else {
         return Err(ChainStateError::InternalError);
     };
     Ok(value.len() as u16)
 }
-pub async fn get_membership_id(
-    address: &str,
-    community_id: u16,
-) -> Result<u16, ChainStateError> {
+pub async fn get_membership_id(address: &str, community_id: u16) -> Result<u16, ChainStateError> {
     let query = format!(
         "wss://kreivo.io/communityMemberships/account/{}/{}",
-        address,
-        community_id,
+        address, community_id,
     );
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!(&query)
+        .await
+        .map_err(|_| ChainStateError::FailedQuery)?;
     let Response::ValueSet(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let Some(value) = value.get(0) else {
+    let Some(value) = value.first() else {
         return Err(ChainStateError::InternalError);
     };
     let value = &value.0;
     let Some(value) = value.get(2) else {
         return Err(ChainStateError::InternalError);
     };
-    let Ok(value) = serde_json::to_value(&value) else {
+    let Ok(value) = serde_json::to_value(value) else {
         return Err(ChainStateError::InternalError);
     };
-    let membership_id = serde_json::from_value::<u16>(value)
-        .map_err(|_| ChainStateError::FailedDecode)?;
+    let membership_id =
+        serde_json::from_value::<u16>(value).map_err(|_| ChainStateError::FailedDecode)?;
     Ok(membership_id)
 }
 pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError> {
     let query = format!("wss://kreivo.io/communityMemberships/account/{}", address);
-    let response = sube!(& query).await.map_err(|_| ChainStateError::FailedQuery)?;
+    let response = sube!(&query)
+        .await
+        .map_err(|_| ChainStateError::FailedQuery)?;
     let Response::ValueSet(ref value) = response else {
         return Err(ChainStateError::InternalError);
     };
@@ -74,12 +76,10 @@ pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError
 
 pub async fn get_communities() -> Result<Vec<Community>, ChainStateError> {
     let mut communities = vec![];
-    let community_trackIds = tracksIds()
-        .await
-        .map_err(|e| {
-            log::warn!("error: {:?}", e);
-            ChainStateError::FailedQuery
-        })?;
+    let community_trackIds = tracksIds().await.map_err(|e| {
+        log::warn!("error: {:?}", e);
+        ChainStateError::FailedQuery
+    })?;
     for community in community_trackIds.communities.iter() {
         let response_track = tracks(*community).await;
         let response_collection = collection(*community).await;
@@ -106,11 +106,6 @@ pub async fn get_communities() -> Result<Vec<Community>, ChainStateError> {
 
         let filtered_name: &[u8] = &filtered_name;
 
-        let item_details = match response_item {
-            Ok(items) => items,
-            Err(_) => 0u16,
-        };
-
         let community = Community {
             id: *community,
             icon: None,
@@ -118,7 +113,7 @@ pub async fn get_communities() -> Result<Vec<Community>, ChainStateError> {
             description: String::from(""),
             tags: vec![],
             memberships: collection_items,
-            members: item_details,
+            members: response_item.unwrap_or(0),
             favorite: false,
             has_membership: false,
         };
@@ -148,7 +143,7 @@ pub async fn is_community_member_by_address(
             return Ok(false);
         };
 
-        value.len() > 0
+        !value.is_empty()
     };
 
     Ok(is_member)

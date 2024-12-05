@@ -24,7 +24,7 @@ pub struct InputTagsProps {
     on_click: EventHandler<MouseEvent>,
 }
 pub fn InputTags(props: InputTagsProps) -> Element {
-    let input_error_container = if let Some(_) = props.error {
+    let input_error_container = if props.error.is_some() {
         "input--error-container"
     } else {
         ""
@@ -37,19 +37,19 @@ pub fn InputTags(props: InputTagsProps) -> Element {
 
     let is_active = use_signal::<bool>(|| false);
     let mut tags = use_signal::<Vec<String>>(|| {
-        if props.message.len() > 0 {
+        if !props.message.is_empty() {
             props
                 .message
-                .split(",")
-                .map(|e| String::from(e))
+                .split(',')
+                .map(String::from)
                 .collect::<Vec<String>>()
         } else {
             vec![]
         }
     });
-    let mut complete_value = use_signal(|| String::new());
-    let mut new_value = use_signal(|| String::new());
-    let mut temporal_value = use_signal(|| String::new());
+    let mut complete_value = use_signal(String::new);
+    let mut new_value = use_signal(String::new);
+    let mut temporal_value = use_signal(String::new);
     let mut is_editing_tag = use_signal(|| None);
     rsx!(
         section {
@@ -109,7 +109,7 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                         )
                     })
                 },
-                if new_value().trim().len() > 0 {
+                if !new_value().trim().is_empty() {
                     div {
                         class: "tag",
                         class: if is_editing_tag().is_some() { "tag--editing" },
@@ -119,7 +119,7 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                                 new_value.set(temporal_value());
                                 is_editing_tag.set(None);
                             },
-                            if temporal_value().len() > 0 {
+                            if !temporal_value().is_empty() {
                                 "{temporal_value()}"
                             } else {
                                 "{new_value()}"
@@ -141,11 +141,7 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                     class: "input",
                     value: new_value,
                     required: props.required,
-                    placeholder: if props.required {
-                        format!("{}*", props.placeholder)
-                    } else {
-                        format!("{}", props.placeholder)
-                    },
+                    placeholder: if props.required { format!("{}*", props.placeholder) } else { props.placeholder },
                     oninput: move |event| {
                         if let Some(index) = is_editing_tag() {
                             tags.with_mut(|t| t[index] = event.value());
@@ -171,7 +167,7 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                                 .map(|s| s.to_string())
                                 .collect();
                             let last_tag = e[1].clone();
-                            if last_tag.len() > 0 {
+                            if !last_tag.is_empty() {
                                 tags.with_mut(|t| t.push(e[0].clone()));
                                 complete_value.set(tags().join(","));
                                 new_value.set(last_tag.clone());
@@ -181,11 +177,11 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                         } else {
                             new_value.set(event.value().clone());
                         }
-                        if event.value().len() == 0 && tags.last().is_some() {
+                        if event.value().is_empty() && tags.last().is_some() {
                             new_value.set(tags().last().unwrap().to_string());
                             tags.with_mut(|t| t.pop());
                         }
-                        let val = if temporal_value().len() > 0 {
+                        let val = if !temporal_value().is_empty() {
                             temporal_value()
                         } else {
                             new_value()

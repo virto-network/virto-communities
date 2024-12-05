@@ -1,8 +1,8 @@
+use super::dropdown::ElementSize;
+use crate::components::atoms::{Icon, IconButton, Search, WarningSign};
 use dioxus::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use crate::components::atoms::{Icon, IconButton, Search, WarningSign};
-use super::dropdown::ElementSize;
 #[derive(PartialEq, Clone)]
 pub enum InputType {
     Text,
@@ -35,7 +35,7 @@ pub struct InputProps {
 }
 pub fn Input(props: InputProps) -> Element {
     let mut input_ref = use_signal::<Option<Box<HtmlInputElement>>>(|| None);
-    let input_error_container = if let Some(_) = props.error {
+    let input_error_container = if props.error.is_some() {
         "input--error-container"
     } else {
         ""
@@ -71,11 +71,13 @@ pub fn Input(props: InputProps) -> Element {
                     r#type: "{input_type}",
                     class: "input",
                     onmounted: move |event| {
-                        event
+                        if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
                             .and_then(|element| element.clone().dyn_into::<HtmlInputElement>().ok())
-                            .map(|html_element| input_ref.set(Some(Box::new(html_element.clone()))));
+                        {
+                            input_ref.set(Some(Box::new(html_element.clone())))
+                        }
                         if input_type == "date" {
                             if let Some(input_element) = input_ref() {
                                 input_element.set_type("text")
@@ -98,7 +100,7 @@ pub fn Input(props: InputProps) -> Element {
                     placeholder: if props.required {
                         format!("{}*", props.placeholder)
                     } else {
-                        format!("{}", props.placeholder)
+                        props.placeholder.to_string()
                     },
                     oninput: move |event| props.on_input.call(event),
                     onkeypress: move |event| props.on_keypress.call(event)

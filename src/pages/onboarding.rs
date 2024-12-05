@@ -78,7 +78,7 @@ pub fn Onboarding() -> Element {
 
     let to_pay = consume_context::<Signal<f64>>();
 
-    let mut id_number = use_signal::<String>(|| String::new());
+    let mut id_number = use_signal::<String>(String::new);
     let mut onboarding_step = use_signal::<OnboardingStep>(|| OnboardingStep::Basics);
 
     let mut handle_required_inputs = use_signal::<bool>(|| false);
@@ -88,10 +88,10 @@ pub fn Onboarding() -> Element {
     use_drop(move || attach.reset());
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         if accounts.is_active_account_an_admin() {
-            nav.push(vec![], "/");
+            nav.push(vec![], "/dashboard");
         };
 
-        if let Err(_) = is_chain_available(i18, timestamp, notification)() {
+        if is_chain_available(i18, timestamp, notification)().is_err() {
             nav.push(vec![], "/");
         };
     });
@@ -100,20 +100,20 @@ pub fn Onboarding() -> Element {
             div { class: "row",
                 div { class: "onboarding__form",
                     div { class: "form__wrapper",
-                    IconButton {
-                        on_click: move |_| {
-                            nav.push(vec![], "/");
-                        },
-                        body: rsx! {
-                            Icon {
-                                icon: VirtoLogo,
-                                height: 64,
-                                width: 64,
-                                stroke_width: 1,
-                                fill: "var(--color-lavanda-400)"
+                        IconButton {
+                            on_click: move |_| {
+                                nav.push(vec![], "/");
+                            },
+                            body: rsx! {
+                                Icon {
+                                    icon: VirtoLogo,
+                                    height: 64,
+                                    width: 64,
+                                    stroke_width: 1,
+                                    fill: "var(--color-lavanda-400)"
+                                }
                             }
                         }
-                    }
                         div { class: "progress progress--steps",
                             button {
                                 class: "step",
@@ -340,7 +340,7 @@ pub fn Onboarding() -> Element {
                                                                 value: NotificationHandler::None,
                                                             },
                                                         });
-                                                    nav.push(Vec::new(), "/");
+                                                    nav.push(Vec::new(), "/vos");
                                                     Ok::<(), String>(())
                                                 }
                                                     .unwrap_or_else(move |e: String| {

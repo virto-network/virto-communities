@@ -1,18 +1,23 @@
-use std::str::FromStr;
-
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
+use futures_util::{StreamExt, TryFutureExt};
 
 use crate::{
-    components::atoms::{button::Variant as ButtonVariant, dropdown::ElementSize, Button, Tab},
+    components::atoms::{
+        button::Variant as ButtonVariant,
+        dropdown::{DropdownItem, ElementSize},
+        AccountButton, Button, Dropdown, Tab,
+    },
     hooks::{
-        use_market_client::use_market_client, use_notification::use_notification,
-        use_our_navigator::use_our_navigator, use_session::use_session,
+        use_accounts::use_accounts,
+        use_market_client::use_market_client,
+        use_notification::use_notification,
+        use_our_navigator::use_our_navigator,
+        use_session::{use_session, UserSession},
         use_timestamp::use_timestamp,
     },
     middlewares::is_chain_available::is_chain_available,
-    services::{kreivo, market::types::Tokens},
+    services::market::types::Tokens,
 };
 use wasm_bindgen::prelude::*;
 
@@ -37,97 +42,136 @@ extern "C" {
 pub fn Account() -> Element {
     let i18 = use_i18();
     let mut notification = use_notification();
+    let mut accounts = use_accounts();
     let nav = use_our_navigator();
-    let session = use_session();
+    let mut session = use_session();
     let timestamp = use_timestamp();
     let market_client = use_market_client().get();
     let mut ksm_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
     let mut usdt_balance = use_signal::<(String, String)>(|| ('0'.to_string(), "00".to_string()));
 
-    let mut kreivo_balance = use_signal(|| 0.0);
-    let mut ksm_usd = use_signal(|| 0.0);
-
-    let get_balance = move || {
-        spawn({
-            async move {
-                let user_session = session
-                    .get()
-                    .ok_or(translate!(i18, "errors.wallet.accounts_not_found"))?;
-
-                let address =
-                    sp_core::sr25519::Public::from_str(&user_session.address).map_err(|e| {
-                        log::warn!("Not found public address: {}", e);
-                        translate!(i18, "errors.wallet.account_address")
-                    })?;
-
-                let hex_address = hex::encode(address.0);
-
-                let Ok(account) = kreivo::balances::account(&format!("0x{}", hex_address)).await
-                else {
-                    ksm_balance.set(('0'.to_string(), "00".to_string()));
-                    usdt_balance.set(('0'.to_string(), "00".to_string()));
-
-                    return Ok(());
-                };
-
-                kreivo_balance.set(account.data.free as f64 / 10_f64.powf(12f64));
-
-                let unscaled_value = kreivo_balance();
-                let KSM_PRICE = market_client
-                    .get_price_by_token(Tokens::KSM)
-                    .await
-                    .map_err(|_| translate!(i18, "errors.market.query_failed"))?;
-
-                ksm_usd.set(KSM_PRICE);
-
-                let usdt_value = unscaled_value * KSM_PRICE;
-
-                let usdt_value = usdt_value.to_string();
-                let unscaled_value = unscaled_value.to_string();
-
-                let usdt_value = usdt_value.split(".").collect::<Vec<&str>>();
-                let unscaled_value = unscaled_value.split(".").collect::<Vec<&str>>();
-
-                ksm_balance.set((
-                    unscaled_value[0].to_string(),
-                    format!("{:.2}", unscaled_value.get(1).unwrap_or(&"00")),
-                ));
-                usdt_balance.set((
-                    usdt_value[0].to_string(),
-                    format!("{:.2}", usdt_value.get(1).unwrap_or(&"00")),
-                ));
-
-                Ok::<(), String>(())
-            }
-            .unwrap_or_else(move |e: String| notification.handle_warning(&e))
-        });
-    };
-
-    use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if session.is_logged() {
-            get_balance();
-        }
-    });
+    let kreivo_balance = use_signal(|| 0.0);
+    let ksm_usd = use_signal(|| 0.0);
 
     let tab_value = use_signal(|| AccountTabs::Kreivo);
     let mut profile_value = use_signal(|| ProfileTabs::Wallet);
 
+    let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
+    let mut items = vec![];
+    for account in accounts.get().into_iter() {
+        let address = account.address();
+
+        items.push(rsx!(AccountButton {
+            title: account.name(),
+            description: address.clone(),
+            on_click: move |_| {}
+        }))
+    }
+
+    let on_account = move || {
+        spawn({
+            let market_client = market_client.to_owned();
+            async move {
+                if session.is_logged() {
+                    dropdown_value.set(accounts.get_account().map(|account| DropdownItem {
+                        key: account.address().clone(),
+                        value: account.name(),
+                    }));
+
+                    let balance = accounts
+                        .get_balance()
+                        .await
+                        .map_err(|_| translate!(i18, "warnings.wallet.balance_not_found"))?;
+
+                    let KSM_PRICE = market_client
+                        .get_price_by_token(Tokens::KSM)
+                        .await
+                        .map_err(|_| translate!(i18, "warnings.market.query_failed"))?;
+
+                    let usdt_value = balance * KSM_PRICE;
+                    let usdt_value = usdt_value.to_string();
+                    let ksm_value = balance.to_string();
+                    let (usdt_units, usdt_decimals) = usdt_value.split_once('.').unwrap_or((&usdt_value, ""));
+                    let (ksm_units, ksm_decimals) = ksm_value.split_once('.').unwrap_or((&ksm_value, ""));
+
+                    ksm_balance.set((
+                        ksm_units.to_string(),
+                        format!("{:.2}", ksm_decimals),
+                    ));
+                    usdt_balance.set((
+                        usdt_units.to_string(),
+                        format!("{:.2}", usdt_decimals),
+                    ));
+                }
+                Ok::<(), String>(())
+            }
+            .unwrap_or_else(move |e: String| {
+                ksm_balance.set(('0'.to_string(), "00".to_string()));
+                usdt_balance.set(('0'.to_string(), "00".to_string()));
+                notification.handle_warning(&translate!(i18, "warnings.title"), &e);
+            })
+        });
+    };
+
+    let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
+        while rx.next().await.is_some() {
+            on_account();
+        }
+    });
+
+    use_effect(use_reactive(
+        &accounts.are_accounts_initialized(),
+        move |are_accounts_initialized| {
+            if are_accounts_initialized {
+                on_handle_account.send(())
+            }
+        },
+    ));
+
     rsx! {
         div { class: "page--vote",
             div { class: "account",
-                div { class: "account__options",
-                    Tab {
-                        text: translate!(i18, "account.tabs.wallet.tab"),
-                        is_active: if *profile_value.read() == ProfileTabs::Wallet { true } else { false },
-                        on_click: move |_| {
-                            profile_value.set(ProfileTabs::Wallet);
+                div { class: "account__balance",
+                    div { class: "account__options",
+                        Tab {
+                            text: translate!(i18, "account.tabs.wallet.tab"),
+                            is_active: matches!(*profile_value.read(), ProfileTabs::Wallet),
+                            on_click: move |_| {
+                                profile_value.set(ProfileTabs::Wallet);
+                            }
+                        }
+                        Tab {
+                            class: "tab--comming-soon",
+                            text: translate!(i18, "account.tabs.transfers.tab"),
+                            is_active: true,
+                            on_click: move |_| {}
                         }
                     }
-                    Tab {
-                        class: "tab--comming-soon",
-                        text: translate!(i18, "account.tabs.transfers.tab"),
-                        is_active: true,
-                        on_click: move |_| {}
+                    Dropdown {
+                        class: "header__wallet dropdown--right".to_string(),
+                        value: dropdown_value(),
+                        placeholder: translate!(i18, "header.cta.account"),
+                        size: ElementSize::Medium,
+                        default: None,
+                        on_change: move |event: usize| {
+                            spawn({
+                                async move {
+                                    let selected_account = accounts.set_account(event).map_err(|_|"errors.session.persist".to_string())?;
+                                    on_handle_account.send(());
+
+                                    let _ = session.update_session_file(&UserSession {
+                                        name: selected_account.name(),
+                                        address: selected_account.address(),
+                                        account_id: event as u8,
+                                    });
+                                    Ok::<(), String>(())
+                                }
+                                .unwrap_or_else(move |e: String| {
+                                    notification.handle_warning(&translate!(i18, "warnings.title"), &e);
+                                })
+                            });
+                        },
+                        body: items
                     }
                 }
                 match *profile_value.read() {
@@ -152,7 +196,7 @@ pub fn Account() -> Element {
                                                             ], "/deposit");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
-                
+
                                                         })
                                                     );
                                                 },
@@ -168,7 +212,7 @@ pub fn Account() -> Element {
                                                             nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification))], "/withdraw");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
-                
+
                                                         })
                                                     );
                                                 },
@@ -203,7 +247,7 @@ pub fn Account() -> Element {
                                             }
                                         }
                                     }
-                
+
                                 }
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
@@ -218,7 +262,7 @@ pub fn Account() -> Element {
                                                     th { {translate!(i18, "account.tabs.wallet.assets.cost")} }
                                                     th { {translate!(i18, "account.tabs.wallet.assets.total")} }
                                                 }
-                
+
                                                 match *tab_value.read() {
                                                     AccountTabs::Kreivo => rsx!(
                                                         tr {
@@ -231,14 +275,14 @@ pub fn Account() -> Element {
                                                                 { format!("${} USD", if ksm_usd() == 0.0 || kreivo_balance() <= 0.001  { "-".to_string() } else { format!("{:.2}", ksm_usd() * kreivo_balance()) } )}
                                                             }
                                                         }
-                
+
                                                         tr { class: "list__asset--comming-soon",
                                                             td { class: "list__name", "USDT" }
                                                             td { "-" }
                                                             td { "-" }
                                                             td { "-" }
                                                         }
-                
+
                                                         tr { class: "list__asset--comming-soon",
                                                             td { class: "list__name", "dUSD" }
                                                             td { "-" }
@@ -268,28 +312,28 @@ pub fn Account() -> Element {
                                             th { {translate!(i18, "account.tabs.transfers.table.quantity")} }
                                             th { {translate!(i18, "account.tabs.transfers.table.account")} }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
                                             td { "10" }
                                             td { "5E4S9C..." }
                                         }
-                
+
                                         tr {
                                             td { class: "list__name", "KSM" }
                                             td { "2024-08-20 20:16:34" }
