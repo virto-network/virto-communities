@@ -4,6 +4,7 @@ use crate::components::atoms::dropdown::DropdownItem;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
+use sp_core::crypto::Ss58Codec;
 const BLOCK_TIME_IN_SECONDS: i64 = 6;
 #[derive(Clone, Default, Deserialize, Serialize, Debug)]
 pub struct InfoForm {
@@ -399,7 +400,7 @@ impl UseInitiativeState {
                         .into_iter()
                         .filter_map(|member| {
                             if !member.account.is_empty() {
-                                match sp_core::sr25519::Public::from_str(&member.account) {
+                                match sp_core::sr25519::Public::from_ss58check(&member.account) {
                                     Ok(_) => Some(member.account),
                                     Err(_) => None,
                                 }
@@ -564,7 +565,7 @@ impl UseInitiativeState {
                         .into_iter()
                         .filter_map(|transfer| {
                             if transfer.value > 0 {
-                                match sp_core::sr25519::Public::from_str(&transfer.account) {
+                                match sp_core::sr25519::Public::from_ss58check(&transfer.account) {
                                     Ok(_) => Some(transfer),
                                     Err(_) => None,
                                 }

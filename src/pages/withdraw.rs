@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -307,11 +307,11 @@ pub fn Withdraw() -> Element {
                                                     body: "This could take a moment".to_string(),
                                                     show: true,
                                                 });
-                                            let address = sp_core::sr25519::Public::from_str(
+                                            let address = sp_core::sr25519::Public::from_ss58check(
                                                     &withdraw.get_withdraw().address,
                                                 )
                                                 .map_err(|e| {
-                                                    log::warn!("Not found public address: {}", e);
+                                                    log::warn!("Not found public address: {:?}", e);
                                                     translate!(i18, "errors.wallet.account_address")
                                                 })?;
                                             let hex_address = hex::encode(address.0);

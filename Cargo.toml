@@ -53,7 +53,7 @@ serde = "1.0.197"
 serde_json = "1.0.114"
 hex = "0.4.3"
 wasm-bindgen-futures = "0.4.42"
-sp-core = "32.0.0"
+sp-core = { version = "34.0.0", default-features = false, features = ["serde"] }
 reqwest = { version = "0.12.4", features = ["multipart", "json"] }
 pulldown-cmark = "0.11.0"
 blake2 = "0.10.6"
