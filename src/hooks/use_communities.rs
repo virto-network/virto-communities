@@ -1,4 +1,5 @@
-use std::{str::FromStr, vec};
+use std::vec;
+use sp_core::crypto::Ss58Codec;
 
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
@@ -45,7 +46,7 @@ pub fn use_communities() -> UseCommunitiesState {
         let public_address = session
             .get()
             .and_then(
-                |session| match sp_core::sr25519::Public::from_str(&session.address) {
+                |session| match sp_core::sr25519::Public::from_ss58check(&session.address) {
                     Ok(public_address) => Some(public_address.0),
                     Err(_) => {
                         log::warn!("error here by address");

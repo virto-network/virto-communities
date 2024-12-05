@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 use dioxus::prelude::*;
 use dioxus_std::{i18n::use_i18, translate};
 use futures_util::{StreamExt, TryFutureExt};
@@ -71,7 +71,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .handle_error(&translate!(i18, "errors.communities.query_failed"));
                 return;
             };
-            let Ok(address) = sp_core::sr25519::Public::from_str(&account.address) else {
+            let Ok(address) = sp_core::sr25519::Public::from_ss58check(&account.address) else {
                 log::info!("error here by address");
                 notification
                     .handle_error(&translate!(i18, "errors.wallet.account_address"));
@@ -187,9 +187,9 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .get()
                     .ok_or(translate!(i18, "errors.wallet.account_address"))?
                     .address;
-                let address = sp_core::sr25519::Public::from_str(&account_address)
+                let address = sp_core::sr25519::Public::from_ss58check(&account_address)
                     .map_err(|e| {
-                        log::warn!("Not found public address: {}", e);
+                        log::warn!("Not found public address: {:?}", e);
                         translate!(i18, "errors.wallet.account_address")
                     })?;
                 let hex_address = hex::encode(address.0);

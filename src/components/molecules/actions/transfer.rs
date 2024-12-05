@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use crate::{
     components::atoms::{
@@ -35,7 +35,7 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                     size: ElementSize::Small,
                                     placeholder: translate!(i18, "initiative.steps.actions.community_transfer.dest.placeholder"),
                                     error: {
-                                        match sp_core::sr25519::Public::from_str(&transfer.account) {
+                                        match sp_core::sr25519::Public::from_ss58check(&transfer.account) {
                                             Ok(_) => None,
                                             Err(_) => Some(translate!(i18, "initiative.steps.actions.error.invalid_address")),
                                         }

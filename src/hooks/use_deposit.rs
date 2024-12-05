@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use sp_core::crypto::Ss58Codec;
 
 use dioxus::prelude::*;
 
@@ -45,7 +45,7 @@ impl DepositForm {
         let amount = (amount * 1_000_000_000_000.0) as u64;
         match &self.dest {
             DepositTo::Address(addrs) => {
-                let address = sp_core::sr25519::Public::from_str(addrs)
+                let address = sp_core::sr25519::Public::from_ss58check(addrs)
                     .map_err(|_| DepositError::MalformedAddress)?;
                 let hex_address = format!("0x{}", hex::encode(address.0));
                 Ok((hex_address, amount, false))
