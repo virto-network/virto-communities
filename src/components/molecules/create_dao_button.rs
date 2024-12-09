@@ -24,7 +24,6 @@ pub fn CreateDaoButton(props: CreateDaoButtonProps) -> Element {
     let handle_click = move |_| {
         nav.push(
             vec![
-                Box::new(is_chain_available(i18.clone(), timestamp.clone(), notification.clone())),
                 Box::new(is_dao_owner(i18.clone(), accounts.clone(), notification.clone())),
             ],
             "/onboarding",
@@ -32,8 +31,10 @@ pub fn CreateDaoButton(props: CreateDaoButtonProps) -> Element {
     };
 
     let handle_mouse_enter = move |_| {
+        let chain_available = is_chain_available(i18.clone(), timestamp.clone(), notification.clone())();
         let is_owner = is_dao_owner(i18.clone(), accounts.clone(), notification.clone())();
-        if is_owner.is_err() {
+        
+        if chain_available.is_ok() && is_owner.is_err() {
             show_tooltip.set(true);
         }
     };
