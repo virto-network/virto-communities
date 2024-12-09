@@ -4061,3 +4061,52 @@ small.summary__item__value {
         background-color: var(--fill-100);
     }
 }
+
+.create-dao-button-wrapper {
+    position: relative;
+}
+
+.create-dao-tooltip-container {
+    position: absolute;
+    top: 100%;
+    left: 40%;
+    transform: translateX(-50%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.create-dao-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: fit-content;
+    background-color: var(--background-modal);
+    color: var(--text-white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    transition: opacity 0.3s, visibility 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin-top: 10px;
+}
+
+.create-dao-tooltip--visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.create-dao-tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--background-modal) transparent;
+}
+
+.create-dao-tooltip,
+.create-dao-tooltip--visible {
+    @extend %text-xs-font-regular;
+}
