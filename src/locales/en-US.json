@@ -503,7 +503,7 @@
         "warnings": {
             "title": "⚠️Attention: This information is for you",
             "middleware": {
-                "has_dao": "We're sorry! 😞 You cannot create more organizations associated with this account.",
+                "has_dao": "By now, you can only have one organization",
                 "chain_unavailable": "At this time, it is not possible to complete this action.",
                 "signer_not_found": "We're sorry! 😞 You cannot perform this action, you must authenticate first.",
                 "not_account": "You are not connected to an account. Connect to access more features and easily manage your assets."
