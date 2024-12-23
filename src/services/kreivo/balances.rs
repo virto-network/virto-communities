@@ -18,7 +18,7 @@ pub struct AccountData {
 }
 pub async fn account(account: &str) -> Result<AccountInfo, ChainStateError> {
     let query = format!("wss://kreivo.io/system/account/{}", account);
-    log::info!("query: {:#?}", query);
+    dioxus::logger::tracing::info!("query: {:#?}", query);
     let response = sube!(& query).await.map_err(|_| { ChainStateError::FailedQuery })?;
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);

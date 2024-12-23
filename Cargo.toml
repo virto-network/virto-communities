@@ -6,14 +6,11 @@ edition = "2021"
 
 [dependencies]
 
-dioxus = { version = "0.5", features = ["web", "router"] }
-dioxus-std = { version = "0.5.0", features = ["i18n"] }
+dioxus = { version = "0.6", features = ["web", "router"] }
+dioxus-i18n = { git = "https://github.com/mrxiaozhuox/dioxus-i18n.git" }
 
-log = "0.4.19"
-dioxus-logger = "0.4.1"
-console_error_panic_hook = "0.1.7"
-wasm-bindgen = "0.2.95"
-unic-langid = "0.9.1"
+wasm-bindgen = "0.2.99"
+unic-langid = { version = "0.9.5", features = ["macros"] }
 web-sys = { version = "0.3.69", features = [
     "Document",
     "Element",
@@ -58,10 +55,22 @@ reqwest = { version = "0.12.4", features = ["multipart", "json"] }
 pulldown-cmark = "0.11.0"
 blake2 = "0.10.6"
 chrono = "0.4.38"
-wasm-logger = "0.2.0"
+manganis = "0.6.0"
 
 [patch.crates-io]
 cookie = { git = "https://github.com/S0c5/cookie-rs.git" }
 
 [build-dependencies]
 grass = "0.13.2"
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"

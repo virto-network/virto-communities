@@ -22,7 +22,7 @@ use crate::{
     services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use futures_util::TryFutureExt;
 use gloo::utils::format::JsValueSerdeExt;
 use serde::Serialize;
@@ -64,9 +64,12 @@ extern "C" {
         maybe_topup: JsValue,
     ) -> Result<JsValue, JsValue>;
 }
+const WINDOW: Asset = asset!("/public/images/window.png");
+const PHONE: Asset = asset!("/public/images/phone.png");
+const FACES: Asset = asset!("/public/images/faces.png");
 #[component]
 pub fn Onboarding() -> Element {
-    let i18 = use_i18();
+    
     let accounts = use_accounts();
     let mut onboard = use_onboard();
     let mut attach = use_attach();
@@ -91,7 +94,7 @@ pub fn Onboarding() -> Element {
             nav.push(vec![], "/dashboard");
         };
 
-        if is_chain_available(i18, timestamp, notification)().is_err() {
+        if is_chain_available(timestamp, notification)().is_err() {
             nav.push(vec![], "/");
         };
     });
@@ -167,7 +170,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(*onboarding_step.read(), OnboardingStep::Basics) {
                             Button {
                                 class: "",
-                                text: translate!(i18, "onboard.management.cta.back"),
+                                text: t!("onboard-management-cta-back"),
                                 size: ElementSize::Big,
                                 variant: Variant::Secondary,
                                 on_click: move |_| {
@@ -193,7 +196,7 @@ pub fn Onboarding() -> Element {
                         if !matches!(onboarding_step(), OnboardingStep::Invite) {
                             Button {
                                 class: "",
-                                text: translate!(i18, "onboard.management.cta.next"),
+                                text: t!("onboard-management-cta-next"),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty()
@@ -220,7 +223,7 @@ pub fn Onboarding() -> Element {
                         } else {
                             Button {
                                 class: "",
-                                text: format!("{}: {:.2} KSM", translate!(i18, "onboard.invite.cta.next"), to_pay()),
+                                text: format!("{}: {:.2} KSM", t!("onboard-invite-cta-next"), to_pay()),
                                 size: ElementSize::Big,
                                 on_click: move |_| {
                                     if onboard.get_basics().name.is_empty()
@@ -256,7 +259,7 @@ pub fn Onboarding() -> Element {
                                                     let response_track_ids = tracksIds()
                                                         .await
                                                         .map_err(|_| {
-                                                            translate!(i18, "errors.form.community_creation")
+                                                            t!("errors-form-community_creation")
                                                         })?;
                                                     let name_bytes = Vec::from(onboard.get_basics().name);
                                                     let community_id = name_bytes
@@ -273,23 +276,23 @@ pub fn Onboarding() -> Element {
                                                     id_number.set(current_id.to_string());
                                                     tooltip
                                                         .handle_tooltip(TooltipItem {
-                                                            title: translate!(i18, "onboard.tips.loading.title"),
-                                                            body: translate!(i18, "onboard.tips.loading.description"),
+                                                            title: t!("onboard-tips-loading-title"),
+                                                            body: t!("onboard-tips-loading-description"),
                                                             show: true,
                                                         });
                                                     let decision_method = convert_to_jsvalue(
                                                             &DecisionMethod::Membership,
                                                         )
                                                         .map_err(|_| {
-                                                            log::warn!("Malformed decision method");
-                                                            translate!(i18, "errors.form.community_creation")
+                                                            dioxus::logger::tracing::warn!("Malformed decision method");
+                                                            t!("errors-form-community_creation")
                                                         })?;
                                                     let response = spaces_client
                                                         .get()
                                                         .create(community)
                                                         .await
                                                         .map_err(|_| {
-                                                            translate!(i18, "errors.form.community_creation")
+                                                            t!("errors-form-community_creation")
                                                         })?;
                                                     let identity = Identity {
                                                         display: onboard.get_basics().name,
@@ -297,8 +300,8 @@ pub fn Onboarding() -> Element {
                                                     };
                                                     let encoded_identity = convert_to_jsvalue(&identity)
                                                         .map_err(|_| {
-                                                            log::warn!("Malformed identity");
-                                                            translate!(i18, "errors.form.community_creation")
+                                                            dioxus::logger::tracing::warn!("Malformed identity");
+                                                            t!("errors-form-community_creation")
                                                         })?;
                                                     let members = onboard
                                                         .get_invitations()
@@ -313,8 +316,8 @@ pub fn Onboarding() -> Element {
                                                         .collect::<Vec<String>>();
                                                     let membership_accounts = convert_to_jsvalue(&members)
                                                         .map_err(|_| {
-                                                            log::warn!("Malformed membership accounts");
-                                                            translate!(i18, "errors.form.community_creation")
+                                                            dioxus::logger::tracing::warn!("Malformed membership accounts");
+                                                            t!("errors-form-community_creation")
                                                         })?;
                                                     topup_then_create_community(
                                                             current_id,
@@ -326,14 +329,14 @@ pub fn Onboarding() -> Element {
                                                         )
                                                         .await
                                                         .map_err(|_| {
-                                                            log::warn!("Error on xcm program");
-                                                            translate!(i18, "errors.form.community_creation")
+                                                            dioxus::logger::tracing::warn!("Error on xcm program");
+                                                            t!("errors-form-community_creation")
                                                         })?;
                                                     tooltip.hide();
                                                     notification
                                                         .handle_notification(NotificationItem {
-                                                            title: translate!(i18, "onboard.tips.created.title"),
-                                                            body: translate!(i18, "onboard.tips.created.description"),
+                                                            title: t!("onboard-tips-created-title"),
+                                                            body: t!("onboard-tips-created-description"),
                                                             variant: NotificationVariant::Success,
                                                             show: true,
                                                             handle: NotificationHandle {
@@ -362,9 +365,9 @@ pub fn Onboarding() -> Element {
                 div { class: "onboarding__image",
                     img {
                         src: match *onboarding_step.read() {
-                            OnboardingStep::Basics => "images/window.png",
-                            OnboardingStep::Management => "images/phone.png",
-                            OnboardingStep::Invite => "images/faces.png",
+                            OnboardingStep::Basics => WINDOW,
+                            OnboardingStep::Management => PHONE,
+                            OnboardingStep::Invite => FACES,
                         }
                     }
                 }

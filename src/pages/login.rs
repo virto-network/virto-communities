@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 
 use crate::{
     components::atoms::{
@@ -18,7 +18,7 @@ use futures_util::{StreamExt, TryFutureExt};
 
 #[component]
 pub fn Login() -> Element {
-    let i18 = use_i18();
+    
     let mut notification = use_notification();
     let accounts = use_accounts();
     let mut session = use_session();
@@ -40,8 +40,8 @@ pub fn Login() -> Element {
         while let Some(event) = rx.next().await {
             let Some(selected_account) = &accounts.get_one(event as usize) else {
                 return notification.handle_warning(
-                    &translate!(i18, "warnings.title"),
-                    &translate!(i18, "warnings.middleware.not_account"),
+                    &t!("warnings-title"),
+                    &t!("warnings-middleware-not_account"),
                 );
             };
 
@@ -50,7 +50,7 @@ pub fn Login() -> Element {
                 address: selected_account.address(),
                 account_id: event,
             }) else {
-                return notification.handle_error(&translate!(i18, "errors.session.persist"));
+                return notification.handle_error(&t!("errors-session-persist"));
             };
 
             nav.push(vec![], "/");
@@ -76,12 +76,12 @@ pub fn Login() -> Element {
                                 stroke_width: 1,
                                 fill: "var(--color-lavanda-400)"
                             }
-                            div { class: "login__welcome", {translate!(i18, "login.welcome")} }
+                            div { class: "login__welcome", {t!("login-welcome")} }
                             div { class: "login__name", "VIRTO" }
                         }
                         div { class: "login__info",
                             p { class: "login__info__description",
-                                {translate!(i18, "login.description")}
+                                {t!("login-description")}
                             }
                             ul { class: "login__info__opportunities",
                                 li { class: "icon-text",
@@ -92,7 +92,7 @@ pub fn Login() -> Element {
                                         fill: "var(--state-primary-active)"
                                     }
                                     span { class: "icon-text__title",
-                                        {translate!(i18, "login.opportunities.connect")}
+                                        {t!("login-opportunities-connect")}
                                     }
                                 }
                                 li { class: "icon-text",
@@ -103,7 +103,7 @@ pub fn Login() -> Element {
                                         fill: "var(--state-primary-active)"
                                     }
                                     span { class: "icon-text__title",
-                                        {translate!(i18, "login.opportunities.learn")}
+                                        {t!("login-opportunities-learn")}
                                     }
                                 }
                                 li { class: "icon-text",
@@ -114,7 +114,7 @@ pub fn Login() -> Element {
                                         fill: "var(--state-primary-active)"
                                     }
                                     span { class: "icon-text__title",
-                                        {translate!(i18, "login.opportunities.impact")}
+                                        {t!("login-opportunities-impact")}
                                     }
                                 }
                             }
@@ -124,12 +124,12 @@ pub fn Login() -> Element {
                 div { class: "login__form",
                     div { class: "login__form__wrapper",
                         div { class: "login__form__head",
-                            h3 { class: "login__form__title", {translate!(i18, "login.form.title")} }
+                            h3 { class: "login__form__title", {t!("login-form-title")} }
                         }
                         div { class: "login__form__cta",
                             if !connect_handled() {
                                 Button {
-                                    text: translate!(i18, "header.cta.connect"),
+                                    text: t!("header-cta-connect"),
                                     status: None,
                                     variant: Variant::Secondary,
                                     right_icon: rsx! {
@@ -147,13 +147,13 @@ pub fn Login() -> Element {
                                                         PjsError::ConnectionFailed => {
                                                             notification
                                                                 .handle_error(
-                                                                    &translate!(i18, "errors.wallet.connection_failed"),
+                                                                    &t!("errors-wallet-connection_failed"),
                                                                 )
                                                         }
                                                         PjsError::AccountsNotFound => {
                                                             notification
                                                                 .handle_error(
-                                                                    &translate!(i18, "errors.wallet.accounts_not_found"),
+                                                                    &t!("errors-wallet-accounts_not_found"),
                                                                 );
                                                         }
                                                     };
@@ -166,7 +166,7 @@ pub fn Login() -> Element {
                                     class: "header__wallet dropdown--left".to_string(),
                                     value: None,
                                     size: ElementSize::Big,
-                                    placeholder: translate!(i18, "header.cta.account"),
+                                    placeholder: t!("header-cta-account"),
                                     default: None,
                                     on_change: move |event: usize| {
                                         on_handle_account.send(event as u8);

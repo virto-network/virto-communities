@@ -19,7 +19,7 @@ use crate::{
     },
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 static SKIP: usize = 6;
@@ -31,7 +31,7 @@ pub struct InitiativeWrapper {
 }
 #[component]
 pub fn Initiatives(id: u16) -> Element {
-    let i18 = use_i18();
+    
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
     let spaces_client = use_spaces_client();
@@ -43,7 +43,7 @@ pub fn Initiatives(id: u16) -> Element {
     let mut search_word = use_signal::<String>(String::new);
     let tab_items = vec![TabItem {
         k: String::from("all"),
-        value: translate!(i18, "dao.tabs.all"),
+        value: t!("dao-tabs-all"),
     }];
     let tab_value = use_signal::<String>(|| String::from("all"));
     let initiatives_ids = use_signal::<Vec<u32>>(Vec::new);
@@ -66,8 +66,8 @@ pub fn Initiatives(id: u16) -> Element {
             filtered_initiatives.set(vec![]);
 
             tooltip.handle_tooltip(TooltipItem {
-                title: translate!(i18, "dao.tips.loading.title"),
-                body: translate!(i18, "dao.tips.loading.description"),
+                title: t!("dao-tips-loading-title"),
+                body: t!("dao-tips-loading-description"),
                 show: true,
             });
             // Temporal value for FIFO ongoing initiative
@@ -95,7 +95,7 @@ pub fn Initiatives(id: u16) -> Element {
                         ongoing: response.ongoing,
                     };
 
-                    log::info!("{:?}", metadata_of(track).await);
+                    dioxus::logger::tracing::info!("{:?}", metadata_of(track).await);
                     let Ok(initiative_metadata) = metadata_of(track).await else {
                         initiatives.with_mut(|c| c.push(init));
                         continue;
@@ -123,7 +123,7 @@ pub fn Initiatives(id: u16) -> Element {
                         continue;
                     };
 
-                    log::info!("{:?}", response.info);
+                    dioxus::logger::tracing::info!("{:?}", response.info);
 
                     init.info = response.info;
 
@@ -152,7 +152,7 @@ pub fn Initiatives(id: u16) -> Element {
                 div { class: "head__actions",
                     SearchInput {
                         message: search_word(),
-                        placeholder: translate!(i18, "dao.cta_header.search"),
+                        placeholder: t!("dao-cta_header-search"),
                         error: None,
                         on_input: move |event: Event<FormData>| {
                             search_word.set(event.value());
@@ -254,14 +254,14 @@ pub fn Initiatives(id: u16) -> Element {
                 section { class: "card card--reverse",
                     div { class: "card__container",
                         div { class: "card__head",
-                            h3 { class: "card__title", {translate!(i18, "dao.cta_cards.create.title")} }
+                            h3 { class: "card__title", {t!("dao-cta_cards-create-title")} }
                         }
                         p { class: "card__description",
                             {
-                            translate!(i18, "dao.cta_cards.create.description") }
+                            t!("dao-cta_cards-create-description") }
                         }
                         div { class: "card__head",
-                            a { class: "card__learn", {translate!(i18, "dao.cta_cards.create.cta")} }
+                            a { class: "card__learn", {t!("dao-cta_cards-create-cta")} }
                             Icon {
                                 icon: ArrowRight,
                                 height: 20,

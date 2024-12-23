@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 
 use crate::components::atoms::{dropdown::ElementSize, ArrowLeft, ArrowRight, Icon, IconButton};
 
@@ -28,13 +28,13 @@ pub struct PaginatorProps {
 }
 
 pub fn Paginator(props: PaginatorProps) -> Element {
-    let i18 = use_i18();
+    
 
     rsx!(
         div { class: "paginator",
             if !props.is_item_dotted {
                 span { class: "paginator__range",
-                {translate!(i18, "dashboard.footer.paginator", from: props.value, to: props.to)}
+                {t!("dashboard-footer-paginator", from: props.value, to: props.to)}
             }
             }
             div { class: "paginator__jumpers",

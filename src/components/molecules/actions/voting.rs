@@ -11,7 +11,7 @@ use crate::{
     },
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
@@ -19,7 +19,7 @@ pub struct VotingProps {
 }
 const KUSAMA_PRECISION_DECIMALS: u64 = 1_000_000_000_000;
 pub fn VotingAction(props: VotingProps) -> Element {
-    let i18 = use_i18();
+    
     let mut initiative = use_initiative();
     rsx!(
         ul { class: "form__inputs form__inputs--combo",
@@ -37,10 +37,10 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                             if proposal.poll_index > 0 {
                                                 None
                                             } else {
-                                                Some(translate!(i18, "initiative.steps.actions.error.amount"))
+                                                Some(t!("initiative-steps-actions-error-amount"))
                                             }
                                         },
-                                        label: translate!(i18, "initiative.steps.actions.voting_open_gov.poll_index"),
+                                        label: t!("initiative-steps-actions-voting_open_gov-poll_index"),
                                         on_input: move |event: Event<FormData>| {
                                             if let ActionItem::VotingOpenGov(ref mut meta) = initiative.get_action(props.index) {
                                                 let poll_index: u64 = event.value().parse().unwrap_or(0);
@@ -74,10 +74,10 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                             if vote.balance > 0 {
                                                                 None
                                                             } else {
-                                                                Some(translate!(i18, "initiative.steps.actions.error.amount"))
+                                                                Some(t!("initiative-steps-actions-error-amount"))
                                                             }
                                                         },
-                                                        placeholder: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.balance"),
+                                                        placeholder: t!("initiative-steps-actions-voting_open_gov-standard-balance"),
                                                         right_text: {
                                                             rsx!(
                                                                 span { class: "input--right__text",
@@ -88,31 +88,31 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                         options: vec![
                                                             DropdownItem {
                                                                 key: "None".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.none"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-none"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked1x".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_1"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-locked_1"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked2x".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_2"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-locked_2"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked3x".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_3"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-locked_3"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked4x".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_4"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-locked_4"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked5x".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_5"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-locked_5"),
                                                             },
                                                             DropdownItem {
                                                                 key: "Locked6x".to_string(),
-                                                                value: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.conviction.locked_6"),
+                                                                value: t!("initiative-steps-actions-voting_open_gov-standard-conviction-locked_6"),
                                                             }
                                                         ],
                                                         on_change: move |event: ComboInputValue| {
@@ -144,7 +144,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                     }
                                                     div { class: "form__inputs__container__cta",
                                                         RadioButton {
-                                                            title: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.aye"),
+                                                            title: t!("initiative-steps-actions-voting_open_gov-standard-aye"),
                                                             name: "Aye",
                                                             checked: vote.aye,
                                                             on_change: move |_| {
@@ -156,7 +156,7 @@ pub fn VotingAction(props: VotingProps) -> Element {
                                                             }
                                                         }
                                                         RadioButton {
-                                                            title: translate!(i18, "initiative.steps.actions.voting_open_gov.standard.nay"),
+                                                            title: t!("initiative-steps-actions-voting_open_gov-standard-nay"),
                                                             name: "Nay",
                                                             checked: !vote.aye,
                                                             on_change: move |_| {

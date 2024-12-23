@@ -1,7 +1,7 @@
 use super::dropdown::ElementSize;
 use crate::components::atoms::{dropdown::DropdownItem, input::InputType, Dropdown, Input};
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[derive(PartialEq, Clone, Debug)]
 pub enum ComboInputOption {
     Dropdown(DropdownItem),
@@ -28,7 +28,7 @@ pub struct ComboInputProps {
     on_change: EventHandler<ComboInputValue>,
 }
 pub fn ComboInput(props: ComboInputProps) -> Element {
-    let i18 = use_i18();
+    
     let mut option_value = use_signal(|| props.value.option.clone());
     let mut input_value = use_signal::<String>(|| props.value.input.clone());
     let mut items = vec![];
@@ -36,7 +36,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
         let Some(options) = props.options else {
             return vec![DropdownItem {
                 key: "Wallet".to_string(),
-                value: translate!(i18, "onboard.invite.form.wallet.label"),
+                value: t!("onboard-invite-form-wallet-label"),
             }];
         };
         options
@@ -68,7 +68,7 @@ pub fn ComboInput(props: ComboInputProps) -> Element {
                     Dropdown {
                             class: "dropdown--left".to_string(),
                             value: value,
-                            placeholder: translate!(i18, "header.cta.account"),
+                            placeholder: t!("header-cta-account"),
                             size: props.size.clone(),
                             default: None,
                             on_change: move |event: usize| {

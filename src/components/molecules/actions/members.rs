@@ -12,23 +12,23 @@ use crate::{
     },
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
     meta: AddMembersAction,
 }
 pub fn MembersAction(props: VotingProps) -> Element {
-    let i18 = use_i18();
+    
     let mut initiative = use_initiative();
     rsx!(
         ul { class: "form__inputs form__inputs--combo",
             {
                 props.meta.members.iter().enumerate().map(|(index_meta, member)| {
                     let dropdown_item = DropdownItem { key: match member.medium {
-                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                        MediumOptions::Wallet => t!("onboard-invite-form-wallet-label"),
                     }, value: match member.medium.clone() {
-                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                        MediumOptions::Wallet => t!("onboard-invite-form-wallet-label"),
                     } };
             
                     rsx!(
@@ -40,12 +40,12 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                     input: member.account.clone()
                                 },
                                 placeholder: match member.medium {
-                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
+                                    MediumOptions::Wallet => t!("onboard-invite-form-wallet-placeholder"),
                                 },
                                 error: {
                                     match sp_core::sr25519::Public::from_ss58check(&member.account) {
                                         Ok(_) => None,
-                                        Err(_) => Some(translate!(i18, "onboard.invite.form.error.invalid_address")),
+                                        Err(_) => Some(t!("onboard-invite-form-error-invalid_address")),
                                     }
                                 },
                                 on_change: move |event: ComboInputValue| {
@@ -53,7 +53,7 @@ pub fn MembersAction(props: VotingProps) -> Element {
                                         return;
                                     };
                                 
-                                    let invite_wallet = translate!(i18, "onboard.invite.form.wallet.label");
+                                    let invite_wallet = t!("onboard-invite-form-wallet-label");
                                     let medium = if value.key == invite_wallet {
                                         MediumOptions::Wallet
                                     } else {

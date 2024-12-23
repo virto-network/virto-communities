@@ -5,7 +5,7 @@ use crate::services::kreivo::{balances::AccountInfo, community_track::ChainState
 pub async fn account(account: &str) -> Result<AccountInfo, ChainStateError> {
     let query = format!("wss://kusama-rpc.dwellir.com/system/account/{}", account);
 
-    log::info!("query: {:#?}", query);
+    dioxus::logger::tracing::info!("query: {:#?}", query);
     let response = sube!(&query).await.map_err(|_| {
         ChainStateError::FailedQuery
     })?;

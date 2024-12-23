@@ -77,7 +77,7 @@ pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError
 pub async fn get_communities() -> Result<Vec<Community>, ChainStateError> {
     let mut communities = vec![];
     let community_trackIds = tracksIds().await.map_err(|e| {
-        log::warn!("error: {:?}", e);
+        dioxus::logger::tracing::warn!("error: {:?}", e);
         ChainStateError::FailedQuery
     })?;
     for community in community_trackIds.communities.iter() {

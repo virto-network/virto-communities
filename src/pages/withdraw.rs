@@ -1,7 +1,7 @@
 use sp_core::crypto::Ss58Codec;
 
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 
 use crate::{
@@ -45,7 +45,7 @@ extern "C" {
 
 #[component]
 pub fn Withdraw() -> Element {
-    let i18 = use_i18();
+    
     let mut withdraw = use_withdraw();
 
     let mut payment_selected = use_signal(|| PaymentMethods::None);
@@ -60,7 +60,7 @@ pub fn Withdraw() -> Element {
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if is_signer_ready(i18, accounts, notification)().is_err() {
+        if is_signer_ready(accounts, notification)().is_err() {
             nav.push(vec![], "/login");
         }
     });
@@ -116,8 +116,8 @@ pub fn Withdraw() -> Element {
                                             class: "checkbox-card--payment",
                                             body: rsx! {
                                                 PaymentMethod {
-                                                    title: translate!(i18, "withdraw.payment.methods.kusama.title"),
-                                                    fee: translate!(i18, "withdraw.payment.methods.kusama.fee"),
+                                                    title: t!("withdraw-payment-methods-kusama-title"),
+                                                    fee: t!("withdraw-payment-methods-kusama-fee"),
                                                     icon: rsx! {
                                                         Icon { icon: KusamaLogo, height: 20, width: 20, fill: "var(--fill-600)" }
                                                     }
@@ -135,8 +135,8 @@ pub fn Withdraw() -> Element {
                                             class: "checkbox-card--payment",
                                             body: rsx! {
                                                 PaymentMethod {
-                                                    title: translate!(i18, "withdraw.payment.methods.card.title"),
-                                                    fee: translate!(i18, "withdraw.payment.methods.card.fee", fee : 5),
+                                                    title: t!("withdraw-payment-methods-card-title"),
+                                                    fee: t!("withdraw-payment-methods-card-fee", fee : 5),
                                                     icon: rsx! {
                                                         Icon { icon: BankCardLine, height: 20, width: 20, fill: "var(--fill-600)" }
                                                     }
@@ -154,8 +154,8 @@ pub fn Withdraw() -> Element {
                                             class: "checkbox-card--payment",
                                             body: rsx! {
                                                 PaymentMethod {
-                                                    title: translate!(i18, "withdraw.payment.methods.paypal.title"),
-                                                    fee: translate!(i18, "withdraw.payment.methods.paypal.fee", fee : 5),
+                                                    title: t!("withdraw-payment-methods-paypal-title"),
+                                                    fee: t!("withdraw-payment-methods-paypal-fee", fee : 5),
                                                     icon: rsx! {
                                                         Icon { icon: PaypalLogo, height: 20, width: 20, fill: "var(--fill-600)" }
                                                     }
@@ -173,8 +173,8 @@ pub fn Withdraw() -> Element {
                                             class: "checkbox-card--payment",
                                             body: rsx! {
                                                 PaymentMethod {
-                                                    title: translate!(i18, "withdraw.payment.methods.pse.title"),
-                                                    fee: translate!(i18, "withdraw.payment.methods.pse.fee", fee : 3),
+                                                    title: t!("withdraw-payment-methods-pse-title"),
+                                                    fee: t!("withdraw-payment-methods-pse-fee", fee : 3),
                                                     icon: rsx! {
                                                         Icon { icon: PaypalLogo, height: 20, width: 20, fill: "var(--fill-600)" }
                                                     }
@@ -192,8 +192,8 @@ pub fn Withdraw() -> Element {
                                             class: "checkbox-card--payment",
                                             body: rsx! {
                                                 PaymentMethod {
-                                                    title: translate!(i18, "withdraw.payment.methods.eth.title"),
-                                                    fee: translate!(i18, "withdraw.payment.methods.eth.fee"),
+                                                    title: t!("withdraw-payment-methods-eth-title"),
+                                                    fee: t!("withdraw-payment-methods-eth-fee"),
                                                     icon: rsx! {
                                                         Icon { icon: PolygonLogo, height: 20, width: 20, fill: "var(--fill-600)" }
                                                     }
@@ -233,7 +233,7 @@ pub fn Withdraw() -> Element {
                                                             value: dropdown_value(),
                                                             label: "Account",
                                                             size: ElementSize::Medium,
-                                                            placeholder: translate!(i18, "header.cta.account"),
+                                                            placeholder: t!("header-cta-account"),
                                                             default: None,
                                                             on_change: move |event: usize| {
                                                                 on_handle_account.send(event as u8);
@@ -311,15 +311,15 @@ pub fn Withdraw() -> Element {
                                                     &withdraw.get_withdraw().address,
                                                 )
                                                 .map_err(|e| {
-                                                    log::warn!("Not found public address: {:?}", e);
-                                                    translate!(i18, "errors.wallet.account_address")
+                                                    dioxus::logger::tracing::warn!("Not found public address: {:?}", e);
+                                                    t!("errors-wallet-account_address")
                                                 })?;
                                             let hex_address = hex::encode(address.0);
                                             let destination_address = convert_to_jsvalue(
                                                     &format!("0x{}", hex_address),
                                                 )
                                                 .map_err(|_| {
-                                                    log::warn!("Malformed dest account");
+                                                    dioxus::logger::tracing::warn!("Malformed dest account");
                                                     String::from("Invalid address destination")
                                                 })?;
                                             let amount = withdraw
@@ -327,14 +327,14 @@ pub fn Withdraw() -> Element {
                                                 .amount
                                                 .parse::<f64>()
                                                 .map_err(|_| {
-                                                    log::warn!("Malformed amount");
+                                                    dioxus::logger::tracing::warn!("Malformed amount");
                                                     String::from("Invalid amount to withdraw")
                                                 })?;
                                             let amount = (amount * 1_000_000_000_000.0) as u64;
                                             withdrawAction(destination_address, amount)
                                                 .await
                                                 .map_err(|e| {
-                                                    log::warn!("Withdraw failed {:?}", e);
+                                                    dioxus::logger::tracing::warn!("Withdraw failed {:?}", e);
                                                     String::from("Withdraw Failed")
                                                 })?;
                                             tooltip.hide();

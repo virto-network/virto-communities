@@ -25,7 +25,7 @@ use crate::{
     },
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use futures_util::TryFutureExt;
 use wasm_bindgen::prelude::*;
 #[derive(Clone, Debug)]
@@ -54,7 +54,7 @@ extern "C" {
 
 #[component]
 pub fn Initiative(id: u16) -> Element {
-    let i18 = use_i18();
+    
     let mut initiative = use_initiative();
     let accounts = use_accounts();
     let session = use_session();
@@ -68,7 +68,7 @@ pub fn Initiative(id: u16) -> Element {
         initiative.default();
     });
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
-        if is_signer_ready(i18, accounts, notification)().is_err() {
+        if is_signer_ready(accounts, notification)().is_err() {
             nav.push(vec![], &format!("/dao/{}/initiatives", id));
         };
     });
@@ -79,7 +79,7 @@ pub fn Initiative(id: u16) -> Element {
                     is_active: matches!(*onboarding_step.read(), InitiativeStep::Info),
                     is_completed: false,
                     has_cube: true,
-                    name: Some(translate!(i18, "initiative.steps.info.label")),
+                    name: Some(t!("initiative-steps-info-label")),
                     on_click: move |_| {
                         onboarding_step.set(InitiativeStep::Info);
                     }
@@ -88,7 +88,7 @@ pub fn Initiative(id: u16) -> Element {
                     is_active: matches!(*onboarding_step.read(), InitiativeStep::Actions),
                     is_completed: false,
                     has_cube: true,
-                    name: Some(translate!(i18, "initiative.steps.actions.label")),
+                    name: Some(t!("initiative-steps-actions-label")),
                     on_click: move |_| {
                         if initiative.get_info().name.is_empty() {
                             onboarding_step.set(InitiativeStep::Info);
@@ -103,16 +103,16 @@ pub fn Initiative(id: u16) -> Element {
             }
             div { class: "initiative__form",
                 div { class: "form__wrapper form__wrapper--initiative",
-                    h2 { class: "form__title", {translate!(i18, "initiative.title")} }
+                    h2 { class: "form__title", {t!("initiative-title")} }
                     div { class: "steps__wrapper",
                         StepCard {
-                            name: translate!(i18, "initiative.steps.info.label"),
+                            name: t!("initiative-steps-info-label"),
                             checked: matches!(*onboarding_step.read(), InitiativeStep::Info),
                             body: rsx! {
                                 div { class: "step-card__info",
                                     span { class: "step-card__title",
                                         {
-                                        translate!(i18, "initiative.steps.info.label") }
+                                        t!("initiative-steps-info-label") }
                                     }
                                     IconButton {
                                         variant: IconButtonVariant::Round,
@@ -152,13 +152,13 @@ pub fn Initiative(id: u16) -> Element {
                             }
                         }
                         StepCard {
-                            name: translate!(i18, "initiative.steps.actions.label"),
+                            name: t!("initiative-steps-actions-label"),
                             checked: matches!(*onboarding_step.read(), InitiativeStep::Actions),
                             body: rsx! {
                                 div { class: "step-card__info",
                                     span { class: "step-card__title",
                                         {
-                                        translate!(i18, "initiative.steps.actions.label") }
+                                        t!("initiative-steps-actions-label") }
                                     }
                                     IconButton {
                                         variant: IconButtonVariant::Round,
@@ -201,7 +201,7 @@ pub fn Initiative(id: u16) -> Element {
             div { class: "form__cta form__cta--initiatives",
                 Button {
                     class: "",
-                    text: translate!(i18, "initiative.cta.cancel"),
+                    text: t!("initiative-cta-cancel"),
                     size: ElementSize::Small,
                     variant: Variant::Secondary,
                     on_click: move |_| {
@@ -211,7 +211,7 @@ pub fn Initiative(id: u16) -> Element {
                 }
                 Button {
                     class: "",
-                    text: translate!(i18, "initiative.cta.continue"),
+                    text: t!("initiative-cta-continue"),
                     size: ElementSize::Small,
                     disabled: !initiative.check() || initiative.get_info().name.is_empty(),
                     on_click: move |_| {
@@ -219,15 +219,15 @@ pub fn Initiative(id: u16) -> Element {
                             async move {
                                 tooltip
                                     .handle_tooltip(TooltipItem {
-                                        title: translate!(i18, "initiative.tips.loading.title"),
-                                        body: translate!(i18, "initiative.tips.loading.description"),
+                                        title: t!("initiative-tips-loading-title"),
+                                        body: t!("initiative-tips-loading-description"),
                                         show: true,
                                     });
                                 let last_initiative = referendum_count()
                                     .await
                                     .map_err(|_| {
-                                        log::warn!("Failed to get last initiative");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Failed to get last initiative");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let response_bot = spaces_client
                                     .get()
@@ -248,77 +248,77 @@ pub fn Initiative(id: u16) -> Element {
                                     })
                                     .await
                                     .map_err(|_| {
-                                        log::warn!("Failed to create off-chain");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Failed to create off-chain");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let room_id = response_bot.get_id();
                                 let current_block = number()
                                     .await
                                     .map_err(|_| {
-                                        log::warn!("Failed to get last block kusama");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Failed to get last block kusama");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let now_kusama = now()
                                     .await
                                     .map_err(|_| {
-                                        log::warn!("Failed to get timestamp kusama");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Failed to get timestamp kusama");
+                                        t!("errors-form-initiative_creation")
                                     })?;
-                                log::info!("{} {}", current_block, now_kusama);
+                                dioxus::logger::tracing::info!("{} {}", current_block, now_kusama);
                                 let add_members_action = initiative.filter_valid_address_add_members();
-                                log::info!("add_members_action: {:?}", add_members_action);
+                                dioxus::logger::tracing::info!("add_members_action: {:?}", add_members_action);
                                 let treasury_action = initiative
                                     .convert_treasury_to_period(current_block, now_kusama);
-                                log::info!("treasury {:?}", treasury_action);
+                                dioxus::logger::tracing::info!("treasury {:?}", treasury_action);
                                 let votiong_open_gov_action = initiative.filter_valid_voting_open_gov();
                                 let votiong_open_gov_action = votiong_open_gov_action
                                     .into_iter()
                                     .map(|v| v.serialize_vote_type())
                                     .collect::<Vec<serde_json::Value>>();
-                                log::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
+                                dioxus::logger::tracing::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
                                 let community_transfer_action = initiative
                                     .filter_valid_community_transfer();
-                                log::info!("community_transfer_action {:?}", community_transfer_action);
+                                dioxus::logger::tracing::info!("community_transfer_action {:?}", community_transfer_action);
                                 let votiong_open_gov_action = convert_to_jsvalue(
                                         &votiong_open_gov_action,
                                     )
                                     .map_err(|_| {
-                                        log::warn!("Malformed voting open gov");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed voting open gov");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let community_transfer_action = convert_to_jsvalue(
                                         &community_transfer_action,
                                     )
                                     .map_err(|_| {
-                                        log::warn!("Malformed voting open gov");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed voting open gov");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                     .map_err(|_| {
-                                        log::warn!("Malformed membership accounts add");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed membership accounts add");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let membership_accounts_add = convert_to_jsvalue(&add_members_action)
                                     .map_err(|_| {
-                                        log::warn!("Malformed membership accounts add");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed membership accounts add");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let membership_accounts_remove = convert_to_jsvalue(
                                         &Vec::<String>::new(),
                                     )
                                     .map_err(|_| {
-                                        log::warn!("Malformed membership accounts remove");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed membership accounts remove");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let room_id = convert_to_jsvalue(&room_id.clone())
                                     .map_err(|_| {
-                                        log::warn!("Malformed room id");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed room id");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 let remark = convert_to_jsvalue(&initiative.get_info().name)
                                     .map_err(|_| {
-                                        log::warn!("Malformed remark");
-                                        translate!(i18, "errors.form.initiative_creation")
+                                        dioxus::logger::tracing::warn!("Malformed remark");
+                                        t!("errors-form-initiative_creation")
                                     })?;
                                 initiative_setup(
                                         id,
@@ -333,7 +333,7 @@ pub fn Initiative(id: u16) -> Element {
                                     )
                                     .await
                                     .map_err(|e| {
-                                        log::warn!("Failed to create initiative {:?}", e);
+                                        dioxus::logger::tracing::warn!("Failed to create initiative {:?}", e);
                                         String::from("Failed to create initiative")
                                     })?;
                                 tooltip.hide();

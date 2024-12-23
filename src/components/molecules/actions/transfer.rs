@@ -8,7 +8,7 @@ use crate::{
     hooks::use_initiative::{use_initiative, ActionItem, CommunityTransferAction, TransferItem},
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
@@ -16,7 +16,7 @@ pub struct VotingProps {
 }
 const KUSAMA_PRECISION_DECIMALS: u64 = 1_000_000_000_000;
 pub fn TransferAction(props: VotingProps) -> Element {
-    let i18 = use_i18();
+    
     let mut initiative = use_initiative();
     rsx!(
         ul { class: "form__inputs form__inputs--combo",
@@ -33,11 +33,11 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                 Input {
                                     message: transfer.account.clone(),
                                     size: ElementSize::Small,
-                                    placeholder: translate!(i18, "initiative.steps.actions.community_transfer.dest.placeholder"),
+                                    placeholder: t!("initiative-steps-actions-community_transfer-dest-placeholder"),
                                     error: {
                                         match sp_core::sr25519::Public::from_ss58check(&transfer.account) {
                                             Ok(_) => None,
-                                            Err(_) => Some(translate!(i18, "initiative.steps.actions.error.invalid_address")),
+                                            Err(_) => Some(t!("initiative-steps-actions-error-invalid_address")),
                                         }
                                     },
                                     on_input: move |event: Event<FormData>| {
@@ -52,12 +52,12 @@ pub fn TransferAction(props: VotingProps) -> Element {
                                 Input {
                                     message: (transfer.value / KUSAMA_PRECISION_DECIMALS).to_string(),
                                     size: ElementSize::Small,
-                                    placeholder: translate!(i18, "initiative.steps.actions.community_transfer.amount.placeholder"),
+                                    placeholder: t!("initiative-steps-actions-community_transfer-amount-placeholder"),
                                     error: {
                                         if transfer.value > 0 {
                                             None
                                         } else {
-                                            Some(translate!(i18, "initiative.steps.actions.error.amount"))
+                                            Some(t!("initiative-steps-actions-error-amount"))
                                         }
                                     },
                                     right_text: {

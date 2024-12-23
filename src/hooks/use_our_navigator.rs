@@ -17,7 +17,7 @@ impl UseOurNavigatorState {
     ) {
         for middleware in middlewares {
             if let Err(e) = middleware() {
-                log::info!("Middleware failed: {}", e);
+                dioxus::logger::tracing::info!("Middleware failed: {}", e);
                 return;
             }
         }

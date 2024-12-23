@@ -15,17 +15,17 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
     let response = sube!("wss://kreivo.io/communityTracks/tracksIds")
         .await
         .map_err(|e| {
-            log::warn!("{:?}", e);
+            dioxus::logger::tracing::warn!("{:?}", e);
             ChainStateError::FailedQuery
         })?;
-    log::info!("{:?}", response);
+    dioxus::logger::tracing::info!("{:?}", response);
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
     };
     let data = value.as_ref();
     let account_info = CommunityTracks::decode(&mut &data[..])
         .map_err(|e| {
-            log::warn!("{:?}", e);
+            dioxus::logger::tracing::warn!("{:?}", e);
             ChainStateError::FailedDecode
         })?;
     Ok(account_info)
@@ -68,7 +68,7 @@ pub async fn tracks(track: u16) -> Result<TrackInfo, ChainStateError> {
     let response = sube!(& query)
         .await
         .map_err(|e| {
-            log::info!("{}", e);
+            dioxus::logger::tracing::info!("{}", e);
             ChainStateError::FailedQuery
         })?;
     let Response::Value(value) = response else {

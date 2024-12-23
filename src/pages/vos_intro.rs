@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, ScrollToOptions};
 
@@ -22,7 +22,7 @@ pub struct IntroCards {
 
 #[component]
 pub fn VOSIntro() -> Element {
-    let i18 = use_i18();
+    
     let nav = use_our_navigator();
     let mut show_cards = use_signal(|| false);
 
@@ -31,8 +31,8 @@ pub fn VOSIntro() -> Element {
 
     let intro_cards: Vec<IntroCards> = vec![
         IntroCards {
-            title: translate!(i18, "vos_intro.cards.management.title"),
-            description: translate!(i18, "vos_intro.cards.management.description"),
+            title: t!("vos_intro-cards-management-title"),
+            description: t!("vos_intro-cards-management-description"),
             icon_element: rsx!(Icon {
                 icon: TimerLine,
                 height: 56,
@@ -41,8 +41,8 @@ pub fn VOSIntro() -> Element {
             }),
         },
         IntroCards {
-            title: translate!(i18, "vos_intro.cards.payments.title"),
-            description: translate!(i18, "vos_intro.cards.payments.description"),
+            title: t!("vos_intro-cards-payments-title"),
+            description: t!("vos_intro-cards-payments-description"),
             icon_element: rsx!(Icon {
                 icon: GlobalLine,
                 height: 56,
@@ -51,8 +51,8 @@ pub fn VOSIntro() -> Element {
             }),
         },
         IntroCards {
-            title: translate!(i18, "vos_intro.cards.governance.title"),
-            description: translate!(i18, "vos_intro.cards.governance.description"),
+            title: t!("vos_intro-cards-governance-title"),
+            description: t!("vos_intro-cards-governance-description"),
             icon_element: rsx!(Icon {
                 icon: HandCoinLine,
                 height: 56,
@@ -61,8 +61,8 @@ pub fn VOSIntro() -> Element {
             }),
         },
         IntroCards {
-            title: translate!(i18, "vos_intro.cards.wallet.title"),
-            description: translate!(i18, "vos_intro.cards.wallet.description"),
+            title: t!("vos_intro-cards-wallet-title"),
+            description: t!("vos_intro-cards-wallet-description"),
             icon_element: rsx!(Icon {
                 icon: WalletLine,
                 height: 56,
@@ -95,13 +95,13 @@ pub fn VOSIntro() -> Element {
                 class: "vos-intro__head",
                 div { class: "vos-intro__name",
                     span {
-                       {translate!(i18, "vos_intro.name")}
+                       {t!("vos_intro-name")}
                     }
                 }
                 p { class: "vos-intro__description",
-                    {translate!(i18, "vos_intro.description_p1")}
+                    {t!("vos_intro-description_p1")}
                     span { class: "vos-intro__description vos-intro__description--green",
-                        {translate!(i18, "vos_intro.description_p2")}
+                        {t!("vos_intro-description_p2")}
                     }
                 }
             }
@@ -132,7 +132,7 @@ pub fn VOSIntro() -> Element {
                 if current_card() == intro_cards.len().saturating_sub(1).max(0) {
                     Button {
                         class: "vos-intro__next",
-                        text: translate!(i18, "vos_intro.continue"),
+                        text: t!("vos_intro-continue"),
                         size: ElementSize::Medium,
                         status: None,
                         on_click: move |_| {
@@ -142,7 +142,7 @@ pub fn VOSIntro() -> Element {
                 } else {
                     Button {
                         class: "vos-intro__skip",
-                        text: translate!(i18, "vos_intro.skip"),
+                        text: t!("vos_intro-skip"),
                         size: ElementSize::Medium,
                         variant: Variant::Tertiary,
                         status: None,
@@ -157,7 +157,7 @@ pub fn VOSIntro() -> Element {
                         is_item_dotted: true,
                         value: current_card(),
                         on_change: move |event: PaginatorValue| {
-                            log::info!("{:?}", event.value());
+                            dioxus::logger::tracing::info!("{:?}", event.value());
                             current_card.set(event.value());
                             on_handle_paginator();
                         }
@@ -165,7 +165,7 @@ pub fn VOSIntro() -> Element {
                 } else {
                     Button {
                         class: "vos-intro__next",
-                        text: translate!(i18, "vos_intro.tour"),
+                        text: t!("vos_intro-tour"),
                         size: ElementSize::Medium,
                         right_icon: rsx! {
                             Icon { icon: ArrowRight, height: 20, width: 20, fill: "var(--text-primary)" }

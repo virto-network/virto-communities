@@ -64,7 +64,11 @@ pub fn InputTags(props: InputTagsProps) -> Element {
                         rsx!(
                             div {
                                 class: "tag",
-                                class: if let Some(i) = is_editing_tag() { if i != index { "tag--editing" } else {""} },
+                                class: if let Some(i) = is_editing_tag() {
+                                    // if i != index { "tag--editing" }
+                                    // else {""}
+                                    "tag--editing"
+                                },
                                 button {
                                     class: "tag__text",
                                     onclick: move |_| {

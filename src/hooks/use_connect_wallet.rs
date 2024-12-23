@@ -23,7 +23,7 @@ pub async fn use_connect_wallet() -> Result<(), PjsError> {
 
     let mut vault = pjs::PjsExtension::connect(APP_NAME).await.map_err(|_| {
         if session.persist_session_file("").is_err() {
-            log::warn!("Failed to persist session")
+            dioxus::logger::tracing::warn!("Failed to persist session")
         };
 
         PjsError::ConnectionFailed

@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 
 use crate::{
     components::atoms::{
@@ -15,7 +15,7 @@ use crate::{
 };
 #[component]
 pub fn Sidebar() -> Element {
-    let i18 = use_i18();
+    
     let mut communities = use_communities();
     let nav = use_our_navigator();
     let mut tooltip = use_tooltip();
@@ -98,7 +98,7 @@ pub fn Sidebar() -> Element {
                                         nav.push(vec![], "/login");
                                     }
                                 }
-                                span { class: "sidebar__action-label__not-displayed", {translate!(i18, "sidebar.dashboard")} }
+                                span { class: "sidebar__action-label__not-displayed", {t!("hello")} }
                             }
                         ),
                     },
@@ -116,7 +116,7 @@ pub fn Sidebar() -> Element {
                             }
                         }
                         span { class: "sidebar__action-label__not-displayed",
-                            {translate!(i18, "sidebar.dashboard")}
+                            {t!("sidebar-dashboard")}
                         }
                     }
                     li { class: "sidebar__item", onclick: move |_| {},
@@ -140,7 +140,7 @@ pub fn Sidebar() -> Element {
                             }
                         }
                         span { class: "sidebar__action-label__not-displayed",
-                            {translate!(i18, "sidebar.explore")}
+                            {t!("sidebar-explore")}
                         }
                     }
                     hr { class: "sidebar__divider" }

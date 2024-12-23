@@ -606,7 +606,7 @@ impl UseInitiativeState {
             && (has_community_transfer_actions && count > 0)
     }
     pub fn check(&self) -> bool {
-        log::info!("{} {}", self.check_add_members(), self.check_treasury());
+        dioxus::logger::tracing::info!("{} {}", self.check_add_members(), self.check_treasury());
         (self.check_add_members()
             && self.check_treasury()
             && self.check_voting_open_gov()

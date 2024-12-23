@@ -8,7 +8,7 @@ use crate::{
     hooks::use_initiative::{use_initiative, ActionItem, KusamaTreasury, KusamaTreasuryAction},
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[derive(PartialEq, Props, Clone)]
 pub struct VotingProps {
     index: usize,
@@ -16,7 +16,6 @@ pub struct VotingProps {
 }
 const KUSAMA_PRECISION_DECIMALS: u64 = 1_000_000_000_000;
 pub fn TreasuryAction(props: VotingProps) -> Element {
-    let i18 = use_i18();
     let mut initiative = use_initiative();
     let mut items = vec![];
     let dropdown_options = vec![
@@ -41,10 +40,9 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
     rsx!(
         ul { class: "form__inputs form__inputs--combo",
             p { class: "form__inputs__disclaimer",
-                {translate!(i18, "initiative.steps.actions.kusama_treasury.disclaimer.period_1")},
+                {t!("initiative-steps-actions-kusama_treasury-disclaimer-period_1")},
                 if props.meta.periods.len() > 1 {
-                    { translate!(i18,
-                    "initiative.steps.actions.kusama_treasury.disclaimer.period_n") }
+                    { t!("initiative-steps-actions-kusama_treasury-disclaimer-period_n") }
                 }
             }
             {
@@ -60,12 +58,12 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                                 Input {
                                     message: (period.amount / KUSAMA_PRECISION_DECIMALS).to_string(),
                                     size: ElementSize::Small,
-                                    placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
+                                    placeholder: t!("initiative-steps-actions-kusama_treasury-placeholder"),
                                     error: {
                                         if period.amount > 0 {
                                             None
                                         } else {
-                                            Some(translate!(i18, "initiative.steps.actions.error.amount"))
+                                            Some(t!("initiative-steps-actions-error-amount"))
                                         }
                                     },
                                     right_text: {
@@ -92,7 +90,7 @@ pub fn TreasuryAction(props: VotingProps) -> Element {
                                         message: period.date.clone(),
                                         size: ElementSize::Small,
                                         itype: InputType::Date,
-                                        placeholder: translate!(i18, "initiative.steps.actions.kusama_treasury.placeholder"),
+                                        placeholder: t!("initiative-steps-actions-kusama_treasury-placeholder"),
                                         error: None,
                                         on_input: move |event: Event<FormData>| {
                                             if let ActionItem::KusamaTreasury(ref mut meta) = initiative.get_action(props.index) {

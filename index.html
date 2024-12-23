@@ -208,7 +208,6 @@
       min-height: 100dvh;
     }
   </style>
-  {style_include}
 </head>
 
 <body>
@@ -218,8 +217,8 @@
     import {
       XcmProgramsExecutor,
       globallyInjectPrograms,
+      Pass
     } from "https://unpkg.com/@virtonetwork/xcm-programs@latest/dist/xcm-programs.js";
-    import init from "/{base_path}/assets/dioxus/{app_name}.js";
 
     const executor = new XcmProgramsExecutor({
       kusama: ["wss://kusama-rpc.dwellir.com", "wss://kusama-rpc-tn.dwellir.com", "wss://kusama-public-rpc.blockops.network/ws"],
@@ -235,16 +234,17 @@
       await executor.setSigner(address);
     };
 
-    init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(
-      async (wasm) => {
-        if (wasm.__wbindgen_start == undefined) {
-          wasm.main();
-        }
+    import("/./wasm/virto-communities.js").then(
+      ({ default: init }) => {
+        init("/./wasm/virto-communities_bg.wasm").then((wasm) => {
+          if (wasm.__wbindgen_start == undefined) {
+            wasm.main();
+          }
+        });
       }
     );
   </script>
   <script src="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.js"></script>
-  {script_include}
 </body>
 
 </html>

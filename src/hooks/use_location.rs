@@ -21,18 +21,18 @@ pub fn use_location() -> UseLocationState {
     use_coroutine(move |_:UnboundedReceiver<()>| async move {
         if let Ok(stored_location) = LocalStorage::get("user_location") {
                     location.set(Some(stored_location));
-                    log::info!("{}", "Location loaded from storage");
+                    dioxus::logger::tracing::info!("{}", "Location loaded from storage");
                 } else {
                     match fetch_and_store_location().await {
                         Ok(loc) => {
                             location.set(Some(loc.clone()));
                             error.set(None);
-                            log::info!("{}", &format!("Location fetched: {}, {}", loc.city, loc.country));
+                            dioxus::logger::tracing::info!("{}", &format!("Location fetched: {}, {}", loc.city, loc.country));
                         }
                         Err(err) => {
                             location.set(None);
                             error.set(Some(err.clone()));
-                            log::error!("{}", &format!("Error fetching location: {:?}", err));
+                            dioxus::logger::tracing::error!("{}", &format!("Error fetching location: {:?}", err));
                         }
                     }
                 }
