@@ -56,14 +56,13 @@ fn call_method_reflect(
 
 pub fn Markdown(props: MarkdownProps) -> Element {
     let mut is_editor_loaded = use_signal(|| false);
-    // let content = use_signal(|| {
-    //     if !props.content.is_empty() {
-    //         props.content.clone()
-    //     } else {
-    //         t!("utils-markdown-value")
-    //     }
-    // });
-    let content = use_signal(String::new);
+    let content = use_signal(|| {
+        if !props.content.is_empty() {
+            props.content.clone()
+        } else {
+            t!("utils-markdown-value")
+        }
+    });
     let mut is_markdown_visible = use_signal(|| true);
     let mut toolbar_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
     let mut editor_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
@@ -88,7 +87,7 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                 };
 
                 closure.forget();
-                // is_editor_loaded.set(true);
+                is_editor_loaded.set(true);
             }
         }
     });
