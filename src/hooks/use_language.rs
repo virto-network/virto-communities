@@ -11,11 +11,11 @@ pub fn use_language() {
         .language()
         .unwrap_or("en-US".to_string());
     let default_language = if navigator_language.starts_with("es") {
-        "es-ES"
+        I18nConfig::new(langid!("es-ES"))
     } else {
-        "en-US"
+        I18nConfig::new(langid!("en-US"))
     };
-    let configuration_language = I18nConfig::new(langid!("en-US"))
+    let configuration_language = default_language
         .with_locale(Locale::new_static(langid!("en-US"), &EN_US))
         .with_locale(Locale::new_static(langid!("es-ES"), &ES_ES));
 
