@@ -1,7 +1,6 @@
-use codec::Decode;
 use serde::Deserialize;
 use sube::{sube, Response};
-#[derive(Decode, Debug, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct CommunityTracks {
     pub communities: Vec<u16>,
 }

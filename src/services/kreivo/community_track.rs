@@ -1,10 +1,7 @@
-use codec::Decode;
 use serde::Deserialize;
 use sube::{sube, Response};
-#[derive(Decode, Debug, Deserialize)]
-pub struct CommunityTracks {
-    pub communities: Vec<u16>,
-}
+
+use super::communities::CommunityTracks;
 #[derive(Debug)]
 pub enum ChainStateError {
     FailedQuery,
@@ -18,17 +15,16 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
             dioxus::logger::tracing::warn!("{:?}", e);
             ChainStateError::FailedQuery
         })?;
-    dioxus::logger::tracing::info!("{:?}", response);
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let data = value.as_ref();
-    let account_info = CommunityTracks::decode(&mut &data[..])
+    let ids = serde_json::from_value::<Vec<u16>>(value.into())
         .map_err(|e| {
             dioxus::logger::tracing::warn!("{:?}", e);
             ChainStateError::FailedDecode
         })?;
-    Ok(account_info)
+    let community_tracks = CommunityTracks{communities: ids};
+    Ok(community_tracks)
 }
 const DEFAULT_MAX_TRACK_NAME_LEN: usize = 25;
 const N: usize = DEFAULT_MAX_TRACK_NAME_LEN;

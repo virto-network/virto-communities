@@ -1,9 +1,8 @@
 use super::community_track::{tracks, tracksIds};
 use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
-use codec::Decode;
 use serde::Deserialize;
 use sube::{sube, Response};
-#[derive(Decode, Debug, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct CollectionDetails {
     pub items: u16,
     pub item_metadatas: u16,
