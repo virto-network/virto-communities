@@ -30,7 +30,7 @@ jobs:
         run: cargo install dioxus-cli@0.5.0
 
       - name: Build
-        run: dx build --release
+        run: dx build --release --features dev
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

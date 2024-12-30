@@ -57,11 +57,16 @@ cookie = { git = "https://github.com/S0c5/cookie-rs.git" }
 [build-dependencies]
 grass = "0.13.2"
 
+[features]
+staging = []
+
 [profile]
 
 [profile.wasm-dev]
 inherits = "dev"
-opt-level = 1
+opt-level = "z"
+incremental = true
+codegen-units = 32
 
 [profile.server-dev]
 inherits = "dev"
