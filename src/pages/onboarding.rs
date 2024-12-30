@@ -21,7 +21,7 @@ use crate::{
     middlewares::is_chain_available::is_chain_available,
     services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
-use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
+use dioxus::{logger::tracing::{warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::TryFutureExt;
 use gloo::utils::format::JsValueSerdeExt;

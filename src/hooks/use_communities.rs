@@ -1,7 +1,7 @@
 use sp_core::crypto::Ss58Codec;
 use std::vec;
 
-use dioxus::{logger::tracing::{debug, warn}, prelude::*};
+use dioxus::{logger::tracing::warn, prelude::*};
 use dioxus_i18n::t;
 use gloo::storage::{errors::StorageError, LocalStorage};
 

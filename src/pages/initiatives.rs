@@ -18,7 +18,7 @@ use crate::{
         preimage::{preimage_for, request_status_for},
     },
 };
-use dioxus::{logger::tracing::{debug, warn}, prelude::*};
+use dioxus::{logger::tracing::debug, prelude::*};
 use dioxus_i18n::t;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};

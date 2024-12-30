@@ -1,8 +1,5 @@
 #![allow(non_snake_case)]
-use dioxus::{
-    logger::tracing::{debug, info, Level},
-    prelude::*,
-};
+use dioxus::{logger::tracing::Level, prelude::*};
 use dioxus_i18n::t;
 use gloo::storage::{errors::StorageError, LocalStorage};
 use virto_communities::{
@@ -27,7 +24,7 @@ fn main() {
     } else {
         Level::INFO
     };
-    dioxus::logger::init(log_level);
+    dioxus::logger::init(log_level).expect("Failed to set log level");
     launch(App);
 }
 fn App() -> Element {

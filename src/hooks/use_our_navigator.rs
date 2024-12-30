@@ -1,4 +1,4 @@
-use dioxus::{logger::tracing::{debug, warn}, prelude::*};
+use dioxus::{logger::tracing::warn, prelude::*};
 #[derive(Clone, Default)]
 pub struct FromMiddleware(pub bool);
 pub fn use_our_navigator() -> UseOurNavigatorState {

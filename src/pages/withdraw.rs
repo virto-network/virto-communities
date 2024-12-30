@@ -1,6 +1,6 @@
 use sp_core::crypto::Ss58Codec;
 
-use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
+use dioxus::{logger::tracing::{warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 

@@ -1,6 +1,5 @@
-use dioxus_i18n::{prelude::*, t};
-use std::str::FromStr;
-use unic_langid::{langid, LanguageIdentifier};
+use dioxus_i18n::prelude::*;
+use unic_langid::langid;
 use web_sys::window;
 static EN_US: &str = include_str!("../locales/en-US.ftl");
 static ES_ES: &str = include_str!("../locales/es-ES.ftl");

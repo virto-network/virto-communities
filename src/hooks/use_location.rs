@@ -1,4 +1,4 @@
-use dioxus::{logger::tracing::{debug, warn, error}, prelude::*};
+use dioxus::{logger::tracing::{debug, error}, prelude::*};
 use serde::{Deserialize, Serialize};
 use gloo::storage::{LocalStorage, Storage};
 

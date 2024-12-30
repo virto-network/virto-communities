@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::components::atoms::dropdown::DropdownItem;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
-use dioxus::{logger::tracing::{debug, warn}, prelude::*};
+use dioxus::{logger::tracing::debug, prelude::*};
 use serde::{Deserialize, Serialize};
 use sp_core::crypto::Ss58Codec;
 const BLOCK_TIME_IN_SECONDS: i64 = 6;

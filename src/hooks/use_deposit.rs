@@ -1,6 +1,6 @@
 use sp_core::crypto::Ss58Codec;
 
-use dioxus::{logger::tracing::{debug, warn}, prelude::*};
+use dioxus::{logger::tracing::warn, prelude::*};
 
 #[derive(Clone, Debug)]
 pub enum DepositTo {

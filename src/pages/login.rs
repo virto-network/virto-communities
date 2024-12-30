@@ -1,4 +1,4 @@
-use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
+use dioxus::{logger::tracing::info, prelude::*};
 use dioxus_i18n::t;
 
 use crate::{
