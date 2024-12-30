@@ -1,6 +1,7 @@
 use crate::components::atoms::button::Variant;
 use crate::components::atoms::dropdown::ElementSize;
 use crate::components::atoms::Button;
+use dioxus::logger::tracing::warn;
 use dioxus::prelude::*;
 use dioxus_i18n::t;
 use wasm_bindgen::prelude::*;
@@ -83,7 +84,7 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                     init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
                 let content_value = JsValue::from(content());
                 if let Err(e) = call_method_reflect(&tiny_editor, "setContent", &[content_value]) {
-                    dioxus::logger::tracing::warn!("Failed to set content {:?}", e);
+                    warn!("Failed to set content {:?}", e);
                 };
 
                 closure.forget();

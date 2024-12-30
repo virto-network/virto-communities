@@ -1,7 +1,7 @@
 use sp_core::crypto::Ss58Codec;
 use std::vec;
 
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn}, prelude::*};
 use dioxus_i18n::t;
 use gloo::storage::{errors::StorageError, LocalStorage};
 
@@ -46,7 +46,7 @@ pub fn use_communities() -> UseCommunitiesState {
             match sp_core::sr25519::Public::from_ss58check(&session.address) {
                 Ok(public_address) => Some(public_address.0),
                 Err(_) => {
-                    dioxus::logger::tracing::warn!("error here by address");
+                    warn!("error here by address");
                     notification.handle_error(&t!("errors-wallet-account_address"));
                     None
                 }
@@ -54,7 +54,7 @@ pub fn use_communities() -> UseCommunitiesState {
         });
 
         let Ok(mut community_tracks) = get_communities().await else {
-            dioxus::logger::tracing::warn!("error here by member");
+            warn!("error here by member");
             notification.handle_error(&t!("errors-communities-query_failed"));
             tooltip.hide();
             is_loading.set(false);
@@ -100,7 +100,7 @@ pub fn use_communities() -> UseCommunitiesState {
             if let Err(e) =
                 <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities)
             {
-                dioxus::logger::tracing::warn!("Failed to persist communities: {:?}", e);
+                warn!("Failed to persist communities: {:?}", e);
             }
         }
 
@@ -235,7 +235,7 @@ impl UseCommunitiesState {
 
         if <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities).is_err()
         {
-            dioxus::logger::tracing::warn!("Failed to persist communities");
+            warn!("Failed to persist communities");
         };
 
         Ok(())

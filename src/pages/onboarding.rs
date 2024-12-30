@@ -21,7 +21,7 @@ use crate::{
     middlewares::is_chain_available::is_chain_available,
     services::{bot::types::CommunitySpace, kreivo::community_track::tracksIds},
 };
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::TryFutureExt;
 use gloo::utils::format::JsValueSerdeExt;
@@ -284,7 +284,7 @@ pub fn Onboarding() -> Element {
                                                             &DecisionMethod::Membership,
                                                         )
                                                         .map_err(|_| {
-                                                            dioxus::logger::tracing::warn!("Malformed decision method");
+                                                            warn!("Malformed decision method");
                                                             t!("errors-form-community_creation")
                                                         })?;
                                                     let response = spaces_client
@@ -300,7 +300,7 @@ pub fn Onboarding() -> Element {
                                                     };
                                                     let encoded_identity = convert_to_jsvalue(&identity)
                                                         .map_err(|_| {
-                                                            dioxus::logger::tracing::warn!("Malformed identity");
+                                                            warn!("Malformed identity");
                                                             t!("errors-form-community_creation")
                                                         })?;
                                                     let members = onboard
@@ -316,7 +316,7 @@ pub fn Onboarding() -> Element {
                                                         .collect::<Vec<String>>();
                                                     let membership_accounts = convert_to_jsvalue(&members)
                                                         .map_err(|_| {
-                                                            dioxus::logger::tracing::warn!("Malformed membership accounts");
+                                                            warn!("Malformed membership accounts");
                                                             t!("errors-form-community_creation")
                                                         })?;
                                                     topup_then_create_community(
@@ -329,10 +329,11 @@ pub fn Onboarding() -> Element {
                                                         )
                                                         .await
                                                         .map_err(|_| {
-                                                            dioxus::logger::tracing::warn!("Error on xcm program");
+                                                            warn!("Error on xcm program");
                                                             t!("errors-form-community_creation")
                                                         })?;
                                                     tooltip.hide();
+                                                    info!("created community {:?}", onboard.get_basics().name);
                                                     notification
                                                         .handle_notification(NotificationItem {
                                                             title: t!("onboard-tips-created-title"),

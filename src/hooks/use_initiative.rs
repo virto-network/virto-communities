@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::components::atoms::dropdown::DropdownItem;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn}, prelude::*};
 use serde::{Deserialize, Serialize};
 use sp_core::crypto::Ss58Codec;
 const BLOCK_TIME_IN_SECONDS: i64 = 6;
@@ -606,7 +606,7 @@ impl UseInitiativeState {
             && (has_community_transfer_actions && count > 0)
     }
     pub fn check(&self) -> bool {
-        dioxus::logger::tracing::info!("{} {}", self.check_add_members(), self.check_treasury());
+        debug!("{} {}", self.check_add_members(), self.check_treasury());
         (self.check_add_members()
             && self.check_treasury()
             && self.check_voting_open_gov()

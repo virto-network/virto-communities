@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn}, prelude::*};
 use dioxus_i18n::t;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, ScrollToOptions};
@@ -157,7 +157,7 @@ pub fn VOSIntro() -> Element {
                         is_item_dotted: true,
                         value: current_card(),
                         on_change: move |event: PaginatorValue| {
-                            dioxus::logger::tracing::info!("{:?}", event.value());
+                            debug!("{:?}", event.value());
                             current_card.set(event.value());
                             on_handle_paginator();
                         }

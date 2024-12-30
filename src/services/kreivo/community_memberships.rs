@@ -1,5 +1,6 @@
 use super::community_track::{tracks, tracksIds};
 use crate::{pages::dashboard::Community, services::kreivo::community_track::ChainStateError};
+use dioxus::logger::tracing::warn;
 use serde::Deserialize;
 use sube::{sube, Response};
 #[derive(Debug, Deserialize)]
@@ -76,7 +77,7 @@ pub async fn get_owned_memberships(address: &str) -> Result<u16, ChainStateError
 pub async fn get_communities() -> Result<Vec<Community>, ChainStateError> {
     let mut communities = vec![];
     let community_trackIds = tracksIds().await.map_err(|e| {
-        dioxus::logger::tracing::warn!("error: {:?}", e);
+        warn!("error: {:?}", e);
         ChainStateError::FailedQuery
     })?;
     for community in community_trackIds.communities.iter() {

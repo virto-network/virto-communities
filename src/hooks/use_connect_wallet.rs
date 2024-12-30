@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::warn, prelude::*};
 use wasm_bindgen::prelude::*;
 
 use super::{use_accounts::Account, use_session::use_session};
@@ -23,7 +23,7 @@ pub async fn use_connect_wallet() -> Result<(), PjsError> {
 
     let mut vault = pjs::PjsExtension::connect(APP_NAME).await.map_err(|_| {
         if session.persist_session_file("").is_err() {
-            dioxus::logger::tracing::warn!("Failed to persist session")
+            warn!("Failed to persist session")
         };
 
         PjsError::ConnectionFailed

@@ -1,4 +1,5 @@
 use crate::hooks::{use_accounts::UseAccountsState, use_notification::UseNotificationState};
+use dioxus::logger::tracing::debug;
 use dioxus_i18n::t;
 pub fn is_signer_ready(
     accounts: UseAccountsState,
@@ -9,7 +10,7 @@ pub fn is_signer_ready(
             notification.handle_warning(&t!("warnings-title"), &t!("warnings-middleware-signer_not_found"));
             Err("Failed to get account to sign")
         } else {
-            dioxus::logger::tracing::debug!("Signer is ready");
+            debug!("Signer is ready");
             Ok(())
         }
     }

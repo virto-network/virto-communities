@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 
@@ -360,18 +360,19 @@ pub fn Deposit() -> Element {
                                                                     t!("errors-form-invalid_amount")
                                                                 }
                                                             })?;
-                                                        let destination = convert_to_jsvalue(&destination)
+                                                        let destination_js = convert_to_jsvalue(&destination)
                                                             .map_err(|_| {
-                                                                dioxus::logger::tracing::warn!("Malformed dest account");
+                                                                warn!("Malformed dest account");
                                                                 t!("errors-form-invalid_address")
                                                             })?;
-                                                        depositAction(destination, amount, to_community)
+                                                        depositAction(destination_js, amount, to_community)
                                                             .await
                                                             .map_err(|e| {
-                                                                dioxus::logger::tracing::warn!("Deposit failed {:?}", e);
+                                                                warn!("Deposit failed {:?}", e);
                                                                 t!("errors-form-deposit_failed")
                                                             })?;
                                                         tooltip.hide();
+                                                        info!("deposited {:?} to {:?}", amount, destination);
                                                         notification
                                                             .handle_success(
                                                                 &t!("deposit-tips-created-description"),

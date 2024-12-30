@@ -18,7 +18,7 @@ use crate::{
         preimage::{preimage_for, request_status_for},
     },
 };
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
@@ -95,7 +95,7 @@ pub fn Initiatives(id: u16) -> Element {
                         ongoing: response.ongoing,
                     };
 
-                    dioxus::logger::tracing::info!("{:?}", metadata_of(track).await);
+                    debug!("{:?}", metadata_of(track).await);
                     let Ok(initiative_metadata) = metadata_of(track).await else {
                         initiatives.with_mut(|c| c.push(init));
                         continue;
@@ -123,7 +123,7 @@ pub fn Initiatives(id: u16) -> Element {
                         continue;
                     };
 
-                    dioxus::logger::tracing::info!("{:?}", response.info);
+                    debug!("{:?}", response.info);
 
                     init.info = response.info;
 

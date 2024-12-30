@@ -1,5 +1,5 @@
 use sp_core::crypto::Ss58Codec;
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 use crate::{
@@ -66,20 +66,20 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let on_handle_vote = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
         while (rx.next().await).is_some() {
             let Some(account) = session.get() else {
-                dioxus::logger::tracing::info!("error here by account");
+                debug!("error here by account");
                 notification
                     .handle_error(&t!("errors-communities-query_failed"));
                 return;
             };
             let Ok(address) = sp_core::sr25519::Public::from_ss58check(&account.address) else {
-                dioxus::logger::tracing::info!("error here by address");
+                debug!("error here by address");
                 notification
                     .handle_error(&t!("errors-wallet-account_address"));
                 return;
             };
 
             let Ok(is_member) = is_community_member_by_address(&address.0, id).await else {
-                dioxus::logger::tracing::info!("error here by memeber");
+                debug!("error here by memeber");
                 notification
                     .handle_error(&t!("errors-communities-query_failed"));
                 return;
@@ -89,12 +89,12 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
             let response_item = item(id).await;
             members.set(response_item.unwrap_or(0));
             let Ok(block) = number().await else {
-                dioxus::logger::tracing::warn!("Failed to get last block kusama");
+                warn!("Failed to get last block kusama");
                 continue;
             };
             current_block.set(block);
             let Ok(track) = tracks(id).await else {
-                dioxus::logger::tracing::warn!("Failed to get track");
+                warn!("Failed to get track");
                 continue;
             };
             track_info.set(Some(track));
@@ -159,7 +159,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .await else {
                     continue;
                 };
-                dioxus::logger::tracing::info!("{}", room_id_metadata);
+                debug!("{}", room_id_metadata);
                 let Ok(response) = spaces_client
                     .get()
                     .get_initiative_by_id(&room_id_metadata)
@@ -189,7 +189,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .address;
                 let address = sp_core::sr25519::Public::from_ss58check(&account_address)
                     .map_err(|e| {
-                        dioxus::logger::tracing::warn!("Not found public address: {:?}", e);
+                        warn!("Not found public address: {:?}", e);
                         t!("errors-wallet-account_address")
                     })?;
                 let hex_address = hex::encode(address.0);
@@ -208,18 +208,19 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                         })
                         .await
                         .map_err(|e| {
-                            dioxus::logger::tracing::warn!("Failed to persist vote: {:?}", e);
+                            warn!("Failed to persist vote: {:?}", e);
                             t!("errors-vote-persist_failed")
                         })?;
                 }
                 topup_then_initiative_vote(membership_id, initiativeid, is_vote_aye)
                     .await
                     .map_err(|e| {
-                        dioxus::logger::tracing::warn!("Failed to vote on-chain: {:?}", e);
+                        warn!("Failed to vote on-chain: {:?}", e);
                         t!("errors-vote-chain")
                     })?;
                 on_handle_vote.send(());
                 tooltip.hide();
+                info!("voted initiative {:?} with {:?}", initiativeid, if is_vote_aye { "aye" } else { "nay" });
                 notification
                     .handle_success(
                         &t!("governance-tips-voted-description"),
@@ -509,7 +510,7 @@ enum Times {
 fn blocks_to_times(blocks: u32) -> Times {
     let seconds = blocks * 12;
     let minutes = seconds / 60;
-    dioxus::logger::tracing::info!("minutes {}", minutes);
+    debug!("minutes {}", minutes);
     if minutes / (24 * 60) > 0 {
         Times::Days(minutes / (24 * 60))
     } else if minutes / 60 > 0 {

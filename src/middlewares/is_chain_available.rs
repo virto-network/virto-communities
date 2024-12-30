@@ -1,3 +1,4 @@
+use dioxus::logger::tracing::{debug, warn};
 use dioxus_i18n::t;
 use web_sys::js_sys::Date;
 
@@ -9,11 +10,11 @@ pub fn is_chain_available(
     mut notification: UseNotificationState,
 ) -> impl FnOnce() -> Result<(), &'static str> {
     move || {
-        dioxus::logger::tracing::info!("timestamp: {:?}", timestamp.get().0);
-        dioxus::logger::tracing::info!("now: {:?}", Date::now());
-        dioxus::logger::tracing::info!("rest: {:?}", Date::now() as u64 - timestamp.get().0);
+        debug!("timestamp: {:?}", timestamp.get().0);
+        debug!("now: {:?}", Date::now());
+        debug!("rest: {:?}", Date::now() as u64 - timestamp.get().0);
         if Date::now() as u64 - timestamp.get().0 > THRESHOLD {
-            dioxus::logger::tracing::warn!("Chain unavailable");
+            warn!("Chain unavailable");
             notification.handle_warning(&t!("warnings-title"), &t!("warnings-middleware-chain_unavailable"));
             Err("Chain unavailable")
         } else {

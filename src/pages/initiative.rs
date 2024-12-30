@@ -24,7 +24,7 @@ use crate::{
         kusama::system::number,
     },
 };
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::TryFutureExt;
 use wasm_bindgen::prelude::*;
@@ -226,7 +226,7 @@ pub fn Initiative(id: u16) -> Element {
                                 let last_initiative = referendum_count()
                                     .await
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Failed to get last initiative");
+                                        warn!("Failed to get last initiative");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let response_bot = spaces_client
@@ -248,76 +248,76 @@ pub fn Initiative(id: u16) -> Element {
                                     })
                                     .await
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Failed to create off-chain");
+                                        warn!("Failed to create off-chain");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let room_id = response_bot.get_id();
                                 let current_block = number()
                                     .await
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Failed to get last block kusama");
+                                        warn!("Failed to get last block kusama");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let now_kusama = now()
                                     .await
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Failed to get timestamp kusama");
+                                        warn!("Failed to get timestamp kusama");
                                         t!("errors-form-initiative_creation")
                                     })?;
-                                dioxus::logger::tracing::info!("{} {}", current_block, now_kusama);
+                                debug!("{} {}", current_block, now_kusama);
                                 let add_members_action = initiative.filter_valid_address_add_members();
-                                dioxus::logger::tracing::info!("add_members_action: {:?}", add_members_action);
+                                debug!("add_members_action: {:?}", add_members_action);
                                 let treasury_action = initiative
                                     .convert_treasury_to_period(current_block, now_kusama);
-                                dioxus::logger::tracing::info!("treasury {:?}", treasury_action);
+                                debug!("treasury {:?}", treasury_action);
                                 let votiong_open_gov_action = initiative.filter_valid_voting_open_gov();
                                 let votiong_open_gov_action = votiong_open_gov_action
                                     .into_iter()
                                     .map(|v| v.serialize_vote_type())
                                     .collect::<Vec<serde_json::Value>>();
-                                dioxus::logger::tracing::info!("votiong_open_gov_action {:?}", votiong_open_gov_action);
+                                debug!("votiong_open_gov_action {:?}", votiong_open_gov_action);
                                 let community_transfer_action = initiative
                                     .filter_valid_community_transfer();
-                                dioxus::logger::tracing::info!("community_transfer_action {:?}", community_transfer_action);
+                                debug!("community_transfer_action {:?}", community_transfer_action);
                                 let votiong_open_gov_action = convert_to_jsvalue(
                                         &votiong_open_gov_action,
                                     )
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed voting open gov");
+                                        warn!("Malformed voting open gov");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let community_transfer_action = convert_to_jsvalue(
                                         &community_transfer_action,
                                     )
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed voting open gov");
+                                        warn!("Malformed voting open gov");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let treasury_action = convert_to_jsvalue(&treasury_action)
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed membership accounts add");
+                                        warn!("Malformed membership accounts add");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let membership_accounts_add = convert_to_jsvalue(&add_members_action)
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed membership accounts add");
+                                        warn!("Malformed membership accounts add");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let membership_accounts_remove = convert_to_jsvalue(
                                         &Vec::<String>::new(),
                                     )
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed membership accounts remove");
+                                        warn!("Malformed membership accounts remove");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let room_id = convert_to_jsvalue(&room_id.clone())
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed room id");
+                                        warn!("Malformed room id");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 let remark = convert_to_jsvalue(&initiative.get_info().name)
                                     .map_err(|_| {
-                                        dioxus::logger::tracing::warn!("Malformed remark");
+                                        warn!("Malformed remark");
                                         t!("errors-form-initiative_creation")
                                     })?;
                                 initiative_setup(
@@ -333,10 +333,11 @@ pub fn Initiative(id: u16) -> Element {
                                     )
                                     .await
                                     .map_err(|e| {
-                                        dioxus::logger::tracing::warn!("Failed to create initiative {:?}", e);
+                                        warn!("Failed to create initiative {:?}", e);
                                         String::from("Failed to create initiative")
                                     })?;
                                 tooltip.hide();
+                                info!("created initiative {:?}", initiative.get_info().name);
                                 let path = format!("/dao/{id}/initiatives");
                                 nav.push(vec![], &path);
                                 Ok::<(), String>(())

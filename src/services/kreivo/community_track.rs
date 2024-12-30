@@ -1,3 +1,4 @@
+use dioxus::logger::tracing::{debug, warn};
 use serde::Deserialize;
 use sube::{sube, Response};
 
@@ -12,7 +13,7 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
     let response = sube!("wss://kreivo.io/communityTracks/tracksIds")
         .await
         .map_err(|e| {
-            dioxus::logger::tracing::warn!("{:?}", e);
+            warn!("{:?}", e);
             ChainStateError::FailedQuery
         })?;
     let Response::Value(value) = response else {
@@ -20,7 +21,7 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
     };
     let ids = serde_json::from_value::<Vec<u16>>(value.into())
         .map_err(|e| {
-            dioxus::logger::tracing::warn!("{:?}", e);
+            warn!("{:?}", e);
             ChainStateError::FailedDecode
         })?;
     let community_tracks = CommunityTracks{communities: ids};
@@ -64,7 +65,7 @@ pub async fn tracks(track: u16) -> Result<TrackInfo, ChainStateError> {
     let response = sube!(& query)
         .await
         .map_err(|e| {
-            dioxus::logger::tracing::info!("{}", e);
+            debug!("{}", e);
             ChainStateError::FailedQuery
         })?;
     let Response::Value(value) = response else {

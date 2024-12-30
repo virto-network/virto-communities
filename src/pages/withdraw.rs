@@ -1,6 +1,6 @@
 use sp_core::crypto::Ss58Codec;
 
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
 use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 
@@ -311,15 +311,16 @@ pub fn Withdraw() -> Element {
                                                     &withdraw.get_withdraw().address,
                                                 )
                                                 .map_err(|e| {
-                                                    dioxus::logger::tracing::warn!("Not found public address: {:?}", e);
+                                                    warn!("Not found public address: {:?}", e);
                                                     t!("errors-wallet-account_address")
                                                 })?;
                                             let hex_address = hex::encode(address.0);
-                                            let destination_address = convert_to_jsvalue(
-                                                    &format!("0x{}", hex_address),
+                                            let destination = &format!("0x{}", hex_address);
+                                            let destination_js = convert_to_jsvalue(
+                                                    destination,
                                                 )
                                                 .map_err(|_| {
-                                                    dioxus::logger::tracing::warn!("Malformed dest account");
+                                                    warn!("Malformed dest account");
                                                     String::from("Invalid address destination")
                                                 })?;
                                             let amount = withdraw
@@ -327,17 +328,18 @@ pub fn Withdraw() -> Element {
                                                 .amount
                                                 .parse::<f64>()
                                                 .map_err(|_| {
-                                                    dioxus::logger::tracing::warn!("Malformed amount");
+                                                    warn!("Malformed amount");
                                                     String::from("Invalid amount to withdraw")
                                                 })?;
                                             let amount = (amount * 1_000_000_000_000.0) as u64;
-                                            withdrawAction(destination_address, amount)
+                                            withdrawAction(destination_js, amount)
                                                 .await
                                                 .map_err(|e| {
-                                                    dioxus::logger::tracing::warn!("Withdraw failed {:?}", e);
+                                                    warn!("Withdraw failed {:?}", e);
                                                     String::from("Withdraw Failed")
                                                 })?;
                                             tooltip.hide();
+                                            info!("withdrawn {:?} to {:?}", amount, destination);
                                             notification.handle_success("Your withdraw was completed");
                                             nav.push(vec![], "/account");
                                             Ok::<(), String>(())

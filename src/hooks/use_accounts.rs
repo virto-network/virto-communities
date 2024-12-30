@@ -1,6 +1,6 @@
 use sp_core::crypto::Ss58Codec;
 
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn}, prelude::*};
 use dioxus_i18n::t;
 use pjs::Account as PjsAccount;
 use wasm_bindgen::prelude::*;
@@ -65,13 +65,13 @@ pub fn use_accounts() -> UseAccountsState {
                         let Ok(address) =
                             sp_core::sr25519::Public::from_ss58check(&selected_account.address())
                         else {
-                            dioxus::logger::tracing::warn!("Not found public address");
+                            warn!("Not found public address");
                             return notification
                                 .handle_error(&t!("errors-wallet-account_address"));
                         };
 
                         let Ok(is_owner) = is_admin(&address.0).await else {
-                            dioxus::logger::tracing::warn!("Failed to get is admin");
+                            warn!("Failed to get is admin");
                             return notification
                                 .handle_error(&t!("errors-wallet-account_address"));
                         };
@@ -132,7 +132,7 @@ impl UseAccountsState {
             .ok_or("errors.wallet.accounts_not_found")?;
         let account_address = pjs_account.address();
         let address = sp_core::sr25519::Public::from_ss58check(&account_address).map_err(|e| {
-            dioxus::logger::tracing::warn!("Not found public address: {:?}", e);
+            warn!("Not found public address: {:?}", e);
             "errors.wallet.account_address".to_string()
         })?;
         let hex_address = hex::encode(address.0);
@@ -142,7 +142,7 @@ impl UseAccountsState {
         Ok(account.data.free as f64 / 10_f64.powf(12f64))
     }
     pub fn is_active_account_an_admin(&self) -> bool {
-        dioxus::logger::tracing::info!("is_dao_owner: {:?}", self.is_dao_owner.read());
+        debug!("is_dao_owner: {:?}", self.is_dao_owner.read());
         match &*self.is_dao_owner.read() {
             Some(is_dao_owner) => is_dao_owner.0,
             None => true,

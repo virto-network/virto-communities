@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
 use dioxus_i18n::t;
 
 use crate::{
@@ -52,6 +52,8 @@ pub fn Login() -> Element {
             }) else {
                 return notification.handle_error(&t!("errors-session-persist"));
             };
+
+            info!("logged in as {:?}", selected_account.name());
 
             nav.push(vec![], "/");
         }
