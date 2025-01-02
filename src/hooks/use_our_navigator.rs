@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::warn, prelude::*};
 #[derive(Clone, Default)]
 pub struct FromMiddleware(pub bool);
 pub fn use_our_navigator() -> UseOurNavigatorState {
@@ -17,7 +17,7 @@ impl UseOurNavigatorState {
     ) {
         for middleware in middlewares {
             if let Err(e) = middleware() {
-                log::info!("Middleware failed: {}", e);
+                warn!("Middleware failed: {}", e);
                 return;
             }
         }

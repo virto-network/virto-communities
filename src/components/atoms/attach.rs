@@ -1,9 +1,3 @@
-use std::ops::Deref;
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
-use futures_util::TryFutureExt;
-use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
 use crate::{
     components::atoms::{
         button::Variant as ButtonVariant, dropdown::ElementSize,
@@ -11,6 +5,12 @@ use crate::{
     },
     hooks::use_attach::{use_attach, AttachFile},
 };
+use dioxus::prelude::*;
+use dioxus_i18n::t;
+use futures_util::TryFutureExt;
+use std::ops::Deref;
+use wasm_bindgen::JsCast;
+use web_sys::HtmlElement;
 #[derive(Clone, Debug)]
 pub enum AttachError {
     NotFound,
@@ -36,7 +36,7 @@ pub struct AttachProps {
 }
 const MAX_FILE_SIZE: u64 = 2 * 1024 * 1024;
 pub fn Attach(props: AttachProps) -> Element {
-    let i18 = use_i18();
+    
     let mut attach = use_attach();
     let mut textarea_ref = use_signal::<Option<Box<HtmlElement>>>(|| None);
     let mut error = use_signal::<Option<FeedAttachError>>(|| None);
@@ -61,24 +61,18 @@ pub fn Attach(props: AttachProps) -> Element {
                     .read_file(existing_file)
                     .await
                     .ok_or(AttachError::NotFound)?;
-                let infered_type = infer::get(content.deref())
-                    .ok_or(AttachError::UncoverType)?;
-                let content_type: Result<mime::Mime, _> = infered_type
-                    .mime_type()
-                    .parse();
-                let content_type = content_type
-                    .map_err(|_| AttachError::UnknownContent)?;
+                let infered_type = infer::get(content.deref()).ok_or(AttachError::UncoverType)?;
+                let content_type: Result<mime::Mime, _> = infered_type.mime_type().parse();
+                let content_type = content_type.map_err(|_| AttachError::UnknownContent)?;
                 if !supported_types.contains(&content_type) {
                     return Err(AttachError::UncoverType);
                 }
                 let blob = match content_type.type_() {
                     mime::IMAGE => gloo::file::Blob::new(content.deref()),
-                    mime::VIDEO => {
-                        gloo::file::Blob::new_with_options(
-                            content.deref(),
-                            Some(infered_type.mime_type()),
-                        )
-                    }
+                    mime::VIDEO => gloo::file::Blob::new_with_options(
+                        content.deref(),
+                        Some(infered_type.mime_type()),
+                    ),
                     _ => gloo::file::Blob::new(content.deref()),
                 };
                 let size = blob.size();
@@ -97,35 +91,23 @@ pub fn Attach(props: AttachProps) -> Element {
                 props.on_change.call(attach_file);
                 Ok::<(), AttachError>(())
             }
-                .unwrap_or_else(move |e: AttachError| {
-                    let message_error = match e {
-                        AttachError::NotFound => {
-                            FeedAttachError {
-                                explanation: translate!(
-                                    i18, "errors.attach.not_found.explanation"
-                                ),
-                                details: translate!(i18, "errors.attach.not_found.details"),
-                            }
-                        }
-                        AttachError::Size => {
-                            FeedAttachError {
-                                explanation: translate!(
-                                    i18, "errors.attach.size.explanation"
-                                ),
-                                details: translate!(i18, "errors.attach.size.details"),
-                            }
-                        }
-                        AttachError::UncoverType | AttachError::UnknownContent => {
-                            FeedAttachError {
-                                explanation: translate!(
-                                    i18, "errors.attach.mime.explanation"
-                                ),
-                                details: translate!(i18, "errors.attach.mime.details"),
-                            }
-                        }
-                    };
-                    error.set(Some(message_error))
-                })
+            .unwrap_or_else(move |e: AttachError| {
+                let message_error = match e {
+                    AttachError::NotFound => FeedAttachError {
+                        explanation: t!("errors-attach-not_found-explanation"),
+                        details: t!("errors-attach-not_found-details"),
+                    },
+                    AttachError::Size => FeedAttachError {
+                        explanation: t!("errors-attach-size-explanation"),
+                        details: t!("errors-attach-size-details"),
+                    },
+                    AttachError::UncoverType | AttachError::UnknownContent => FeedAttachError {
+                        explanation: t!("errors-attach-mime-explanation"),
+                        details: t!("errors-attach-mime-details"),
+                    },
+                };
+                error.set(Some(message_error))
+            })
         });
     };
     rsx!(
@@ -136,7 +118,7 @@ pub fn Attach(props: AttachProps) -> Element {
             if let Some(e) = error() {
                 div { class: "attach__wrapper attach__wrapper--error",
                     div { class: "attach__error__header",
-                        h4 { class: "attach__error__title", { translate!(i18, "errors.attach.title") } }
+                        h4 { class: "attach__error__title", { t!("errors-attach-title") } }
                         div { class: "attach__close",
                             IconButton {
                                 variant: IconButtonVariant::Round,
@@ -164,7 +146,7 @@ pub fn Attach(props: AttachProps) -> Element {
                             rsx!(
                                 img {
                                     class: "attach__preview",
-                                    src: "{url}"
+                                    src: "{url.deref()}"
                                 }
                             )
                         })

@@ -11,10 +11,10 @@ use crate::{
     },
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[component]
 pub fn InitiativeActions() -> Element {
-    let i18 = use_i18();
+    
     let mut initiative = use_initiative();
     let actions_lock = initiative.get_actions();
     let mut items = vec![];
@@ -49,7 +49,7 @@ pub fn InitiativeActions() -> Element {
                                 Dropdown {
                                     class: "action__option dropdown--left".to_string(),
                                     value: Some(action.option()),
-                                    placeholder: translate!(i18, "header.cta.account"),
+                                    placeholder: t!("header-cta-account"),
                                     size: ElementSize::Small,
                                     default: None,
                                     on_change: move |event: usize| {
@@ -105,7 +105,7 @@ pub fn InitiativeActions() -> Element {
                     Dropdown {
                         class: "action__option dropdown--left".to_string(),
                         value: None,
-                        placeholder: translate!(i18, "header.cta.account"),
+                        placeholder: t!("header-cta-account"),
                         size: ElementSize::Small,
                         default: None,
                         on_change: move |event: usize| {

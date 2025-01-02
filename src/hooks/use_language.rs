@@ -1,9 +1,8 @@
-use std::str::FromStr;
-use dioxus_std::i18n::{use_init_i18n, Language};
-use unic_langid::LanguageIdentifier;
+use dioxus_i18n::prelude::*;
+use unic_langid::langid;
 use web_sys::window;
-static EN_US: &str = include_str!("../locales/en-US.json");
-static ES_ES: &str = include_str!("../locales/es-ES.json");
+static EN_US: &str = include_str!("../locales/en-US.ftl");
+static ES_ES: &str = include_str!("../locales/es-ES.ftl");
 pub fn use_language() {
     let navigator_language = window()
         .expect("window")
@@ -11,21 +10,13 @@ pub fn use_language() {
         .language()
         .unwrap_or("en-US".to_string());
     let default_language = if navigator_language.starts_with("es") {
-        "es-ES"
+        I18nConfig::new(langid!("es-ES"))
     } else {
-        "en-US"
+        I18nConfig::new(langid!("en-US"))
     };
-    let selected_language: LanguageIdentifier = default_language
-        .parse()
-        .expect("can't parse es-ES language");
-    let fallback_language: LanguageIdentifier = selected_language.clone();
-    use_init_i18n(
-        selected_language,
-        fallback_language,
-        || {
-            let en_us = Language::from_str(EN_US).expect("can't get EN_US language");
-            let es_es = Language::from_str(ES_ES).expect("can't get ES_ES language");
-            vec![en_us, es_es]
-        },
-    );
+    let configuration_language = default_language
+        .with_locale(Locale::new_static(langid!("en-US"), &EN_US))
+        .with_locale(Locale::new_static(langid!("es-ES"), &ES_ES));
+
+    use_init_i18n(|| configuration_language);
 }

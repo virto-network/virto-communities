@@ -1,7 +1,7 @@
 use sp_core::crypto::Ss58Codec;
 
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus::{logger::tracing::{debug, warn}, prelude::*};
+use dioxus_i18n::t;
 use pjs::Account as PjsAccount;
 use wasm_bindgen::prelude::*;
 
@@ -29,7 +29,7 @@ extern "C" {
     pub fn set_signer(address: String);
 }
 pub fn use_accounts() -> UseAccountsState {
-    let i18 = use_i18();
+    
     let session = use_session();
     let mut notification = use_notification();
     let accounts = consume_context::<Signal<Vec<Account>>>();
@@ -42,10 +42,10 @@ pub fn use_accounts() -> UseAccountsState {
         if session.is_logged() && pjs().is_none() {
             match use_connect_wallet().await {
                 Err(PjsError::ConnectionFailed) => {
-                    notification.handle_error(&translate!(i18, "errors.wallet.connection_failed"))
+                    notification.handle_error(&t!("errors-wallet-connection_failed"))
                 }
                 Err(PjsError::AccountsNotFound) => {
-                    notification.handle_error(&translate!(i18, "errors.wallet.accounts_not_found"));
+                    notification.handle_error(&t!("errors-wallet-accounts_not_found"));
                 }
                 Ok(_) => {
                     if let Some(user_session) = session.get() {
@@ -54,8 +54,8 @@ pub fn use_accounts() -> UseAccountsState {
                             account_list.get(user_session.account_id as usize)
                         else {
                             return notification.handle_warning(
-                                &translate!(i18, "warnings.title"),
-                                &translate!(i18, "warnings.middleware.not_account"),
+                                &t!("warnings-title"),
+                                &t!("warnings-middleware-not_account"),
                             );
                         };
 
@@ -65,15 +65,15 @@ pub fn use_accounts() -> UseAccountsState {
                         let Ok(address) =
                             sp_core::sr25519::Public::from_ss58check(&selected_account.address())
                         else {
-                            log::warn!("Not found public address");
+                            warn!("Not found public address");
                             return notification
-                                .handle_error(&translate!(i18, "errors.wallet.account_address"));
+                                .handle_error(&t!("errors-wallet-account_address"));
                         };
 
                         let Ok(is_owner) = is_admin(&address.0).await else {
-                            log::warn!("Failed to get is admin");
+                            warn!("Failed to get is admin");
                             return notification
-                                .handle_error(&translate!(i18, "errors.wallet.account_address"));
+                                .handle_error(&t!("errors-wallet-account_address"));
                         };
 
                         is_dao_owner.set(Some(IsDaoOwner(is_owner)));
@@ -132,7 +132,7 @@ impl UseAccountsState {
             .ok_or("errors.wallet.accounts_not_found")?;
         let account_address = pjs_account.address();
         let address = sp_core::sr25519::Public::from_ss58check(&account_address).map_err(|e| {
-            log::warn!("Not found public address: {:?}", e);
+            warn!("Not found public address: {:?}", e);
             "errors.wallet.account_address".to_string()
         })?;
         let hex_address = hex::encode(address.0);
@@ -142,7 +142,7 @@ impl UseAccountsState {
         Ok(account.data.free as f64 / 10_f64.powf(12f64))
     }
     pub fn is_active_account_an_admin(&self) -> bool {
-        log::info!("is_dao_owner: {:?}", self.is_dao_owner.read());
+        debug!("is_dao_owner: {:?}", self.is_dao_owner.read());
         match &*self.is_dao_owner.read() {
             Some(is_dao_owner) => is_dao_owner.0,
             None => true,

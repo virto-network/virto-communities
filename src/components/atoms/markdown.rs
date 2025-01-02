@@ -1,9 +1,9 @@
 use crate::components::atoms::button::Variant;
 use crate::components::atoms::dropdown::ElementSize;
 use crate::components::atoms::Button;
+use dioxus::logger::tracing::warn;
 use dioxus::prelude::*;
-use dioxus_std::i18n::use_i18;
-use dioxus_std::translate;
+use dioxus_i18n::t;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 use web_sys::js_sys;
@@ -45,20 +45,23 @@ extern "C" {
     ) -> JsValue;
 }
 
-fn call_method_reflect(obj: &JsValue, method_name: &str, args: &[JsValue]) -> Result<JsValue, JsValue> {
+fn call_method_reflect(
+    obj: &JsValue,
+    method_name: &str,
+    args: &[JsValue],
+) -> Result<JsValue, JsValue> {
     let method = js_sys::Reflect::get(obj, &method_name.into())?;
     let func: js_sys::Function = method.dyn_into()?;
     func.apply(obj, &js_sys::Array::from_iter(args))
 }
 
 pub fn Markdown(props: MarkdownProps) -> Element {
-    let i18 = use_i18();
     let mut is_editor_loaded = use_signal(|| false);
     let content = use_signal(|| {
         if !props.content.is_empty() {
             props.content.clone()
         } else {
-            translate!(i18, "utils.markdown.value")
+            t!("utils-markdown-value")
         }
     });
     let mut is_markdown_visible = use_signal(|| true);
@@ -69,7 +72,7 @@ pub fn Markdown(props: MarkdownProps) -> Element {
     let mut html_buf = String::new();
     pulldown_cmark::html::push_html(&mut html_buf, parser);
     use_effect(move || {
-        if !is_editor_loaded() {
+        if !*is_editor_loaded.read() {
             if let (Some(toolbar_ref), Some(editor_ref)) = (toolbar_ref(), editor_ref()) {
                 let closure = Closure::wrap(Box::new(move |new_content: JsValue| {
                     if let Some(text) = new_content.as_string() {
@@ -77,19 +80,20 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                     }
                 }) as Box<dyn FnMut(JsValue)>);
                 let function = closure.as_ref().unchecked_ref::<Function>();
-                let tiny_editor = init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
+                let tiny_editor =
+                    init_markdown_editor(*editor_ref.clone(), *toolbar_ref.clone(), function);
                 let content_value = JsValue::from(content());
                 if let Err(e) = call_method_reflect(&tiny_editor, "setContent", &[content_value]) {
-                    log::warn!("Failed to set content {:?}", e);
+                    warn!("Failed to set content {:?}", e);
                 };
-    
+
                 closure.forget();
                 is_editor_loaded.set(true);
             }
         }
     });
-    
-    
+
+   
     rsx!(
         div { class: "markdown",
             div {
@@ -127,9 +131,9 @@ pub fn Markdown(props: MarkdownProps) -> Element {
                 Button {
                     class: "",
                     text: if !is_markdown_visible() {
-                        translate!(i18, "utils.markdown.cta.edit")
+                        t!("utils-markdown-cta-edit")
                     } else {
-                        translate!(i18, "utils.markdown.cta.preview")
+                        t!("utils-markdown-cta-preview")
                     },
                     size: ElementSize::Small,
                     variant: Variant::Tertiary,

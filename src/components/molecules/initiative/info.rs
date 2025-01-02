@@ -6,10 +6,10 @@ use crate::{
     hooks::{use_initiative::use_initiative, use_onboard::use_onboard},
 };
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 #[component]
 pub fn InitiativeInfo(error: bool) -> Element {
-    let i18 = use_i18();
+    
     let onboard = use_onboard();
     let mut initiative = use_initiative();
     let mut name_maxlength = use_signal(|| 24);
@@ -18,21 +18,19 @@ pub fn InitiativeInfo(error: bool) -> Element {
             div { class: "form__input form__input--initiative",
                 div { class: "form__input__info",
                     span { class: "form__input__info__title",
-                        { translate!(i18,
-                        "initiative.steps.info.name.label") }
+                        { t!("initiative-steps-info-name-label") }
                     }
                     p { class: "form__input__info__description",
-                        { translate!(i18,
-                        "initiative.steps.info.name.description") }
+                        { t!("initiative-steps-info-name-description") }
                     }
                 }
                 Input {
                     message: initiative.get_info().name,
                     size: ElementSize::Small,
-                    placeholder: translate!(i18, "initiative.steps.info.name.placeholder"),
+                    placeholder: t!("initiative-steps-info-name-placeholder"),
                     error: if error {
                         if initiative.get_info().name.is_empty() {
-                            Some(translate!(i18, "errors.form.not_empty"))
+                            Some(t!("errors-form-not_empty"))
                         } else {
                             None
                         }
@@ -64,12 +62,10 @@ pub fn InitiativeInfo(error: bool) -> Element {
             div { class: "form__input form__input--initiative",
                 div { class: "form__input__info",
                     span { class: "form__input__info__title",
-                        { translate!(i18,
-                        "initiative.steps.info.description.label") }
+                        { t!("initiative-steps-info-description-label") }
                     }
                     p { class: "form__input__info__description",
-                        { translate!(i18,
-                        "initiative.steps.info.description.description") }
+                        { t!("initiative-steps-info-description-description") }
                     }
                 }
                 Markdown {
@@ -83,20 +79,19 @@ pub fn InitiativeInfo(error: bool) -> Element {
             div { class: "form__input form__input--initiative",
                 div { class: "form__input__info",
                     span { class: "form__input__info__title",
-                        { translate!(i18,
-                        "initiative.steps.info.categories.label") }
+                        { t!("initiative-steps-info-categories-label") }
                     }
                     p { class: "form__input__info__description",
-                        {translate!(i18, "initiative.steps.info.categories.description")}
+                        {t!("initiative-steps-info-categories-description")}
                     }
                 }
                 InputTags {
                     message: initiative.get_info().categories.join(","),
                     size: ElementSize::Small,
-                    placeholder: translate!(i18, "initiative.steps.info.categories.placeholder"),
+                    placeholder: t!("initiative-steps-info-categories-placeholder"),
                     error: if error {
                         if onboard.get_basics().industry.is_empty() {
-                            Some(translate!(i18, "errors.form.not_empty"))
+                            Some(t!("errors-form-not_empty"))
                         } else {
                             None
                         }

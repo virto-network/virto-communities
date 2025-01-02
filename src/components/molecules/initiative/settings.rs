@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 
 use crate::components::atoms::{
     dropdown::{DropdownItem, ElementSize},
@@ -7,7 +7,7 @@ use crate::components::atoms::{
 };
 #[component]
 pub fn InitiativeSettings() -> Element {
-    let i18 = use_i18();
+    
     let mut dropdown_value = use_signal::<Option<DropdownItem>>(|| None);
     let mut items = vec![];
     let dropdown_options = vec![
@@ -35,7 +35,7 @@ pub fn InitiativeSettings() -> Element {
                 Dropdown {
                     class: "header__wallet dropdown--left".to_string(),
                     value: dropdown_value(),
-                    placeholder: translate!(i18, "header.cta.account"),
+                    placeholder: t!("header-cta-account"),
                     size: ElementSize::Small,
                     default: None,
                     on_change: move |event: usize| {

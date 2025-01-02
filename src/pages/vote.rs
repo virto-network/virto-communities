@@ -1,6 +1,6 @@
 use sp_core::crypto::Ss58Codec;
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus::{logger::tracing::{debug, warn, info}, prelude::*};
+use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 use crate::{
     components::{
@@ -13,7 +13,7 @@ use crate::{
     },
     hooks::{
         use_initiative::{
-            ActionItem, InitiativeInfoContent, InitiativeVoteData, Vote, VoteOf,
+            ActionItem, InitiativeInfoContent, InitiativeVoteData, Vote as VoteType, VoteOf,
         },
         use_notification::use_notification, use_our_navigator::use_our_navigator,
         use_session::use_session, use_spaces_client::use_spaces_client,
@@ -41,7 +41,7 @@ extern "C" {
 }
 #[component]
 pub fn Vote(id: u16, initiativeid: u16) -> Element {
-    let i18 = use_i18();
+    
     let session = use_session();
     let spaces_client = use_spaces_client();
     let nav = use_our_navigator();
@@ -66,22 +66,22 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
     let on_handle_vote = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
         while (rx.next().await).is_some() {
             let Some(account) = session.get() else {
-                log::info!("error here by account");
+                debug!("error here by account");
                 notification
-                    .handle_error(&translate!(i18, "errors.communities.query_failed"));
+                    .handle_error(&t!("errors-communities-query_failed"));
                 return;
             };
             let Ok(address) = sp_core::sr25519::Public::from_ss58check(&account.address) else {
-                log::info!("error here by address");
+                debug!("error here by address");
                 notification
-                    .handle_error(&translate!(i18, "errors.wallet.account_address"));
+                    .handle_error(&t!("errors-wallet-account_address"));
                 return;
             };
 
             let Ok(is_member) = is_community_member_by_address(&address.0, id).await else {
-                log::info!("error here by memeber");
+                debug!("error here by memeber");
                 notification
-                    .handle_error(&translate!(i18, "errors.communities.query_failed"));
+                    .handle_error(&t!("errors-communities-query_failed"));
                 return;
             };
 
@@ -89,12 +89,12 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
             let response_item = item(id).await;
             members.set(response_item.unwrap_or(0));
             let Ok(block) = number().await else {
-                log::warn!("Failed to get last block kusama");
+                warn!("Failed to get last block kusama");
                 continue;
             };
             current_block.set(block);
             let Ok(track) = tracks(id).await else {
-                log::warn!("Failed to get track");
+                warn!("Failed to get track");
                 continue;
             };
             track_info.set(Some(track));
@@ -159,7 +159,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                     .await else {
                     continue;
                 };
-                log::info!("{}", room_id_metadata);
+                debug!("{}", room_id_metadata);
                 let Ok(response) = spaces_client
                     .get()
                     .get_initiative_by_id(&room_id_metadata)
@@ -179,50 +179,51 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
             async move {
                 tooltip
                     .handle_tooltip(TooltipItem {
-                        title: translate!(i18, "governance.tips.voting.title"),
-                        body: translate!(i18, "governance.tips.voting.description"),
+                        title: t!("governance-tips-voting-title"),
+                        body: t!("governance-tips-voting-description"),
                         show: true,
                     });
                 let account_address = session
                     .get()
-                    .ok_or(translate!(i18, "errors.wallet.account_address"))?
+                    .ok_or(t!("errors-wallet-account_address"))?
                     .address;
                 let address = sp_core::sr25519::Public::from_ss58check(&account_address)
                     .map_err(|e| {
-                        log::warn!("Not found public address: {:?}", e);
-                        translate!(i18, "errors.wallet.account_address")
+                        warn!("Not found public address: {:?}", e);
+                        t!("errors-wallet-account_address")
                     })?;
                 let hex_address = hex::encode(address.0);
                 let membership_id = get_membership_id(&format!("0x{}", hex_address), id)
                     .await
-                    .map_err(|_| translate!(i18, "errors.wallet.account_address"))?;
+                    .map_err(|_| t!("errors-wallet-account_address"))?;
                 if let Some(room_id) = room_id() {
                     spaces_client
                         .get()
                         .vote_initiative(InitiativeVoteData {
                             user: account_address,
                             room: room_id,
-                            vote: Vote::Standard(
+                            vote: VoteType::Standard(
                                 if is_vote_aye { VoteOf::Yes } else { VoteOf::No },
                             ),
                         })
                         .await
                         .map_err(|e| {
-                            log::warn!("Failed to persist vote: {:?}", e);
-                            translate!(i18, "errors.vote.persist_failed")
+                            warn!("Failed to persist vote: {:?}", e);
+                            t!("errors-vote-persist_failed")
                         })?;
                 }
                 topup_then_initiative_vote(membership_id, initiativeid, is_vote_aye)
                     .await
                     .map_err(|e| {
-                        log::warn!("Failed to vote on-chain: {:?}", e);
-                        translate!(i18, "errors.vote.chain")
+                        warn!("Failed to vote on-chain: {:?}", e);
+                        t!("errors-vote-chain")
                     })?;
                 on_handle_vote.send(());
                 tooltip.hide();
+                info!("voted initiative {:?} with {:?}", initiativeid, if is_vote_aye { "aye" } else { "nay" });
                 notification
                     .handle_success(
-                        &translate!(i18, "governance.tips.voted.description"),
+                        &t!("governance-tips-voted-description"),
                     );
                 let path = format!("/dao/{id}/initiatives");
                 nav.push(vec![], &path);
@@ -246,7 +247,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                         div { class: "details__metadata",
                             KeyValue {
                                 class: "key-value",
-                                text: format!("{}: ", translate!(i18, "governance.description.details.by")),
+                                text: format!("{}: ", t!("governance-description-details-by")),
                                 size: ElementSize::Medium,
                                 variant: KeyValueVariant::Secondary,
                                 body: rsx! {
@@ -292,7 +293,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                         div { class: "details__statistics",
                                             div { class: "details__head",
                                                 h2 { class: "vote-card__title statistics__title",
-                                                    {translate!(i18, "governance.description.details.status.title")}
+                                                    {t!("governance-description-details-status-title")}
                                                 }
                                                 {
                                                     let status = if initiative_wrapper.ongoing.in_queue | initiative_wrapper.ongoing.deciding.is_none() {
@@ -301,10 +302,10 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         ProposalStatus::VOTING
                                                     };
                                                     let (badge_title, badge_color) = match status {
-                                                        ProposalStatus::APPROVED => (translate!(i18, "governance.description.details.status.options.approved"), "badge--green-dark"),
-                                                        ProposalStatus::REJECTED => (translate!(i18, "governance.description.details.status.options.rejected"), "badge--red-dark"),
-                                                        ProposalStatus::VOTING => (translate!(i18, "governance.description.details.status.options.voting"), "badge--lavanda-dark"),
-                                                        ProposalStatus::QUEUE => (translate!(i18, "governance.description.details.status.options.queue"), "badge--blue-light"),
+                                                        ProposalStatus::APPROVED => (t!("governance-description-details-status-options-approved"), "badge--green-dark"),
+                                                        ProposalStatus::REJECTED => (t!("governance-description-details-status-options-rejected"), "badge--red-dark"),
+                                                        ProposalStatus::VOTING => (t!("governance-description-details-status-options-voting"), "badge--lavanda-dark"),
+                                                        ProposalStatus::QUEUE => (t!("governance-description-details-status-options-queue"), "badge--blue-light"),
                                                     };
                                                 
                                                     rsx!(
@@ -359,8 +360,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                         div { class: "details__statistics",
                                             div { class: "details__head",
                                                 h2 { class: "vote-card__title statistics__title",
-                                                    { translate!(i18,
-                                                    "governance.description.voting.title") }
+                                                    { t!("governance-description-voting-title") }
                                                 }
                                                 Button {
                                                     text: if show_vote() { "Hide vote" } else { "Vote" },
@@ -381,7 +381,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 div { class: "row",
                                                     Button {
                                                         class: "vote-cta",
-                                                        text: translate!(i18, "governance.description.voting.cta.for"),
+                                                        text: t!("governance-description-voting-cta-for"),
                                                         size: ElementSize::Medium,
                                                         variant: Variant::Secondary,
                                                         on_click: move |_| { handle_vote(true) },
@@ -392,7 +392,7 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                     }
                                                     Button {
                                                         class: "vote-cta",
-                                                        text: translate!(i18, "governance.description.voting.cta.against"),
+                                                        text: t!("governance-description-voting-cta-against"),
                                                         size: ElementSize::Medium,
                                                         variant: Variant::Secondary,
                                                         on_click: move |_| { handle_vote(false) },
@@ -407,8 +407,8 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                 left_value: votes_statistics().percent_aye(),
                                                 center_value: approval_threshold(),
                                                 right_value: votes_statistics().percent_nay(),
-                                                left_helper: translate!(i18, "governance.description.voting.for"),
-                                                right_helper: translate!(i18, "governance.description.voting.against"),
+                                                left_helper: t!("governance-description-voting-for"),
+                                                right_helper: t!("governance-description-voting-against"),
                                                 left_title: format!("{:.1}%", votes_statistics().percent_aye()),
                                                 right_title: format!("{:.1}%", votes_statistics().percent_nay()),
                                                 variant: crate::components::atoms::bar::Variant::Vote
@@ -439,14 +439,14 @@ pub fn Vote(id: u16, initiativeid: u16) -> Element {
                                                         Icon { icon: CircleCheck, height: 16, width: 16, stroke_width: 2, fill: "#56C95F" }
                                                         p { class: "votes-counter__total",
                                                             "{votes_statistics().aye} "
-                                                            {translate!(i18, "governance.description.voting.votes")}
+                                                            {t!("governance-description-voting-votes")}
                                                         }
                                                     }
                                                     div { class: "votes-counter votes-counter--against",
                                                         Icon { icon: StopSign, height: 16, width: 16, stroke_width: 2, stroke: "#f44336bd" }
                                                         p { class: "votes-counter__total",
                                                             "{votes_statistics().nay} "
-                                                            {translate!(i18, "governance.description.voting.votes")}
+                                                            {t!("governance-description-voting-votes")}
                                                         }
                                                     }
                                                 }
@@ -510,7 +510,7 @@ enum Times {
 fn blocks_to_times(blocks: u32) -> Times {
     let seconds = blocks * 12;
     let minutes = seconds / 60;
-    log::info!("minutes {}", minutes);
+    debug!("minutes {}", minutes);
     if minutes / (24 * 60) > 0 {
         Times::Days(minutes / (24 * 60))
     } else if minutes / 60 > 0 {

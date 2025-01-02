@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 
@@ -42,7 +42,7 @@ static SKIP: usize = 6;
 
 #[component]
 pub fn Dashboard() -> Element {
-    let i18 = use_i18();
+    
     let mut tooltip = use_tooltip();
     let nav = use_our_navigator();
     let mut communities = use_communities();
@@ -54,7 +54,7 @@ pub fn Dashboard() -> Element {
     let mut search_word = use_signal::<String>(String::new);
     let tab_items = vec![TabItem {
         k: String::from("all"),
-        value: translate!(i18, "dashboard.tabs.owned"),
+        value: t!("dashboard-tabs-owned"),
     }];
     let tab_value = use_signal::<String>(|| String::from("all"));
 
@@ -74,9 +74,9 @@ pub fn Dashboard() -> Element {
         on_handle_paginator.send(current_page());
     });
 
-    let dynamic_one = translate!(i18, "dynamic_text.dynamic_one");
-    let dynamic_two = translate!(i18, "dynamic_text.dynamic_two");
-    let dynamic_three = translate!(i18, "dynamic_text.dynamic_three");
+    let dynamic_one = t!("dynamic_text-dynamic_one");
+    let dynamic_two = t!("dynamic_text-dynamic_two");
+    let dynamic_three = t!("dynamic_text-dynamic_three");
 
     let words = vec![dynamic_one, dynamic_two, dynamic_three];
 
@@ -91,7 +91,7 @@ pub fn Dashboard() -> Element {
                 div { class: "head__actions",
                     SearchInput {
                         message: search_word(),
-                        placeholder: translate!(i18, "dashboard.cta_header.search"),
+                        placeholder: t!("dashboard-cta_header-search"),
                         error: None,
                         on_input: move |event: Event<FormData>| {
                             search_word.set(event.value());
@@ -121,8 +121,8 @@ pub fn Dashboard() -> Element {
                             tooltip.hide();
                             nav.push(
                                 vec![
-                                    Box::new(is_chain_available(i18, timestamp, notification)),
-                                    Box::new(is_dao_owner(i18, accounts, notification)),
+                                    Box::new(is_chain_available(timestamp, notification)),
+                                    Box::new(is_dao_owner(accounts, notification)),
                                 ],
                                 "/onboarding",
                             );
@@ -175,9 +175,9 @@ pub fn Dashboard() -> Element {
                                                 on_click: move |_| {
                                                     if let Err(e) = communities.handle_favorite(community.id) {
                                                         let message = match e {
-                                                            CommunitiesError::NotFound => translate!(i18, "errors.communities.favorite_pick_failed"),
-                                                            CommunitiesError::FailedUpdatingFavorites => translate!(i18, "errors.communities.favorite_pick_failed"),
-                                                            CommunitiesError::NotFoundFavorite => translate!(i18, "errors.communities.favorite_pick_failed"),
+                                                            CommunitiesError::NotFound => t!("errors-communities-favorite_pick_failed"),
+                                                            CommunitiesError::FailedUpdatingFavorites => t!("errors-communities-favorite_pick_failed"),
+                                                            CommunitiesError::NotFoundFavorite => t!("errors-communities-favorite_pick_failed"),
                                                         };
                                                         notification.handle_error(&message);
                                                     }
@@ -236,13 +236,12 @@ pub fn Dashboard() -> Element {
                 div { class: "card__container",
                     div { class: "card__head",
                         h3 { class: "card__title",
-                            { translate!(i18,
-                            "dashboard.cta_cards.explore.title") }
+                            { t!("dashboard-cta_cards-explore-title") }
                         }
                     }
                     p { class: "card__description",
                         {
-                        translate!(i18, "dashboard.cta_cards.explore.description") }
+                        t!("dashboard-cta_cards-explore-description") }
                     }
                 }
                 div { class: "card__cta",
@@ -259,21 +258,20 @@ pub fn Dashboard() -> Element {
                     div { class: "card__container",
                         div { class: "card__head",
                             h3 { class: "card__title",
-                            {translate!(i18, "dashboard.cta_cards.create.title_part_one")},
+                            {t!("dashboard-cta_cards-create-title_part_one")},
                             span {
                                 class: "animated-text",
                                 DynamicText { words },
                             },
-                            {translate!(i18, "dashboard.cta_cards.create.title_part_two")}
+                            {t!("dashboard-cta_cards-create-title_part_two")}
                             },
                         }
                         p { class: "card__description",
-                            { translate!(i18,
-                            "dashboard.cta_cards.create.description") }
+                            { t!("dashboard-cta_cards-create-description") }
                         }
                         div { class: "card__head",
                             a { class: "card__learn",
-                                { translate!(i18, "dashboard.cta_cards.create.cta") }
+                                { t!("dashboard-cta_cards-create-cta") }
                             }
                             Icon {
                                 icon: ArrowRight,
@@ -296,8 +294,8 @@ pub fn Dashboard() -> Element {
                                 tooltip.hide();
                                 nav.push(
                                     vec![
-                                        Box::new(is_chain_available(i18, timestamp, notification)),
-                                        Box::new(is_dao_owner(i18, accounts, notification)),
+                                        Box::new(is_chain_available(timestamp, notification)),
+                                        Box::new(is_dao_owner(accounts, notification)),
                                     ],
                                     "/onboarding",
                                 );

@@ -1,6 +1,6 @@
 use sp_core::crypto::Ss58Codec;
 
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::warn, prelude::*};
 
 #[derive(Clone, Debug)]
 pub enum DepositTo {
@@ -39,7 +39,7 @@ impl DepositForm {
 
     pub fn to_deposit(&self) -> Result<(String, u64, bool), DepositError> {
         let amount = self.amount.parse::<f64>().map_err(|_| {
-            log::warn!("Malformed amount");
+            warn!("Malformed amount");
             DepositError::InvalidAmount
         })?;
         let amount = (amount * 1_000_000_000_000.0) as u64;

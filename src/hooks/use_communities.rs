@@ -1,8 +1,8 @@
-use std::vec;
 use sp_core::crypto::Ss58Codec;
+use std::vec;
 
-use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus::{logger::tracing::warn, prelude::*};
+use dioxus_i18n::t;
 use gloo::storage::{errors::StorageError, LocalStorage};
 
 use crate::{
@@ -18,7 +18,6 @@ use super::{
 
 pub type Communities = Vec<Community>;
 pub fn use_communities() -> UseCommunitiesState {
-    let i18 = use_i18();
     let session = use_session();
     let mut tooltip = use_tooltip();
     let mut notification = use_notification();
@@ -29,8 +28,8 @@ pub fn use_communities() -> UseCommunitiesState {
 
     use_coroutine(move |_: UnboundedReceiver<()>| async move {
         tooltip.handle_tooltip(TooltipItem {
-            title: translate!(i18, "dashboard.tips.loading.title"),
-            body: translate!(i18, "dashboard.tips.loading.description"),
+            title: t!("dashboard-tips-loading-title"),
+            body: t!("dashboard-tips-loading-description"),
             show: true,
         });
 
@@ -43,23 +42,20 @@ pub fn use_communities() -> UseCommunitiesState {
             tooltip.hide();
         }
 
-        let public_address = session
-            .get()
-            .and_then(
-                |session| match sp_core::sr25519::Public::from_ss58check(&session.address) {
-                    Ok(public_address) => Some(public_address.0),
-                    Err(_) => {
-                        log::warn!("error here by address");
-                        notification
-                            .handle_error(&translate!(i18, "errors.wallet.account_address"));
-                        None
-                    }
-                },
-            );
+        let public_address = session.get().and_then(|session| {
+            match sp_core::sr25519::Public::from_ss58check(&session.address) {
+                Ok(public_address) => Some(public_address.0),
+                Err(_) => {
+                    warn!("error here by address");
+                    notification.handle_error(&t!("errors-wallet-account_address"));
+                    None
+                }
+            }
+        });
 
         let Ok(mut community_tracks) = get_communities().await else {
-            log::warn!("error here by member");
-            notification.handle_error(&translate!(i18, "errors.communities.query_failed"));
+            warn!("error here by member");
+            notification.handle_error(&t!("errors-communities-query_failed"));
             tooltip.hide();
             is_loading.set(false);
             return;
@@ -104,7 +100,7 @@ pub fn use_communities() -> UseCommunitiesState {
             if let Err(e) =
                 <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities)
             {
-                log::warn!("Failed to persist communities: {:?}", e);
+                warn!("Failed to persist communities: {:?}", e);
             }
         }
 
@@ -239,15 +235,14 @@ impl UseCommunitiesState {
 
         if <LocalStorage as gloo::storage::Storage>::set("communities", cached_communities).is_err()
         {
-            log::warn!("Failed to persist communities");
+            warn!("Failed to persist communities");
         };
 
         Ok(())
     }
 
     pub fn remove_community(&mut self) {
-        let mut c = self.community.write();
-        *c = Community::default()
+        *self.community.write() = Community::default();
     }
     pub fn get_community(&self) -> Community {
         self.community.read().clone()

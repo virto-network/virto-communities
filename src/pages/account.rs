@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use futures_util::{StreamExt, TryFutureExt};
 
 use crate::{
@@ -40,7 +40,7 @@ extern "C" {
 
 #[component]
 pub fn Account() -> Element {
-    let i18 = use_i18();
+    
     let mut notification = use_notification();
     let mut accounts = use_accounts();
     let nav = use_our_navigator();
@@ -81,41 +81,40 @@ pub fn Account() -> Element {
                     let balance = accounts
                         .get_balance()
                         .await
-                        .map_err(|_| translate!(i18, "warnings.wallet.balance_not_found"))?;
+                        .map_err(|_| t!("warnings-wallet-balance_not_found"))?;
 
                     let KSM_PRICE = market_client
                         .get_price_by_token(Tokens::KSM)
                         .await
-                        .map_err(|_| translate!(i18, "warnings.market.query_failed"))?;
+                        .map_err(|_| t!("warnings-market-query_failed"))?;
 
                     let usdt_value = balance * KSM_PRICE;
                     let usdt_value = usdt_value.to_string();
                     let ksm_value = balance.to_string();
-                    let (usdt_units, usdt_decimals) = usdt_value.split_once('.').unwrap_or((&usdt_value, ""));
-                    let (ksm_units, ksm_decimals) = ksm_value.split_once('.').unwrap_or((&ksm_value, ""));
+                    let (usdt_units, usdt_decimals) =
+                        usdt_value.split_once('.').unwrap_or((&usdt_value, ""));
+                    let (ksm_units, ksm_decimals) =
+                        ksm_value.split_once('.').unwrap_or((&ksm_value, ""));
 
-                    ksm_balance.set((
-                        ksm_units.to_string(),
-                        format!("{:.2}", ksm_decimals),
-                    ));
-                    usdt_balance.set((
-                        usdt_units.to_string(),
-                        format!("{:.2}", usdt_decimals),
-                    ));
+                    ksm_balance.set((ksm_units.to_string(), format!("{:.2}", ksm_decimals)));
+                    usdt_balance.set((usdt_units.to_string(), format!("{:.2}", usdt_decimals)));
                 }
                 Ok::<(), String>(())
             }
             .unwrap_or_else(move |e: String| {
                 ksm_balance.set(('0'.to_string(), "00".to_string()));
                 usdt_balance.set(('0'.to_string(), "00".to_string()));
-                notification.handle_warning(&translate!(i18, "warnings.title"), &e);
+                notification.handle_warning(&t!("warnings-title"), &e);
             })
         });
     };
 
-    let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<()>| async move {
-        while rx.next().await.is_some() {
-            on_account();
+    let on_handle_account = use_coroutine(move |mut rx: UnboundedReceiver<()>| {
+        let on_account = on_account.clone();
+        async move {
+            while rx.next().await.is_some() {
+                on_account()
+            }
         }
     });
 
@@ -134,7 +133,7 @@ pub fn Account() -> Element {
                 div { class: "account__balance",
                     div { class: "account__options",
                         Tab {
-                            text: translate!(i18, "account.tabs.wallet.tab"),
+                            text: t!("account-tabs-wallet-tab"),
                             is_active: matches!(*profile_value.read(), ProfileTabs::Wallet),
                             on_click: move |_| {
                                 profile_value.set(ProfileTabs::Wallet);
@@ -142,7 +141,7 @@ pub fn Account() -> Element {
                         }
                         Tab {
                             class: "tab--comming-soon",
-                            text: translate!(i18, "account.tabs.transfers.tab"),
+                            text: t!("account-tabs-transfers-tab"),
                             is_active: true,
                             on_click: move |_| {}
                         }
@@ -150,7 +149,7 @@ pub fn Account() -> Element {
                     Dropdown {
                         class: "header__wallet dropdown--right".to_string(),
                         value: dropdown_value(),
-                        placeholder: translate!(i18, "header.cta.account"),
+                        placeholder: t!("header-cta-account"),
                         size: ElementSize::Medium,
                         default: None,
                         on_change: move |event: usize| {
@@ -167,7 +166,7 @@ pub fn Account() -> Element {
                                     Ok::<(), String>(())
                                 }
                                 .unwrap_or_else(move |e: String| {
-                                    notification.handle_warning(&translate!(i18, "warnings.title"), &e);
+                                    notification.handle_warning(&t!("warnings-title"), &e);
                                 })
                             });
                         },
@@ -181,18 +180,18 @@ pub fn Account() -> Element {
                                 div { class: "account__container",
                                     div { class: "account__balance",
                                         h3 { class: "account__balance__title",
-                                            {translate!(i18, "account.tabs.wallet.balance.title")}
+                                            {t!("account-tabs-wallet-balance-title")}
                                         }
                                         div { class: "account__balance__cta",
                                             Button {
-                                                text: translate!(i18, "account.tabs.wallet.balance.options.deposit"),
+                                                text: t!("account-tabs-wallet-balance-options-deposit"),
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
                                                 on_click: move |_| {
                                                     spawn(
                                                         async move {
                                                             nav.push(vec![
-                                                                Box::new(is_chain_available(i18, timestamp, notification))
+                                                                Box::new(is_chain_available(timestamp, notification))
                                                             ], "/deposit");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
@@ -203,13 +202,13 @@ pub fn Account() -> Element {
                                                 status: None,
                                             }
                                             Button {
-                                                text: translate!(i18, "account.tabs.wallet.balance.options.withdraw"),
+                                                text: t!("account-tabs-wallet-balance-options-withdraw"),
                                                 size: ElementSize::Small,
                                                 variant: ButtonVariant::Secondary,
                                                 on_click: move |_| {
                                                     spawn(
                                                         async move {
-                                                            nav.push(vec![Box::new(is_chain_available(i18, timestamp, notification))], "/withdraw");
+                                                            nav.push(vec![Box::new(is_chain_available(timestamp, notification))], "/withdraw");
                                                             Ok::<(), String>(())
                                                         }.unwrap_or_else(move |_: String| {
 
@@ -251,16 +250,16 @@ pub fn Account() -> Element {
                                 }
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
-                                        {translate!(i18, "account.tabs.wallet.assets.title")}
+                                        {t!("account-tabs-wallet-assets-title")}
                                     }
                                     div { class: "account__actives",
                                         div { class: "actives",
                                             table { class: "actives__list",
                                                 tr {
-                                                    th { class: "list__name", {translate!(i18, "account.tabs.wallet.assets.title")} }
-                                                    th { {translate!(i18, "account.tabs.wallet.assets.quantity")} }
-                                                    th { {translate!(i18, "account.tabs.wallet.assets.cost")} }
-                                                    th { {translate!(i18, "account.tabs.wallet.assets.total")} }
+                                                    th { class: "list__name", {t!("account-tabs-wallet-assets-title")} }
+                                                    th { {t!("account-tabs-wallet-assets-table-quantity")} }
+                                                    th { {t!("account-tabs-wallet-assets-table-cost")} }
+                                                    th { {t!("account-tabs-wallet-assets-table-total")} }
                                                 }
 
                                                 match *tab_value.read() {
@@ -303,14 +302,14 @@ pub fn Account() -> Element {
                             section { class: "transfers",
                                 div { class: "account__container",
                                     h3 { class: "account__balance__title",
-                                        {translate!(i18, "account.tabs.transfers.title")}
+                                        {t!("account-tabs-transfers-title")}
                                     }
                                     table { class: "actives__list",
                                         tr {
-                                            th { class: "list__name", {translate!(i18, "account.tabs.transfers.table.asset")} }
-                                            th { {translate!(i18, "account.tabs.transfers.table.time")} }
-                                            th { {translate!(i18, "account.tabs.transfers.table.quantity")} }
-                                            th { {translate!(i18, "account.tabs.transfers.table.account")} }
+                                            th { class: "list__name", {t!("account-tabs-transfers-table-asset")} }
+                                            th { {t!("account-tabs-transfers-table-time")} }
+                                            th { {t!("account-tabs-transfers-table-quantity")} }
+                                            th { {t!("account-tabs-transfers-table-account")} }
                                         }
 
                                         tr {

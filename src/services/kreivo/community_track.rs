@@ -1,10 +1,8 @@
-use codec::Decode;
+use dioxus::logger::tracing::{debug, warn};
 use serde::Deserialize;
 use sube::{sube, Response};
-#[derive(Decode, Debug, Deserialize)]
-pub struct CommunityTracks {
-    pub communities: Vec<u16>,
-}
+
+use super::communities::CommunityTracks;
 #[derive(Debug)]
 pub enum ChainStateError {
     FailedQuery,
@@ -15,20 +13,19 @@ pub async fn tracksIds() -> Result<CommunityTracks, ChainStateError> {
     let response = sube!("wss://kreivo.io/communityTracks/tracksIds")
         .await
         .map_err(|e| {
-            log::warn!("{:?}", e);
+            warn!("{:?}", e);
             ChainStateError::FailedQuery
         })?;
-    log::info!("{:?}", response);
     let Response::Value(value) = response else {
         return Err(ChainStateError::InternalError);
     };
-    let data = value.as_ref();
-    let account_info = CommunityTracks::decode(&mut &data[..])
+    let ids = serde_json::from_value::<Vec<u16>>(value.into())
         .map_err(|e| {
-            log::warn!("{:?}", e);
+            warn!("{:?}", e);
             ChainStateError::FailedDecode
         })?;
-    Ok(account_info)
+    let community_tracks = CommunityTracks{communities: ids};
+    Ok(community_tracks)
 }
 const DEFAULT_MAX_TRACK_NAME_LEN: usize = 25;
 const N: usize = DEFAULT_MAX_TRACK_NAME_LEN;
@@ -68,7 +65,7 @@ pub async fn tracks(track: u16) -> Result<TrackInfo, ChainStateError> {
     let response = sube!(& query)
         .await
         .map_err(|e| {
-            log::info!("{}", e);
+            debug!("{}", e);
             ChainStateError::FailedQuery
         })?;
     let Response::Value(value) = response else {

@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::{i18n::use_i18, translate};
+use dioxus_i18n::t;
 use crate::{
     components::atoms::{
         combo_input::{ComboInputOption, ComboInputValue},
@@ -10,7 +10,7 @@ use crate::{
 };
 #[component]
 pub fn OnboardingInvite() -> Element {
-    let i18 = use_i18();
+    
     let mut onboard = use_onboard();
     let members_lock = onboard.get_invitations();
     let mut to_pay = consume_context::<Signal<f64>>();
@@ -35,16 +35,16 @@ pub fn OnboardingInvite() -> Element {
     );
     rsx!(
         div { class: "form__title",
-            span { class: "label", {translate!(i18, "onboard.invite.label")} }
-            Title { text: translate!(i18, "onboard.invite.title") }
+            span { class: "label", {t!("onboard-invite-label")} }
+            Title { text: t!("onboard-invite-title") }
         }
         ul { class: "form__inputs",
             {
                 members_lock.iter().enumerate().map(|(index, member)| {
                     let x  = DropdownItem { key: match member.medium {
-                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                        MediumOptions::Wallet => t!("onboard-invite-form-wallet-label"),
                     }, value: match member.medium.clone() {
-                        MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.label"),
+                        MediumOptions::Wallet => t!("onboard-invite-form-wallet-label"),
                     } };
             
                     rsx!(
@@ -56,14 +56,14 @@ pub fn OnboardingInvite() -> Element {
                                     input: member.account.clone()
                                 },
                                 placeholder: match member.medium {
-                                    MediumOptions::Wallet => translate!(i18, "onboard.invite.form.wallet.placeholder"),
+                                    MediumOptions::Wallet => t!("onboard-invite-form-wallet-placeholder"),
                                 },
                                 on_change: move |event: ComboInputValue| {
                                     let ComboInputOption::Dropdown(value) = event.option else {
                                         return;
                                     };
                                 
-                                    let invite_wallet = translate!(i18, "onboard.invite.form.wallet.label");
+                                    let invite_wallet = t!("onboard-invite-form-wallet-label");
                                     let medium = if value.key == invite_wallet {
                                         MediumOptions::Wallet
                                     } else {

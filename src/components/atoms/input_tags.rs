@@ -51,6 +51,7 @@ pub fn InputTags(props: InputTagsProps) -> Element {
     let mut new_value = use_signal(String::new);
     let mut temporal_value = use_signal(String::new);
     let mut is_editing_tag = use_signal(|| None);
+
     rsx!(
         section {
             class: "input__wrapper",
@@ -61,10 +62,13 @@ pub fn InputTags(props: InputTagsProps) -> Element {
             div { class: "input-wrapper {size} {input_error_container}",
                 {
                     tags().iter().enumerate().map(|(index, tag)| {
+                        let class_name = match is_editing_tag() {
+                            Some(i) if i != index => "tag--editing",
+                            _ => "",
+                        };
                         rsx!(
                             div {
-                                class: "tag",
-                                class: if let Some(i) = is_editing_tag() { if i != index { "tag--editing" } else {""} },
+                                class: "tag {class_name}",
                                 button {
                                     class: "tag__text",
                                     onclick: move |_| {
