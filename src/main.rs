@@ -19,7 +19,7 @@ const FAVICON: Asset = asset!("/public/favicon.ico");
 const MAIN_CSS: Asset = asset!("/public/css-out/main.css");
 
 fn main() {
-    let log_level = if cfg!(feature = "staging") {
+    let log_level = if cfg!(feature = "dev") {
         Level::DEBUG
     } else {
         Level::INFO
