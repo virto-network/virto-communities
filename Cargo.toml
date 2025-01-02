@@ -1,6 +1,6 @@
 [package]
 name = "virto-communities"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["b-avb <brayan.vargas.dev@gmail.com>"]
 edition = "2021"
 
@@ -64,9 +64,7 @@ dev = []
 
 [profile.wasm-dev]
 inherits = "dev"
-opt-level = "z"
-incremental = true
-codegen-units = 32
+opt-level = 1
 
 [profile.server-dev]
 inherits = "dev"

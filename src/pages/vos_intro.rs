@@ -108,11 +108,12 @@ pub fn VOSIntro() -> Element {
             if show_cards() {
                 div { class: "vos-intro__cards",
                     onmounted: move |event| {
-                        event
+                        if let Some(html_element) = event
                             .data
                             .downcast::<web_sys::Element>()
-                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok())
-                            .map(|html_element| swiper_ref.set(Some(Box::new(html_element.clone()))));
+                            .and_then(|element| element.clone().dyn_into::<web_sys::HtmlElement>().ok()) {
+                            swiper_ref.set(Some(Box::new(html_element.clone())));
+                        }
                     },
                     for (index, card) in intro_cards.iter().enumerate() {
                         CardVos {

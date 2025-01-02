@@ -10,4 +10,4 @@ check:
     @find public -name "*.br" -type f -delete
     # dx fmt --check --all-code
     dx check
-    cargo clippy -- -D warnings
+    cargo clippy --target wasm32-unknown-unknown -- -D warnings
