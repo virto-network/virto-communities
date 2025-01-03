@@ -4735,9 +4735,6 @@ name = "uuid"
 version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8c5f0a0af699448548ad1a2fbf920fb4bee257eae39953ba95cb84891a0446a"
-dependencies = [
- "getrandom",
-]
 
 [[package]]
 name = "value-bag"
@@ -4761,7 +4758,6 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 name = "virto-communities"
 version = "0.3.1"
 dependencies = [
- "blake2",
  "chrono",
  "dioxus",
  "dioxus-i18n",
@@ -4770,18 +4766,15 @@ dependencies = [
  "grass",
  "hex",
  "infer",
- "manganis",
  "mime",
  "pjs",
  "pulldown-cmark",
- "rand_core",
  "reqwest",
  "serde",
  "serde_json",
  "sp-core",
  "sube",
  "unic-langid",
- "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
