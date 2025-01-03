@@ -10,7 +10,7 @@ use crate::{
             ArrowRight, Avatar, Badge, CardSkeleton, Compass, DynamicText, Icon, IconButton, SearchInput, Star,
             Tab, UserAdd, UserGroup,
         },
-        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator},
+        molecules::{paginator::PaginatorValue, tabs::TabItem, Paginator, create_dao_button::CreateDaoButton},
     },
     hooks::{
         use_accounts::use_accounts, use_communities::{use_communities, CommunitiesError},
@@ -105,29 +105,7 @@ pub fn Dashboard() -> Element {
                         on_keypress: move |_| {},
                         on_click: move |_| {}
                     }
-                    IconButton {
-                        class: "button--avatar desktop",
-                        size: ElementSize::Medium,
-                        body: rsx! {
-                            Icon {
-                                icon: AddPlus,
-                                height: 26,
-                                width: 26,
-                                stroke_width: 1.5,
-                                fill: "var(--fill-00)"
-                            }
-                        },
-                        on_click: move |_| {
-                            tooltip.hide();
-                            nav.push(
-                                vec![
-                                    Box::new(is_chain_available(timestamp, notification)),
-                                    Box::new(is_dao_owner(accounts, notification)),
-                                ],
-                                "/onboarding",
-                            );
-                        }
-                    }
+                    CreateDaoButton {},
                 }
             }
             div { class: "dashboard__communities",
@@ -283,24 +261,7 @@ pub fn Dashboard() -> Element {
                         }
                     }
                     div { class: "card__cta",
-                        IconButton {
-                            class: "button--avatar",
-                            size: ElementSize::Big,
-                            body: rsx!(
-                                Icon { icon : AddPlus, height : 32, width : 32, stroke_width : 1.5, fill :
-                                "var(--fill-00)" }
-                            ),
-                            on_click: move |_| {
-                                tooltip.hide();
-                                nav.push(
-                                    vec![
-                                        Box::new(is_chain_available(timestamp, notification)),
-                                        Box::new(is_dao_owner(accounts, notification)),
-                                    ],
-                                    "/onboarding",
-                                );
-                            }
-                        }
+                        CreateDaoButton {},
                     }
                 }
             }
